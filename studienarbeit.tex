@@ -265,67 +265,223 @@ Die Simulation wird dann für eine ausgewählte Zeitspanne durchgeführt.
 
 \chapter{Bildverarbeitung}
 \section{Kamera-Kalibrierung}
-The start of the image processing pipeline is the camera calibration. In this project, a fisheye camera was chosen as opposed to a rectilinear camera. The benefit of a 
-fisheye camera arises from its wider angle of view in comparison to a rectilinear camera. However, a fisheye camera distorts(?) an image differently from a rectilinear 
-camera. A rectilinear camera preserves straight lines, when no distortion is present, as opposed to a fisheye camera, which will always curve straight lines. The 
-curvature of these straight lines is dependent on their radial distance from the center of the image.  An example is in FIGURE.
+The start of the image processing pipeline is the camera calibration. In this 
+project, a fisheye camera was chosen as opposed to a rectilinear camera. The 
+benefit of a 
+fisheye camera arises from its wider angle of view in comparison to a 
+rectilinear camera. However, a fisheye camera distorts(?) an image differently 
+from a rectilinear 
+camera. A rectilinear camera preserves straight lines, when no distortion is 
+present, as opposed to a fisheye camera, which will always curve straight lines. 
+The 
+curvature of these straight lines is dependent on their radial distance from 
+the center of the image.  An example is in FIGURE.
 
-Camera calibration is used in order to approximate the extrinsic and intrinsic parameters of a camera (MATLAB). A calibrated camera allows for 3-D information to be recovered from a 2-D image. The intrinsic parameters of a camera are often represented by the following 3x3 matrix:
+Camera calibration is used in order to approximate the extrinsic and intrinsic 
+parameters of a camera (MATLAB). A calibrated camera allows for 3-D information
+to be recovered from a 2-D image. The intrinsic parameters of a camera are often 
+represented by the following 3x3 matrix:
 
-$$K = matrix$$, where fx, fy, cx, and cy MEAN SOMETHING. The extrinsic parameters are often represented by the following row vector:
-$$vector$$, where $R$ is the rotation of the camera with respect to a world frame and $t$ is the translation from the same world frame. The row vector-matrix multiplication of the extrinsics vector and the intrinsics matrix result in the camera matrix $P$.
+$$K = matrix$$, where fx, fy, cx, and cy MEAN SOMETHING. The extrinsic
+parameters are often represented by the following row vector:
+$$vector$$, where $R$ is the rotation of the camera with respect to a world 
+frame and $t$ is the translation from the same world frame. The row 
+vector-matrix multiplication of the extrinsics vector and the intrinsics matrix
+result in the camera matrix $P$.
 
-A camera is calibrated by using a collection of photos with known straight lines. Commonly, a series of checkerboard images with known dimensions are used. Photos of the checkerboard are then captured at varying angles and locations in the scene. This series of images is then fed to the camera calibration algorithm, which will first determine the locations of the checkerboard squares and the lines connecting them.  Afterwards, using the model of a fisheye camera, the algorithm 
+A camera is calibrated by using a collection of photos with known straight 
+lines. Commonly, a series of checkerboard images with known dimensions are used. 
+Photos of the checkerboard are then captured at varying angles and locations in 
+the scene. This series of images is then fed to the camera calibration 
+algorithm, which will first determine the locations of the checkerboard squares
+and the lines connecting them.  Afterwards, using the model of a fisheye camera,
+the algorithm 
 compensates for the distortion of the fisheye camera. 
-For example, as seen in FIGURE, the curved lines of the checkerboard are made straight again after calibration. The number of needed images is dependent on the specific camera, however a large collection of photos will lead to a more accurate parameter approximation. (OPENCV Citation) Using images with a higher resolution will also lead to a more accurate parameters. (OPENCV/BLOG Citation)
-However, the approximated parameters are only accurate for the calibration of images taken at the same resolution as the images used for the calibration. In order to use the camera matrix for images with a lower resolution, the camera must be scaled with the following formula:
-(EQUATION). As the camera matrix is an example of an affine transformation, the value at $C_{3, 3}$ must be reset to 1.
-The resulting camera matrix will work for smaller resolutions matching the aspect ratio of the images used for calibration, but it has been noticed that when the difference in resolution is too large, distortion is added back into the image. In FIGURE, the original image is on the left, the middle image is calibrated using images at 900p and the right image is calibrated using images at 240p. As can be seen, the image on the right straightens the ruler, while the middle image leaves it curved.
+For example, as seen in FIGURE, the curved lines of the checkerboard are made 
+straight again after calibration. The number of needed images is dependent on 
+the specific camera, however a large collection of photos will lead to a more 
+accurate parameter approximation. (OPENCV Citation) Using images with a higher 
+resolution will also lead to a more accurate parameters. (OPENCV/BLOG Citation)
+However, the approximated parameters are only accurate for the calibration of 
+images taken at the same resolution as the images used for the calibration. In
+order to use the camera matrix for images with a lower resolution, the camera 
+must be scaled with the following formula:
+(EQUATION). As the camera matrix is an example of an affine transformation, the
+value at $C_{3, 3}$ must be reset to 1.
+The resulting camera matrix will work for smaller resolutions matching the 
+aspect ratio of the images used for calibration, but it has been noticed that 
+when the difference in resolution is too large, distortion is added back into 
+the image. In FIGURE, the original image is on the left, the middle image is 
+calibrated using images at 900p and the right image is calibrated using images 
+at 240p. As can be seen, the image on the right straightens the ruler, while 
+the middle image leaves it curved.
 
-One downside to camera calibration is that any calibrated image has a lower resolution than the original image. This is a consequence of the calibration process, as the process will distort a subset of the image, particularly involving the pixels around the corners of the image. 
-Therefore the calibration process will remove these pixels from the resulting image. In order to recreate the image in its original resolution, an interpolator is used. 
+One downside to camera calibration is that any calibrated image has a lower 
+resolution than the original image. This is a consequence of the calibration 
+process, as the process will distort a subset of the image, particularly 
+involving the pixels around the corners of the image. 
+Therefore the calibration process will remove these pixels from the resulting 
+image. In order to recreate the image in its original resolution, an 
+interpolator is used. 
 However, the interpolator will return a blurrier image than the original. 
-In order to compensate for this, it is recommended to calibrate a camera with high resolution images and then capture images at that resolution. 
-Then, instead of using the interpolator, shrink the images down to a resolution that is necessary for the application.  
+In order to compensate for this, it is recommended to calibrate a camera with 
+high resolution images and then capture images at that resolution. 
+Then, instead of using the interpolator, shrink the images down to a resolution
+that is necessary for the application.  
 This results in a more accurate image without any blurriness. 
-Unfortunately, this process is computationally heavy and with the processor used on the vehicle, it was decided to only use the images from the interpolator in order to increase the processing speed.
+Unfortunately, this process is computationally heavy and with the processor 
+used on the vehicle, it was decided to only use the images from the interpolator
+in order to increase the processing speed.
 
-Another downside from the camera calibration as that the midpoint of the camera shifts. An example of this can be seen in FIGURE. $C_{3,1}$ and $C_{3,2}$ represent the image center, with $C_{3,1}$ being the $x$ coordinate. By manually changing this value, the midpoint of the image can be shifted back to its original location.
+Another downside from the camera calibration as that the midpoint of the camera
+shifts. An example of this can be seen in FIGURE. $C_{3,1}$ and $C_{3,2}$ 
+represent the image center, with $C_{3,1}$ being the $x$ coordinate. By manually
+changing this value, the midpoint of the image can be shifted back to its 
+original location.
 
 \section{Color Thresholding}
 After the camera calibration comes the color thresholding stage of the pipeline.
 This stage removes all pixels from the image that are not yellow with a high
 saturation and brightness. 
 
-At first, the image is filtered of all pixels without a high red component, as bright yellow in the red, green and blue (RGB) color space has a high red component. 
-Afterwards, the image is converted into the Hue, Lightness and Saturation (HLS) color space. 
+At first, the image is filtered of all pixels without a high red component, as 
+bright yellow in the red, green and blue (RGB) color space has a high red 
+component. 
+Afterwards, the image is converted into the Hue, Lightness and Saturation (HLS)
+color space. 
 
-Under the RGB color space, yellow is represented as a combination of the red and green channels with the blue channel set to 0. Pure yellow is also defined as having both the red and green channels equal to one another, therefore allowing only 1 degree of freedom to tune the pipeline.  Having only 1 degree of freedom leads to issues with tuning, as this reduces the ability for the pipeline to account for disturbances, such as differing lighting conditions or reflective surfaces.
-Under the HLS color space, the hue channel selects the color, the lightness channel corresponds to the amount of white or black in the color and the saturation channel is a measure of the purity of a hue. (MS ANNO) Once the hue is selected, here yellow, the lightness and saturation channels are then used to select the specific shade of yellow. Using these 2 channels allows for a more robust detection of color.
+Under the RGB color space, yellow is represented as a combination of the red 
+and green channels with the blue channel set to 0. Pure yellow is also defined 
+as having both the red and green channels equal to one another, therefore 
+allowing only 1 degree of freedom to tune the pipeline.  Having only 1 degree 
+of freedom leads to issues with tuning, as this reduces the ability for the 
+pipeline to account for disturbances, such as differing lighting conditions or 
+reflective surfaces.
+Under the HLS color space, the hue channel selects the color, the lightness 
+channel corresponds to the amount of white or black in the color and the 
+saturation channel is a measure of the purity of a hue. (MS ANNO) Once the hue 
+is selected, here yellow, the lightness and saturation channels are then used 
+to select the specific shade of yellow. Using these 2 channels allows for a 
+more robust detection of color.
 
-In order to detect the yellow lane, the pipeline will filter out colors outside of the yellow hue range, with a small tolerance, and then truncate the lower part of the lightness and saturation channels. As a result of this, only relatively pure yellow is left in the image.
-The values used in the pipeline for yellow is represented by the following range,
+In order to detect the yellow lane, the pipeline will filter out colors outside 
+of the yellow hue range, with a small tolerance, and then truncate the lower 
+part of the lightness and saturation channels. As a result of this, only 
+relatively pure yellow is left in the image.
+The values used in the pipeline for yellow is represented by the following 
+range,
 TABLE.
 
 An example of the output from this stage of the pipeline is FIGURE.
 
 \section{Perspective Transformation}
-The third part of the image processing pipeline is the perspective transformation. 
- Whenever an image is captured with a camera mounted to the vehicle, the lane 
- line will be trapezoidal as opposed to straight and lane seems to end in a 
- point at the center of the image. This perspective requires that all calculations 
- regarding the lane line must compensate for the decreasing width of the line. 
- Therefore, to remove this requirement, a perspective transformation is employed. Perspective transformation is the process 
- by which a subset of an image is sheared and made to fit the entirety of a new 
- image. An example is in FIGURE. For this project, the shape of the subset of the 
- image is selected to be a trapezoid, shown in FIGURE. 
- Using this perspective transform, the trapezoidal shape of the lane line is corrected 
- into one that is straight, shown in FIGURE.
- 
- A consequence of this new perspective, is that the resulting 
- image is similar to a 2-D plane of the track. The perspective transformation 
- simplifies further image processing as well, as all objects outside of the trapezoid 
- are cropped, leaving only the track. However, as can be seen in FIGURE, the perspective transform introduces extra noise into the image. The shearing caused by the perspective transform causes pixels from the original image to be stretched, thereby polluting the image with noise. 
+The third part of the image processing pipeline is the perspective 
+transformation. 
+Whenever an image is captured with a camera mounted to the vehicle, the lane 
+line will be trapezoidal as opposed to straight and lane seems to end in a 
+point at the center of the image. This perspective requires that all 
+calculations 
+regarding the lane line must compensate for the decreasing width of the line. 
+Therefore, to remove this requirement, a perspective transformation is 
+employed. Perspective transformation is the process 
+by which a subset of an image is sheared and made to fit the entirety of a new 
+image. An example is in FIGURE. For this project, the shape of the subset of 
+the 
+image is selected to be a trapezoid, shown in FIGURE. 
+Using this perspective transform, the trapezoidal shape of the lane line is 
+corrected 
+into one that is straight, shown in FIGURE.
 
- Therefore, this is the third stage in the pipeline. As already discussed, in the second stage of the pipeline, the threshold stage removes the majority of unnecessary information from the image, which reduces the amount of noise caused by the perspective transform.
+A consequence of this new perspective, is that the resulting 
+image is similar to a 2-D plane of the track. The perspective transformation 
+simplifies further image processing as well, as all objects outside of the 
+trapezoid 
+are cropped, leaving only the track. However, as can be seen in FIGURE, the 
+perspective transform introduces extra noise into the image. The shearing 
+caused by the perspective transform causes pixels from the original image to 
+be stretched, thereby polluting the image with noise. 
+
+Therefore, this is the third stage in the pipeline. As already discussed, in 
+the second stage of the pipeline, the threshold stage removes the majority of 
+unnecessary information from the image, which reduces the amount of noise 
+caused by the perspective transform.
+\section{Histogram}
+After the perspective transformation stage, a histogram of the pixel density 
+is created. During this step, the start point for the sliding window method is
+found. 
+At every column of the image, the number of white pixels are counted. 
+The numbers are then placed into a list. The assumption is then that the 
+columns containing the largest numbers contain the lane information. The 
+index with the number is then selected as the start point for the sliding 
+window method. This pipeline stage reduces computation time by filtering out 
+unnecessary parts of the image not containing lane information. A visual 
+representation of the histogram can be seen in FIGURE.
+
+\section{Gleit-Fenster-Verfahren}
+At this stage of the pipeline, the heading and offset of the lane are calculated 
+through the sliding window method.
+
+First, a chosen number of rectangles (windows) are created. The windows are 
+aligned in a column and equally sized. Their height is chosen so that the column
+spans the entire height of the image, while their width is chosen to be a 
+multiple of the image width.
+
+In the image coordinate system, the top left corner of the image is $(0, 0)$, 
+with the positive x-axis increasing to the right, while the positive y-axis 
+increases moving down the image. Therefore, the bottom edge of the image would 
+be any coordinate with a y component equal to the height of the image.
+
+\section{Berechnung von Ausrichtung und Abstand}
+In the final stage of the pipeline, the heading and offset from the lane line 
+are calculated. 
+ 
+From the fitted polynomial calculated in the previous stage, an analytical 
+heading is found at a chosen point along the path with the following equation:
+$$\theta = \arctan(f^\prime(y))$$.
+The inverse tangent of the derivative of the polynomial returns the heading at
+a chosen point. For the stanley controller, only the difference between the 
+path heading and vehicle heading is needed, therefore as there is no global 
+frame for the vehicle, the heading of the vehicle is chosen to be 0!!!!!! at 
+all times. 
+
+The offset from the lane line is calculated from the fitted polynomial with 
+the following function: $$e_{fa} = (\frac{w}{2} - f(h))\cdot x_{mpp}$$, where 
+$w$ is the width of the image, $f(h)$ is the output of the fitted polynomial at 
+the bottom of the image, $x_{mpp}$ is a scaling constant to translate pixels 
+into meters and $e_{fa}$ is the offset from the vehicle to the lane. All 
+together, the difference of the x-component of the midpoint and the 
+x-component of the polynomial point located on the bottom edge of the image is
+translated into meters.
+
+\section{Pipeline-Optimierungen}
+One of the obstacles encountered during the creation of the image processing
+pipeline, is that the image would be processed too slowly. 
+The initial implementation of the pipeline ran at approximately 15 Hz, which was
+decided to be close to the lower bound of our chosen tolerance for the 
+processing frequency. 
+In order to improve the processing speed of the pipeline to an acceptable level,
+only 1 optimization was needed. 
+While further optimizations are possible, they were considered to be out of the
+scope of the assignment and are therefore not discussed here.
+
+The Python program cProfiler was used in order to tabulate the function calls of
+the pipeline, as well as the runtime of each function call. As the pipeline is a
+deterministic program, an simple runtime improvement is to cache the output of 
+expensive function calls into memory. Therefore during all subsequent function 
+calls, the cached result is returned instead of running the calculation again. 
+As an example, the perspective transformation matrices are an expensive 
+calculation, which when cached led to a speed improvement of the pipeline.
+
+In order to prove the speed improvement of the pipeline, an experiment was 
+implemented. First, the pipeline is run through once and the runtime ignored as
+the speed improvement is only relevant to subsequent runs of the pipeline. Then,
+on the second run of the pipeline, the runtime is measured for both variants, 
+with and without caching the expensive function calls from the first run. The 
+experiment is then run 100 times and the result tabulated. The arithmetic mean 
+of the runtimes for both variants are then compared to one another to measure 
+the speed improvement. The values are in TABLE, showing that by caching the 
+expensive function calls, the pipeline processing speed improved by VALUE%.
+
+\chapter{Experiment}
+\chapter{Conclusion}
 \end{document}
