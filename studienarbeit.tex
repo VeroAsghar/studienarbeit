@@ -1,0 +1,331 @@
+%! TEX program = pdflatex
+\documentclass[arbeit=studie,oneside,BCOR=12mm]{ArbeitRST}
+\usepackage{amsmath} 
+\hypersetup{
+    unicode=false,          % non-Latin characters in Acrobat’s bookmarks
+    pdftoolbar=true,        % show Acrobat’s toolbar?
+    pdfmenubar=true,        % show Acrobat’s menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdftitle={RST Vorlage}, % title
+    pdfauthor={James Vero Asghar},     % author
+    pdfsubject={Subject},   % subject of the document
+    pdfcreator={James Vero Asghar},   % creator of the document
+    pdfproducer={Producer}, % producer of the document
+    pdfkeywords={keyword1} {key2} {key3}, % list of keywords
+    pdfnewwindow=true,      % links in new window
+    colorlinks=true,        % false: boxed links; true: colored links
+    linkcolor=blue,         % color of internal links (change box color with linkbordercolor)
+    citecolor=green,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+\setlength{\parindent}{0ex}
+\setlength{\parskip}{2ex}
+
+% Entfernt die farbigen Markierungen - bitte Druckversion mit dieser Option kompilieren
+%\hypersetup{hidelinks}
+
+\begin{document}
+
+% Titelseite
+% ==========
+
+% Name des Verfassers
+\author{James Vero Asghar}
+
+% Geburtsort
+\geburtsort{Austin, Texas, Vereignete Staaten}
+
+% Geburtsdatum
+\geburtsdatum{3. Dezember 1997}
+
+% Titel der Arbeit
+\title{aoeu}
+
+% Untertitel
+\subtitle{asdf}
+
+% Angabe der Betreuer
+\betreuer{Dr.-Ing. Carsten Knoll}
+\betreuer{M.Sc. Paul Auerbach}
+
+% Datum der Einreichung
+\date{2. Februar 2222}
+
+
+% Zunächst für das Vorgeplänkel römische Seitenzahlen und einfacher Seitenstil
+% ============================================================================
+\pagenumbering{Roman}
+\pagestyle{plain}
+
+
+% Titelseite erstellen
+\maketitle
+
+
+% Selbstständigkeitserklärung
+% ===========================
+
+% Selbstständigkeitserklärung erstellen
+\selbststaendigkeitserklaerung
+
+
+% Kurzfassung / Abstract
+% ======================
+\kurzfassung{An dieser Stelle fügen Sie bitte eine deutsche Kurzfassung ein.}
+{At the Connected Robotics Lab (CoRoLa) research group at the Barkhausen 
+Institut, a demonstration using remote controlled 2 axis vehicles was developed.
+The demonstration is currently in use in order to model communications between 
+vehicles similar to an Internet of Things (IoT) network.
+
+In order to better model the complexities of a real world system a nonlinear 
+control algorithm was introduced to the system in order to more accurately
+control the vehicles. The Stanley Controller is a nonlinear controller
+developed for use with the lateral control of 2 axis vehicles in mind. As input
+to the controller, a fisheye camera was used to create images of road. These 
+images were then digitally processed to find the yellow line for the vehicles
+to follow.}
+
+
+% Inhaltsverzeichnis
+% ==================
+\tableofcontents
+
+\chapter{Einführung}
+
+\chapter{Regelalgorithmus}
+
+%The Stanley controller is a non-linear control algorithm developed in 2005 by Stanford University. It was developed in order to control a 2 axle vehicle using only the heading and the cross track error from the path to be followed. It was proven to be asymptotically global stable for Mechanic model of a two axle vehicle .However in for the duration of this thesis the the model used is not the kinematic model of a 2 axle vehicle instead a model that also accounts for the dynamics of the steering angle.
+%
+% The stanley controller is a path following controller as opposed to a trajectory following algorithm. The stanley controller is designed as a lateral controller,  so that the vehicle stays on the path, but has no bearing on the speed at which it will follow the path. The positives of this approach allow for a flexible choice of the speed of the vehicle, which barring dynamic effects, allows for a engineer to choose any speed necessary for their application.
+%
+%The stanley controller is represented by the following equation:
+% $$u = \theta_d - \theta + \arctan\left(\frac{ke_{fa}}{v}\right)$$,
+%where $u$ is the controller output, $\theta$ is the current heading of the vehicle, $\theta_d$ is the heading of the path, $k$ is a scaling factor, $v$ is the velocity of the vehicle, and $e_{fa}$ is the cross track error from the midpoint of the vehicle’s front axle to the path. 
+%
+%The stanley controller is composed of two components:  a component handling the offset of the vehicle from the path and a component handling the derivative of the offset (difference in heading).  
+%The first component, represented by $\arctan(\frac{ke_{fa}}{v})$,  drives the steering angle to 
+%turn more towards the path, the farther away the car currently is.
+%The second component, represented by $\theta_d - \theta$, controls the steering angle to stay parallel with the path to be followed.
+%Working together, the two components steer the vehicle on to the path to be followed.
+
+Der Stanley-Regler ist ein nichtlinearer Regelalgorithmus, der 2005 von der
+Stanford University entwickelt wurde. Er wurde entwickelt, um ein zweiachsiges 
+Fahrzeug zu steuern, wobei nur der Ausrichtung und der Querfehler des zu verfolgenden 
+Weges verwendet werden. Für die Dauer dieser Arbeit wird jedoch nicht das 
+kinematische Modell eines zweiachsigen Fahrzeugs verwendet, sondern ein Modell,
+das auch die Dynamik des Lenkwinkels berücksichtigt.
+
+Der Stanley-Regler ist ein Pfadfolgerregler im Gegensatz zu einem 
+Trajektoriefolgerregler. Der Stanley-Regler ist als Querregler konzipiert, so 
+dass das Fahrzeug auf der Bahn bleibt, aber keinen Einfluss auf die 
+Geschwindigkeit hat, mit der es der Bahn folgt. Die Vorteile dieses Ansatzes 
+liegen darin, dass die Geschwindigkeit des Fahrzeugs flexibel gewählt werden 
+kann, so dass der Ingenieur, abgesehen von dynamischen Effekten, jede für 
+seine Anwendung erforderliche Geschwindigkeit wählen kann.
+
+Der Stanley-Regler wird durch die folgende Gleichung dargestellt:
+$$u = \theta_d - \theta + \arctan\left(\frac{ke_{fa}}{v}\right)$$,
+wobei $u$ das Ausgangssignal des Reglers, theta der aktuelle Ausrichtung des 
+Fahrzeugs, $\theta_p$ der Ausrichtung des PATH?, $k$ ein Skalierungsfaktor, 
+$v$ die Geschwindigkeit des 
+Fahrzeugs und efa der Spurabweichungswert vom Mittelpunkt der Vorderachse des 
+Fahrzeugs zum Pfad ist.
+
+
+Der Stanley-Regler besteht aus zwei Komponenten: eine Komponente h"andelt sich 
+um den Abstand von dem Fahrzeug zu dem Pfad und die andere Komponente h"andelt
+sich mit der Ableitung des Abstands oder genauer geschreiben, die Ausrichtung.
+Die erste Komponente steuert die Lenkwinkelstrecke des Autos so, dass das Auto
+
+
+
+\section{Stanley-Regler}
+\begin{equation}
+    u = \theta - \theta_d + \arctan\left(\frac{ke_V}{v}\right)
+    \label{eq:Stanley-Regler}
+\end{equation}
+
+\section{Simulation}
+
+%In order to investigate the behavior of the stanley controller on the remote controlled vehicle, a simulation of the control loop was used.
+%The simulation has 3 major components: first is the path that the vehicle must follow, second is the stanley controller and third is the vehicle model. A differential equation solver is used in order to analyze the time series of the 2 axle vehicle. 
+%
+%The path that the vehicle must follow is a virtual version of the real world track that the vehicle will use. A visual representation of the path is FIGURE. In the simulation, the path is represented with the following continuous static function:
+%----, 
+%with the input t and the output (x, y, h). This function is then discretized for any chosen amount of t values, in order to create an array of (x, y, theta) values. This array is then fed into the differential equation solver that encapsulates the stanley controller and the vehicle model. 
+%
+%The vehicle model used is the rear axle vehicle model. This model is represented by the following nonlinear state space representation:
+%---.
+%The state variables of the model are X, Y, PHI and THETA, where X and Y are the XY-coordinates of the midpoint of the rear axle and THETA is the heading of the vehicle. PHI is the steering angle of the vehicle. The input variables of the model are V and phi d, where V is the velocity of the vehicle and phi is the output of the stanley controller. The steering angle phi is represented by a first order linear differential equation with the configurable time constant T. The behavior of the stanley controller when subjected to dynamic effects on the steering angle, is of great importance, as the global asymptotic stability of the controller was only proven on the kinematic model, with a springable steering angle. 
+%
+%As the stanley controller requires the midpoint of the front axle for the cross track error, it must be calculated from the rear axle.
+%The midpoint of the front axle is calculated from the state variables through the following static function:
+%---,
+%where xf and yf are the x/y coordinates of this midpoint. 
+%
+%As seen before, the stanley controller is composed of multiple parts, which must be calculated. The heading is a state variable, therefore it is always available. For the cross track error and the heading path, the correct path point must be chosen. The stanley controller uses the closest path point to determine the required heading and current cross track error. For the simulation this is determined by finding the point with the smallest distance from the front axle midpoint. The algorithm is represented as follows: 
+%---.
+%Through this found point, the heading path is determined. The cross track error is then determined through the following equation:
+%---.
+%This equation represents the dot product of the vector perpendicular to the heading vector and the vector from the front axle to the path point. FIGURE is a visual representation of these two vectors.
+%The heading path and cross track error are then fed into the stanley controller, whereby the output of the controller is fed into the vehicle model.
+%
+%As the stanley controller only outputs a steering angle, the velocity is assumed to be constant. 
+%A high level diagram of the control loop is represented in FIGURE.
+%
+%The stanley controller works with continuous time signals, which is different 
+%from what is used on the vehicle. The vehicle captures images at a specific
+%frequency, which are then processed by the pipeline before being fed into the controller. In order to simulate this behavior, a cache was built into the simulator, where the heading path and cross track error are saved. The stanley controller is then fed these saved values for a chosen amount of time. By caching these values, the behavior of a zero-order hold is simulated. The output of this zero-order hold is then fed into the stanley controller. This allows for the behavior of the vehicle to be investigated for different sampling frequencies, which allows for a tolerance to be set for the processing speed of the pipeline. A comparison of the simulation at various sampling frequencies is shown in FIGURE.
+%
+%As can be seen in FIGURE, the stanley controller is indeed affected by the sampling frequency, however above X Hz the behavior of the vehicle is not noticeably different. 
+%
+%The simulation is then executed for a chosen amount of time.
+
+Um das Verhalten des Stanley-Reglers auf dem ferngesteuerten Fahrzeug zu untersuchen, wurde eine Simulation des Regelkreises verwendet.
+Die Simulation besteht aus drei Hauptkomponenten: erstens die Bahn, der das Fahrzeug folgen muss, zweitens der Stanley-Regler und drittens das Fahrzeugmodell. Ein Differentialgleichungslöser wird verwendet, um die Zeitreihen des zweiachsigen Fahrzeugs zu analysieren. 
+
+Der Pfad, dem das Fahrzeug folgen muss, ist eine virtuelle Version der realen Strecke, die das Fahrzeug benutzen wird. Eine visuelle Darstellung des Weges ist ABBILDUNG. In der Simulation wird der Weg durch die folgende kontinuierliche statische Funktion dargestellt:
+----, 
+mit dem Eingang t und dem Ausgang (x, y, h). Diese Funktion wird dann für eine beliebige Anzahl von t-Werten diskretisiert, um ein Array von (x, y, theta)-Werten zu erstellen. Dieses Array wird dann in den Differentialgleichungslöser eingespeist, der den Stanley-Regler und das Fahrzeugmodell kapselt. 
+
+Bei dem verwendeten Fahrzeugmodell handelt es sich um das Modell eines Hinterachsfahrzeugs. Dieses Modell wird durch die folgende nichtlineare Zustandsraumdarstellung dargestellt:
+---.
+Die Zustandsvariablen des Modells sind X, Y, PHI und THETA, wobei X und Y die XY-Koordinaten des Mittelpunkts der Hinterachse sind und THETA der Kurs des Fahrzeugs ist. PHI ist der Lenkwinkel des Fahrzeugs. Die Eingangsvariablen des Modells sind V und phi d, wobei V die Geschwindigkeit des Fahrzeugs und phi der Ausgang des Stanley-Reglers ist. Der Lenkwinkel phi wird durch eine lineare Differentialgleichung erster Ordnung mit der konfigurierbaren Zeitkonstante T dargestellt. Das Verhalten des Stanley-Reglers bei dynamischen Einflüssen auf den Lenkwinkel ist von großer Bedeutung, da die globale asymptotische Stabilität des Reglers nur für das kinematische Modell mit federndem Lenkwinkel nachgewiesen wurde. 
+
+Da der Stanley-Regler den Mittelpunkt der Vorderachse für den Querspurfehler benötigt, muss dieser aus der Hinterachse berechnet werden.
+Der Mittelpunkt der Vorderachse wird über die folgende statische Funktion aus den Zustandsgrößen berechnet:
+---,
+wobei xf und yf die x/y-Koordinaten dieses Mittelpunkts sind. 
+
+Wie bereits erwähnt, besteht der Stanley-Regler aus mehreren Teilen, die berechnet werden müssen. Der Steuerkurs ist eine Zustandsvariable und daher immer verfügbar. Für den Kreuzspurfehler und den Kurs muss der richtige Bahnpunkt gewählt werden. Der Stanley-Regler verwendet den nächstgelegenen Bahnpunkt, um den erforderlichen Kurs und den aktuellen Querfehler zu bestimmen. Für die Simulation wird dieser durch die Suche nach dem Punkt mit dem geringsten Abstand zum Vorderachsmittelpunkt bestimmt. Der Algorithmus wird wie folgt dargestellt: 
+---.
+Durch diesen gefundenen Punkt wird der Kursweg bestimmt. Der Querabweichungsfehler wird dann durch die folgende Gleichung bestimmt:
+---.
+Diese Gleichung stellt das Skalarprodukt des Vektors senkrecht zum Steuerkursvektor und des Vektors von der Vorderachse zum Bahnpunkt dar. ABBILDUNG ist eine visuelle Darstellung dieser beiden Vektoren.
+Der Kurs- und der Spurabweichungsvektor werden dann in den Stanley-Regler eingegeben, wobei der Ausgang des Reglers in das Fahrzeugmodell eingespeist wird. 
+
+Da der Stanley-Regler nur einen Lenkwinkel ausgibt, wird die Geschwindigkeit als konstant angenommen. 
+Ein High-Level-Diagramm des Regelkreises ist in ABBILDUNG dargestellt.
+
+Die Simulation wird dann für eine ausgewählte Zeitspanne durchgeführt.
+
+    \begin{equation} 
+        \underline{x} := 
+        \begin{bmatrix}
+            x_H & y_H & \theta
+        \end{bmatrix}^T 
+        \label{Zustandsvektor}
+    \end{equation}
+
+    \begin{gather}
+        \dot{x_H} = v \cos(\theta) \\
+        \dot{y_H} = v \sin(\theta) \\
+        \dot{\theta} = \frac{v}{l}\tan(\theta)
+    \end{gather}
+
+    \begin{gather}
+        \underline{p}_H := 
+        \begin{bmatrix}
+            x_H & y_H
+        \end{bmatrix}^T \\
+        \underline{p}_V := 
+        \begin{bmatrix}
+            x_V & y_V
+        \end{bmatrix}^T
+        \label{eq:Hinterradachse und Vorderradachse}
+    \end{gather}
+
+    \begin{equation}
+        \underline{p}_V = \underline{p}_H + l 
+        \begin{bmatrix}
+            \cos(\theta + \pi/2) \\ 
+            \sin(\theta + \pi/2)
+        \end{bmatrix}
+        \label{eq:Transformation von Hinterradachse zu Vorderradachse}
+    \end{equation}
+
+    \begin{gather}
+        \underline{\nu} := 
+        \begin{bmatrix}
+            -\cos(\theta + \pi/2) \\
+            -\sin(\theta + \pi/2)
+        \end{bmatrix} \\
+        \underline{p}_P := 
+        \begin{bmatrix}
+            x_P & y_P
+        \end{bmatrix}^T
+    \end{gather}
+
+    \begin{equation}
+        e_V :=  \underline{\nu} \cdot \min_i |\underline{p}_V -  \underline{p}_{Pi}| ?
+        \label{eq:Querabweichung}
+    \end{equation}
+
+\chapter{Bildverarbeitung}
+\section{Kamera-Kalibrierung}
+The start of the image processing pipeline is the camera calibration. In this project, a fisheye camera was chosen as opposed to a rectilinear camera. The benefit of a 
+fisheye camera arises from its wider angle of view in comparison to a rectilinear camera. However, a fisheye camera distorts(?) an image differently from a rectilinear 
+camera. A rectilinear camera preserves straight lines, when no distortion is present, as opposed to a fisheye camera, which will always curve straight lines. The 
+curvature of these straight lines is dependent on their radial distance from the center of the image.  An example is in FIGURE.
+
+Camera calibration is used in order to approximate the extrinsic and intrinsic parameters of a camera (MATLAB). A calibrated camera allows for 3-D information to be recovered from a 2-D image. The intrinsic parameters of a camera are often represented by the following 3x3 matrix:
+
+$$K = matrix$$, where fx, fy, cx, and cy MEAN SOMETHING. The extrinsic parameters are often represented by the following row vector:
+$$vector$$, where $R$ is the rotation of the camera with respect to a world frame and $t$ is the translation from the same world frame. The row vector-matrix multiplication of the extrinsics vector and the intrinsics matrix result in the camera matrix $P$.
+
+A camera is calibrated by using a collection of photos with known straight lines. Commonly, a series of checkerboard images with known dimensions are used. Photos of the checkerboard are then captured at varying angles and locations in the scene. This series of images is then fed to the camera calibration algorithm, which will first determine the locations of the checkerboard squares and the lines connecting them.  Afterwards, using the model of a fisheye camera, the algorithm 
+compensates for the distortion of the fisheye camera. 
+For example, as seen in FIGURE, the curved lines of the checkerboard are made straight again after calibration. The number of needed images is dependent on the specific camera, however a large collection of photos will lead to a more accurate parameter approximation. (OPENCV Citation) Using images with a higher resolution will also lead to a more accurate parameters. (OPENCV/BLOG Citation)
+However, the approximated parameters are only accurate for the calibration of images taken at the same resolution as the images used for the calibration. In order to use the camera matrix for images with a lower resolution, the camera must be scaled with the following formula:
+(EQUATION). As the camera matrix is an example of an affine transformation, the value at $C_{3, 3}$ must be reset to 1.
+The resulting camera matrix will work for smaller resolutions matching the aspect ratio of the images used for calibration, but it has been noticed that when the difference in resolution is too large, distortion is added back into the image. In FIGURE, the original image is on the left, the middle image is calibrated using images at 900p and the right image is calibrated using images at 240p. As can be seen, the image on the right straightens the ruler, while the middle image leaves it curved.
+
+One downside to camera calibration is that any calibrated image has a lower resolution than the original image. This is a consequence of the calibration process, as the process will distort a subset of the image, particularly involving the pixels around the corners of the image. 
+Therefore the calibration process will remove these pixels from the resulting image. In order to recreate the image in its original resolution, an interpolator is used. 
+However, the interpolator will return a blurrier image than the original. 
+In order to compensate for this, it is recommended to calibrate a camera with high resolution images and then capture images at that resolution. 
+Then, instead of using the interpolator, shrink the images down to a resolution that is necessary for the application.  
+This results in a more accurate image without any blurriness. 
+Unfortunately, this process is computationally heavy and with the processor used on the vehicle, it was decided to only use the images from the interpolator in order to increase the processing speed.
+
+Another downside from the camera calibration as that the midpoint of the camera shifts. An example of this can be seen in FIGURE. $C_{3,1}$ and $C_{3,2}$ represent the image center, with $C_{3,1}$ being the $x$ coordinate. By manually changing this value, the midpoint of the image can be shifted back to its original location.
+
+\section{Color Thresholding}
+After the camera calibration comes the color thresholding stage of the pipeline.
+This stage removes all pixels from the image that are not yellow with a high
+saturation and brightness. 
+
+At first, the image is filtered of all pixels without a high red component, as bright yellow in the red, green and blue (RGB) color space has a high red component. 
+Afterwards, the image is converted into the Hue, Lightness and Saturation (HLS) color space. 
+
+Under the RGB color space, yellow is represented as a combination of the red and green channels with the blue channel set to 0. Pure yellow is also defined as having both the red and green channels equal to one another, therefore allowing only 1 degree of freedom to tune the pipeline.  Having only 1 degree of freedom leads to issues with tuning, as this reduces the ability for the pipeline to account for disturbances, such as differing lighting conditions or reflective surfaces.
+Under the HLS color space, the hue channel selects the color, the lightness channel corresponds to the amount of white or black in the color and the saturation channel is a measure of the purity of a hue. (MS ANNO) Once the hue is selected, here yellow, the lightness and saturation channels are then used to select the specific shade of yellow. Using these 2 channels allows for a more robust detection of color.
+
+In order to detect the yellow lane, the pipeline will filter out colors outside of the yellow hue range, with a small tolerance, and then truncate the lower part of the lightness and saturation channels. As a result of this, only relatively pure yellow is left in the image.
+The values used in the pipeline for yellow is represented by the following range,
+TABLE.
+
+An example of the output from this stage of the pipeline is FIGURE.
+
+\section{Perspective Transformation}
+The third part of the image processing pipeline is the perspective transformation. 
+ Whenever an image is captured with a camera mounted to the vehicle, the lane 
+ line will be trapezoidal as opposed to straight and lane seems to end in a 
+ point at the center of the image. This perspective requires that all calculations 
+ regarding the lane line must compensate for the decreasing width of the line. 
+ Therefore, to remove this requirement, a perspective transformation is employed. Perspective transformation is the process 
+ by which a subset of an image is sheared and made to fit the entirety of a new 
+ image. An example is in FIGURE. For this project, the shape of the subset of the 
+ image is selected to be a trapezoid, shown in FIGURE. 
+ Using this perspective transform, the trapezoidal shape of the lane line is corrected 
+ into one that is straight, shown in FIGURE.
+ 
+ A consequence of this new perspective, is that the resulting 
+ image is similar to a 2-D plane of the track. The perspective transformation 
+ simplifies further image processing as well, as all objects outside of the trapezoid 
+ are cropped, leaving only the track. However, as can be seen in FIGURE, the perspective transform introduces extra noise into the image. The shearing caused by the perspective transform causes pixels from the original image to be stretched, thereby polluting the image with noise. 
+
+ Therefore, this is the third stage in the pipeline. As already discussed, in the second stage of the pipeline, the threshold stage removes the majority of unnecessary information from the image, which reduces the amount of noise caused by the perspective transform.
+\end{document}
