@@ -12,7 +12,7 @@
     pdfsubject={Subject},   % subject of the document
     pdfcreator={James Vero Asghar},   % creator of the document
     pdfproducer={Producer}, % producer of the document
-    pdfkeywords={stanley controller} {sliding window method} {model cars}, % list of keywords
+    pdfkeywords={Stanley controller} {sliding window method} {model cars}, % list of keywords
     pdfnewwindow=true,      % links in new window
     colorlinks=true,        % false: boxed links; true: colored links
     linkcolor=blue,         % color of internal links (change box color with linkbordercolor)
@@ -97,6 +97,38 @@ to follow.}
 \chapter{Regelalgorithmus}
 
 \section{Stanley-Regler}
+%The Stanley controller is a non-linear control algorithm developed in 2005 by
+%Stanford University. It was developed in order to control a 2 axle vehicle
+%using only the heading and the cross track error from the path to be followed.
+%It was proven to be asymptotically global stable for the kinematic model of a
+%two axle vehicle .However in for the duration of this thesis the the model used
+%is not the kinematic model of a 2 axle vehicle instead a model that also
+%accounts for the dynamics of the steering angle.
+%
+%The stanley controller is a path following controller as opposed to a
+%trajectory following algorithm. The stanley controller is designed as a lateral
+%controller,  so that the vehicle stays on the path, but has no bearing on the
+%speed at which it will follow the path. The positives of this approach allow
+%for a flexible choice of the speed of the vehicle, which barring dynamic
+%effects, allows for a engineer to choose any speed necessary for their
+%application.
+%
+%The stanley controller is represented by the following equation: $$u = \theta_d
+%- \theta + \arctan\left(\frac{ke_{fa}}{v}\right),$$ where $u$ is the controller
+%output, $\theta$ is the current heading of the vehicle, $\theta_d$ is the
+%heading of the path, $k$ is a scaling factor, $v$ is the velocity of the
+%vehicle, and $e_{fa}$ is the cross track error from the midpoint of the
+%vehicle’s front axle to the path. 
+%
+%The stanley controller is composed of two components:  a component handling the
+%offset of the vehicle from the path and a component handling the derivative of
+%the offset (difference in heading).  The first component, represented by
+%$\arctan(\frac{ke_{fa}}{v})$,  drives the steering angle to turn more towards
+%the path, the farther away the car currently is. The second component,
+%represented by $\theta_d - \theta$, controls the steering angle to stay
+%parallel with the path to be followed. Working together, the two components
+%steer the vehicle on to the path to be followed.
+
 The Stanley controller is a non-linear control algorithm that was developed in
 2005 by Stanford University with the purpose of controlling a two-axle vehicle
 using only the heading and the cross track error from the path to be followed.
@@ -133,10 +165,10 @@ steer the vehicle onto the desired path.
 
 
 \section{Simulation}
-In order to investigate the behavior of the stanley controller on the remote
+In order to investigate the behavior of the Stanley controller on the remote
 controlled vehicle, a simulation of the control loop was used. The simulation
 has 3 major components: first is the path that the vehicle must follow, second
-is the stanley controller and third is the vehicle model. A differential
+is the Stanley controller and third is the vehicle model. A differential
 equation solver is used in order to analyze the time series of the 2 axle
 vehicle. 
 
@@ -146,7 +178,7 @@ In the simulation, the path is represented with the following continuous static
 function: ----, with the input t and the output (x, y, h). This function is
 then discretized for any chosen amount of t values, in order to create an array
 of (x, y, theta) values. This array is then fed into the differential equation
-solver that encapsulates the stanley controller and the vehicle model. 
+solver that encapsulates the Stanley controller and the vehicle model. 
 
 The vehicle model used is the rear axle vehicle model. This model is
 represented by the following nonlinear state space representation: 
@@ -161,14 +193,14 @@ The state variables of the model are $x_H$, $y_H$, $\phi$ und $\theta$, where
 $x_H$ und $y_H$ are the XY-coordinates of the midpoint of the rear axle and
 $\theta$ is the heading of the vehicle. $\phi$ is the steering angle of the
 vehicle. The input variables of the model are $v$ und $\phi_d$, where $v$ is
-the velocity of the vehicle and $\varphi$ is the output of the stanley controller.
-The steering angle $\varphi$ is represented by a first order linear differential
-equation with the configurable time constant $T$  The behavior of the stanley
-controller when subjected to dynamic effects on the steering angle, is of great
-importance, as the global asymptotic stability of the controller was only
-proven on the kinematic model, with a springable steering angle. 
+the velocity of the vehicle and $\varphi$ is the output of the Stanley
+controller. The steering angle $\varphi$ is represented by a first order linear
+differential equation with the configurable time constant $T$  The behavior of
+the Stanley controller when subjected to dynamic effects on the steering angle,
+is of great importance, as the global asymptotic stability of the controller
+was only proven on the kinematic model, with a springable steering angle. 
 
-As the stanley controller requires the midpoint of the front axle for the cross
+As the Stanley controller requires the midpoint of the front axle for the cross
 track error, it must be calculated from the rear axle. The midpoint of the
 front axle is calculated from the state variables through the following static
 function:
@@ -193,10 +225,10 @@ function:
 \end{equation}
 where xf and yf are the x/y coordinates of this midpoint. 
 
-As seen before, the stanley controller is composed of multiple parts, which
+As seen before, the Stanley controller is composed of multiple parts, which
 must be calculated. The heading is a state variable, therefore it is always
 available. For the cross track error and the heading path, the correct path
-point must be chosen. The stanley controller uses the closest path point to
+point must be chosen. The Stanley controller uses the closest path point to
 determine the required heading and current cross track error. For the
 simulation this is determined by finding the point with the smallest distance
 from the front axle midpoint. The algorithm is represented as follows: ---.
@@ -205,27 +237,27 @@ is then determined through the following equation: ---. This equation
 represents the dot product of the vector perpendicular to the heading vector
 and the vector from the front axle to the path point. FIGURE is a visual
 representation of these two vectors. The heading path and cross track error are
-then fed into the stanley controller, whereby the output of the controller is
+then fed into the Stanley controller, whereby the output of the controller is
 fed into the vehicle model.
 
-As the stanley controller only outputs a steering angle, the velocity is
+As the Stanley controller only outputs a steering angle, the velocity is
 assumed to be constant. A high level diagram of the control loop is represented
 in FIGURE.
 
-The stanley controller works with continuous time signals, which is different
+The Stanley controller works with continuous time signals, which is different
 from what is used on the vehicle. The vehicle captures images at a specific
 frequency, which are then processed by the pipeline before being fed into the
 controller. In order to simulate this behavior, a cache was built into the
-simulator, where the heading path and cross track error are saved. The stanley
+simulator, where the heading path and cross track error are saved. The Stanley
 controller is then fed these saved values for a chosen amount of time. By
 caching these values, the behavior of a zero-order hold is simulated. The
-output of this zero-order hold is then fed into the stanley controller. This
+output of this zero-order hold is then fed into the Stanley controller. This
 allows for the behavior of the vehicle to be investigated for different
 sampling frequencies, which allows for a tolerance to be set for the processing
 speed of the pipeline. A comparison of the simulation at various sampling
 frequencies is shown in FIGURE.
 
-As can be seen in FIGURE, the stanley controller is indeed affected by the
+As can be seen in FIGURE, the Stanley controller is indeed affected by the
 sampling frequency, however above X Hz the behavior of the vehicle is not
 noticeably different. 
 
@@ -455,13 +487,13 @@ are calculated.
 From the fitted polynomial calculated in the previous stage, an analytical
 heading is found at a chosen point along the path with the following equation:
 $$\theta = \arctan(f^\prime(y))$$. The inverse tangent of the derivative of
-the polynomial returns the heading at a chosen point. For the stanley
+the polynomial returns the heading at a chosen point. For the Stanley
 controller, only the difference between the path heading and vehicle heading
 is needed, therefore as there is no global frame for the vehicle, the heading
 of the vehicle is chosen to be 0!!!!!! at all times. PICTURE WITH VISUAL
 REPRSENTATION 
 
-The classic stanley controller, as described in chapter 2, uses the heading
+The classic Stanley controller, as described in chapter 2, uses the heading
 calculated from the nearest path point. However, as a side effect of the
 polynomial fitting, the heading calculated at the bottom of the image is
 incorrect. As can be seen in FIGURE, the sliding window method can on average
@@ -473,7 +505,7 @@ this are discussed in chapter 4.
 
 
 The offset from the lane line is calculated from the fitted polynomial with
-the following function: $$e_{fa} = (\frac{w}{2} - f(h))\cdot x_{mpp}$$, where
+the following function: $$e_{fa} = (\frac{w}{2} - f(h))\cdot x_{mpp},$$ where
 $w$ is the width of the image, $f(h)$ is the output of the fitted polynomial
 at the bottom of the image, $x_{mpp}$ is a scaling constant to translate
 pixels into meters and $e_{fa}$ is the offset from the vehicle to the lane.
@@ -516,14 +548,14 @@ DC motor and a motor controller to control the vehicle speed and a servo motor
 to control the steering angle of the vehicle. The Raspberry Pi sends PWM
 signals to the motor controller and the servo controller in order to control
 the vehicle. Using Robot Operating System 2 (ros2), the Raspberry Pi is
-connected over the network to a central computer. The stanley controller runs
+connected over the network to a central computer. The Stanley controller runs
 on the central computer, which processes the data from the camera and sends the
-output of the stanley controller to the vehicle.
+output of the Stanley controller to the vehicle.
 
 \section{Experiment Setup}
-In order to compare the stanley controller and the sliding window method with
+In order to compare the Stanley controller and the sliding window method with
 the PID controller, 4 test criteria are chosen: maximum acceptable velocity and
-maximum offset angle, as well as the root mean square values of the vehicle
+maximum offset angles, as well as the root mean square values of the vehicle
 offset and controller outputs.
 
 In order to measure the maximum acceptable velocity, vehicle drives around the
@@ -539,7 +571,7 @@ experiments. First, the vehicle starts driving around the track. Then using an
 overhead camera, video of the vehicle driving around the curves is recorded.
 The vehicle is recorded at differing forward velocities. For the first round of
 recordings, the vehicle is controlled by the PID controller and for the second,
-it is controlled by the stanley controller. This experiment is then repeated
+it is controlled by the Stanley controller. This experiment is then repeated
 with the camera recording video of the vehicle driving along the straights
 instead. 
 
