@@ -159,16 +159,14 @@ represented by the following nonlinear state space representation:
 
 The state variables of the model are $x_H$, $y_H$, $\phi$ und $\theta$, where
 $x_H$ und $y_H$ are the XY-coordinates of the midpoint of the rear axle and
- $\theta$ is the heading of the vehicle. PHI is the steering angle of the vehicle.
-The input variables of the model are $v$
-und $\phi_d$, where $v$ is the velocity of
-the vehicle
-and $\phi$ is the output of the stanley controller. The steering angle phi is
-represented by a first order linear differential equation with the configurable
-time constant $T$  The behavior of the stanley controller when subjected to
-dynamic effects on the steering angle, is of great importance, as the global
-asymptotic stability of the controller was only proven on the kinematic model,
-with a springable steering angle. 
+$\theta$ is the heading of the vehicle. $\phi$ is the steering angle of the
+vehicle. The input variables of the model are $v$ und $\phi_d$, where $v$ is
+the velocity of the vehicle and $\varphi$ is the output of the stanley controller.
+The steering angle $\varphi$ is represented by a first order linear differential
+equation with the configurable time constant $T$  The behavior of the stanley
+controller when subjected to dynamic effects on the steering angle, is of great
+importance, as the global asymptotic stability of the controller was only
+proven on the kinematic model, with a springable steering angle. 
 
 As the stanley controller requires the midpoint of the front axle for the cross
 track error, it must be calculated from the rear axle. The midpoint of the
