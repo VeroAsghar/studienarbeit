@@ -7,12 +7,12 @@
     pdfmenubar=true,        % show Acrobat’s menu?
     pdffitwindow=false,     % window fit to page when opened
     pdfstartview={FitH},    % fits the width of the page to the window
-    pdftitle={RST Vorlage}, % title
+    pdftitle={Verbessung der Spurerkennung und -verfolgung autonomer Modellfahrzeuge}, % title
     pdfauthor={James Vero Asghar},     % author
     pdfsubject={Subject},   % subject of the document
     pdfcreator={James Vero Asghar},   % creator of the document
     pdfproducer={Producer}, % producer of the document
-    pdfkeywords={keyword1} {key2} {key3}, % list of keywords
+    pdfkeywords={stanley controller} {sliding window method} {model cars}, % list of keywords
     pdfnewwindow=true,      % links in new window
     colorlinks=true,        % false: boxed links; true: colored links
     linkcolor=blue,         % color of internal links (change box color with linkbordercolor)
@@ -41,10 +41,10 @@
 \geburtsdatum{3. Dezember 1997}
 
 % Titel der Arbeit
-\title{aoeu}
+\title{Verbesserung der Spurerkennung und -verfolgung autonomer Modellfahrzeuge}
 
 % Untertitel
-\subtitle{asdf}
+\subtitle{}
 
 % Angabe der Betreuer
 \betreuer{Dr.-Ing. Carsten Knoll}
@@ -74,16 +74,16 @@
 % Kurzfassung / Abstract
 % ======================
 \kurzfassung{An dieser Stelle fügen Sie bitte eine deutsche Kurzfassung ein.}
-{At the Connected Robotics Lab (CoRoLa) research group at the Barkhausen 
-Institut, a demonstration using remote controlled 2 axis vehicles was developed.
-The demonstration is currently in use in order to model communications between 
-vehicles similar to an Internet of Things (IoT) network.
+{At the Connected Robotics Lab (CoRoLa) research group at the Barkhausen
+Institut, a demonstration using remote controlled 2 axis vehicles was
+developed. The demonstration is currently in use in order to model
+communications between vehicles similar to an Internet of Things (IoT) network.
 
-In order to better model the complexities of a real world system a nonlinear 
+In order to better model the complexities of a real world system a nonlinear
 control algorithm was introduced to the system in order to more accurately
 control the vehicles. The Stanley Controller is a nonlinear controller
 developed for use with the lateral control of 2 axis vehicles in mind. As input
-to the controller, a fisheye camera was used to create images of road. These 
+to the controller, a fisheye camera was used to create images of road. These
 images were then digitally processed to find the yellow line for the vehicles
 to follow.}
 
@@ -96,19 +96,7 @@ to follow.}
 
 \chapter{Regelalgorithmus}
 
-%The Stanley controller is a non-linear control algorithm developed in 2005 by Stanford University. It was developed in order to control a 2 axle vehicle using only the heading and the cross track error from the path to be followed. It was proven to be asymptotically global stable for Mechanic model of a two axle vehicle .However in for the duration of this thesis the the model used is not the kinematic model of a 2 axle vehicle instead a model that also accounts for the dynamics of the steering angle.
-%
-% The stanley controller is a path following controller as opposed to a trajectory following algorithm. The stanley controller is designed as a lateral controller,  so that the vehicle stays on the path, but has no bearing on the speed at which it will follow the path. The positives of this approach allow for a flexible choice of the speed of the vehicle, which barring dynamic effects, allows for a engineer to choose any speed necessary for their application.
-%
-%The stanley controller is represented by the following equation:
-% $$u = \theta_d - \theta + \arctan\left(\frac{ke_{fa}}{v}\right)$$,
-%where $u$ is the controller output, $\theta$ is the current heading of the vehicle, $\theta_d$ is the heading of the path, $k$ is a scaling factor, $v$ is the velocity of the vehicle, and $e_{fa}$ is the cross track error from the midpoint of the vehicle’s front axle to the path. 
-%
-%The stanley controller is composed of two components:  a component handling the offset of the vehicle from the path and a component handling the derivative of the offset (difference in heading).  
-%The first component, represented by $\arctan(\frac{ke_{fa}}{v})$,  drives the steering angle to 
-%turn more towards the path, the farther away the car currently is.
-%The second component, represented by $\theta_d - \theta$, controls the steering angle to stay parallel with the path to be followed.
-%Working together, the two components steer the vehicle on to the path to be followed.
+\section{Stanley-Regler}
 
 Der Stanley-Regler ist ein nichtlinearer Regelalgorithmus, der 2005 von der
 Stanford University entwickelt wurde. Er wurde entwickelt, um ein zweiachsiges 
@@ -126,87 +114,130 @@ kann, so dass der Ingenieur, abgesehen von dynamischen Effekten, jede für
 seine Anwendung erforderliche Geschwindigkeit wählen kann.
 
 Der Stanley-Regler wird durch die folgende Gleichung dargestellt:
-$$u = \theta_d - \theta + \arctan\left(\frac{ke_{fa}}{v}\right)$$,
+
+\begin{equation}
+    u = \theta - \theta_d + \arctan\left(\frac{ke_{fa}}{v}\right)
+    \label{eq:Stanley-Regler}
+\end{equation}
+
 wobei $u$ das Ausgangssignal des Reglers, theta der aktuelle Ausrichtung des 
-Fahrzeugs, $\theta_p$ der Ausrichtung des PATH?, $k$ ein Skalierungsfaktor, 
+Fahrzeugs, $\theta_d$ der Ausrichtung des Pfads, $k$ ein Skalierungsfaktor, 
 $v$ die Geschwindigkeit des 
-Fahrzeugs und efa der Spurabweichungswert vom Mittelpunkt der Vorderachse des 
+Fahrzeugs und $e_{fa}$ der Spurabweichungswert vom Mittelpunkt der Vorderachse des 
 Fahrzeugs zum Pfad ist.
 
 
 Der Stanley-Regler besteht aus zwei Komponenten: eine Komponente h"andelt sich 
 um den Abstand von dem Fahrzeug zu dem Pfad und die andere Komponente h"andelt
 sich mit der Ableitung des Abstands oder genauer geschreiben, die Ausrichtung.
-Die erste Komponente steuert die Lenkwinkelstrecke des Autos so, dass das Auto
+
+Die erste Komponente, die um den Abstand geht, steuert die Lenkwinkelstrecke des 
+Fahrzeugs so, dass das Fahrzeug in der Richtung des Pfads je mehr lenkt, desto 
+weiter 
+das Fahrzeug von dem Pfad ist. Diese Komponente ist durch 
+$\arctan\left(\frac{ke_V}{v}\right)$ dargestellt.
+
+Die zweite Komponente steuert die Lenkwinkelstrecke so, dass sie parallel zu
+dem Pfad bleibt. Diese Komponente ist durch $\theta - \theta_d$ dargestellt.
+
+Zussamen arbeiten Komponenten miteinander, sodass das Fahrzeug auf den Pfad
+kommt. 
 
 
 
-\section{Stanley-Regler}
-\begin{equation}
-    u = \theta - \theta_d + \arctan\left(\frac{ke_V}{v}\right)
-    \label{eq:Stanley-Regler}
-\end{equation}
+
+
+
 
 \section{Simulation}
 
-%In order to investigate the behavior of the stanley controller on the remote controlled vehicle, a simulation of the control loop was used.
-%The simulation has 3 major components: first is the path that the vehicle must follow, second is the stanley controller and third is the vehicle model. A differential equation solver is used in order to analyze the time series of the 2 axle vehicle. 
-%
-%The path that the vehicle must follow is a virtual version of the real world track that the vehicle will use. A visual representation of the path is FIGURE. In the simulation, the path is represented with the following continuous static function:
-%----, 
-%with the input t and the output (x, y, h). This function is then discretized for any chosen amount of t values, in order to create an array of (x, y, theta) values. This array is then fed into the differential equation solver that encapsulates the stanley controller and the vehicle model. 
-%
-%The vehicle model used is the rear axle vehicle model. This model is represented by the following nonlinear state space representation:
-%---.
-%The state variables of the model are X, Y, PHI and THETA, where X and Y are the XY-coordinates of the midpoint of the rear axle and THETA is the heading of the vehicle. PHI is the steering angle of the vehicle. The input variables of the model are V and phi d, where V is the velocity of the vehicle and phi is the output of the stanley controller. The steering angle phi is represented by a first order linear differential equation with the configurable time constant T. The behavior of the stanley controller when subjected to dynamic effects on the steering angle, is of great importance, as the global asymptotic stability of the controller was only proven on the kinematic model, with a springable steering angle. 
-%
-%As the stanley controller requires the midpoint of the front axle for the cross track error, it must be calculated from the rear axle.
-%The midpoint of the front axle is calculated from the state variables through the following static function:
-%---,
-%where xf and yf are the x/y coordinates of this midpoint. 
-%
-%As seen before, the stanley controller is composed of multiple parts, which must be calculated. The heading is a state variable, therefore it is always available. For the cross track error and the heading path, the correct path point must be chosen. The stanley controller uses the closest path point to determine the required heading and current cross track error. For the simulation this is determined by finding the point with the smallest distance from the front axle midpoint. The algorithm is represented as follows: 
-%---.
-%Through this found point, the heading path is determined. The cross track error is then determined through the following equation:
-%---.
-%This equation represents the dot product of the vector perpendicular to the heading vector and the vector from the front axle to the path point. FIGURE is a visual representation of these two vectors.
-%The heading path and cross track error are then fed into the stanley controller, whereby the output of the controller is fed into the vehicle model.
-%
-%As the stanley controller only outputs a steering angle, the velocity is assumed to be constant. 
-%A high level diagram of the control loop is represented in FIGURE.
-%
-%The stanley controller works with continuous time signals, which is different 
-%from what is used on the vehicle. The vehicle captures images at a specific
-%frequency, which are then processed by the pipeline before being fed into the controller. In order to simulate this behavior, a cache was built into the simulator, where the heading path and cross track error are saved. The stanley controller is then fed these saved values for a chosen amount of time. By caching these values, the behavior of a zero-order hold is simulated. The output of this zero-order hold is then fed into the stanley controller. This allows for the behavior of the vehicle to be investigated for different sampling frequencies, which allows for a tolerance to be set for the processing speed of the pipeline. A comparison of the simulation at various sampling frequencies is shown in FIGURE.
-%
-%As can be seen in FIGURE, the stanley controller is indeed affected by the sampling frequency, however above X Hz the behavior of the vehicle is not noticeably different. 
-%
-%The simulation is then executed for a chosen amount of time.
 
-Um das Verhalten des Stanley-Reglers auf dem ferngesteuerten Fahrzeug zu untersuchen, wurde eine Simulation des Regelkreises verwendet.
-Die Simulation besteht aus drei Hauptkomponenten: erstens die Bahn, der das Fahrzeug folgen muss, zweitens der Stanley-Regler und drittens das Fahrzeugmodell. Ein Differentialgleichungslöser wird verwendet, um die Zeitreihen des zweiachsigen Fahrzeugs zu analysieren. 
+Um das Verhalten des Stanley-Reglers auf dem ferngesteuerten Fahrzeug zu 
+untersuchen, wurde eine Simulation des Regelkreises verwendet.
+Die Simulation besteht aus drei Hauptkomponenten: erstens die Bahn, der das 
+Fahrzeug folgen muss, zweitens der Stanley-Regler und drittens das 
+Fahrzeugmodell. Ein Differentialgleichungslöser wird verwendet, um die 
+Zeitreihen des zweiachsigen Fahrzeugs zu analysieren. 
 
-Der Pfad, dem das Fahrzeug folgen muss, ist eine virtuelle Version der realen Strecke, die das Fahrzeug benutzen wird. Eine visuelle Darstellung des Weges ist ABBILDUNG. In der Simulation wird der Weg durch die folgende kontinuierliche statische Funktion dargestellt:
+Der Pfad, dem das Fahrzeug folgen muss, ist eine virtuelle Version der realen 
+Strecke, die das Fahrzeug benutzen wird. Eine visuelle Darstellung des Weges 
+ist ABBILDUNG. In der Simulation wird der Weg durch die folgende kontinuierliche
+statische Funktion dargestellt:
 ----, 
-mit dem Eingang t und dem Ausgang (x, y, h). Diese Funktion wird dann für eine beliebige Anzahl von t-Werten diskretisiert, um ein Array von (x, y, theta)-Werten zu erstellen. Dieses Array wird dann in den Differentialgleichungslöser eingespeist, der den Stanley-Regler und das Fahrzeugmodell kapselt. 
+mit dem Eingang t und dem Ausgang (x, y, h). Diese Funktion wird dann für eine 
+beliebige Anzahl von t-Werten diskretisiert, um ein Array von 
+(x, y, theta)-Werten zu erstellen. Dieses Array wird dann in den 
+Differentialgleichungslöser eingespeist, der den Stanley-Regler und das 
+Fahrzeugmodell kapselt. 
 
-Bei dem verwendeten Fahrzeugmodell handelt es sich um das Modell eines Hinterachsfahrzeugs. Dieses Modell wird durch die folgende nichtlineare Zustandsraumdarstellung dargestellt:
----.
-Die Zustandsvariablen des Modells sind X, Y, PHI und THETA, wobei X und Y die XY-Koordinaten des Mittelpunkts der Hinterachse sind und THETA der Kurs des Fahrzeugs ist. PHI ist der Lenkwinkel des Fahrzeugs. Die Eingangsvariablen des Modells sind V und phi d, wobei V die Geschwindigkeit des Fahrzeugs und phi der Ausgang des Stanley-Reglers ist. Der Lenkwinkel phi wird durch eine lineare Differentialgleichung erster Ordnung mit der konfigurierbaren Zeitkonstante T dargestellt. Das Verhalten des Stanley-Reglers bei dynamischen Einflüssen auf den Lenkwinkel ist von großer Bedeutung, da die globale asymptotische Stabilität des Reglers nur für das kinematische Modell mit federndem Lenkwinkel nachgewiesen wurde. 
+Bei dem verwendeten Fahrzeugmodell handelt es sich um das Modell eines 
+Hinterachsfahrzeugs. Dieses Modell wird durch die folgende nichtlineare 
+Zustandsraumdarstellung dargestellt:
+\begin{gather}
+    \dot{x} = v \cos(\theta) \\
+    \dot{y} = v \sin(\theta) \\
+    \dot{\theta} = \frac{v}{l}\tan(\varphi) \\
+    \dot{\varphi} = \frac{-1}{T}\left(\varphi - \delta\right).
+\end{gather}
+Die Zustandsvariablen des Modells sind $x_H$, $y_H$, $\phi$ und $\theta$, wobei 
+$x_H$ und $y_H$ die 
+XY-Koordinaten des Mittelpunkts der Hinterachse sind und $\theta$ der Kurs des 
+Fahrzeugs ist. Die Eingangsvariablen des 
+Modells sind $v$ und $\phi_d$, wobei $v$ die Geschwindigkeit des Fahrzeugs und 
+$\phi$ der 
+Ausgang des Stanley-Reglers ist. Der Lenkwinkel $\phi$ wird durch eine lineare 
+Differentialgleichung erster Ordnung mit der konfigurierbaren Zeitkonstante $T$ 
+dargestellt. Das Verhalten des Stanley-Reglers bei dynamischen Einflüssen auf 
+den Lenkwinkel ist von großer Bedeutung, da die globale asymptotische Stabilität
+des Reglers nur für das kinematische Modell mit federndem Lenkwinkel 
+nachgewiesen wurde. 
 
-Da der Stanley-Regler den Mittelpunkt der Vorderachse für den Querspurfehler benötigt, muss dieser aus der Hinterachse berechnet werden.
-Der Mittelpunkt der Vorderachse wird über die folgende statische Funktion aus den Zustandsgrößen berechnet:
----,
+Da der Stanley-Regler den Mittelpunkt der Vorderachse für den Querspurfehler 
+benötigt, muss dieser aus der Hinterachse berechnet werden.
+Der Mittelpunkt der Vorderachse wird über die folgende statische Funktion aus 
+den Zustandsgrößen berechnet:
+\begin{gather}
+    \underline{p}_H := 
+    \begin{bmatrix}
+        x_H & y_H
+    \end{bmatrix}^T \\
+    \underline{p}_V := 
+    \begin{bmatrix}
+        x_V & y_V
+    \end{bmatrix}^T
+    \label{eq:Hinterradachse und Vorderradachse}
+\end{gather}
+\begin{equation}
+    \underline{p}_V = \underline{p}_H + l 
+    \begin{bmatrix}
+        \cos(\theta + \pi/2) \\ 
+        \sin(\theta + \pi/2),
+    \end{bmatrix}
+    \label{eq:Transformation von Hinterradachse zu Vorderradachse}
+\end{equation}
 wobei xf und yf die x/y-Koordinaten dieses Mittelpunkts sind. 
 
-Wie bereits erwähnt, besteht der Stanley-Regler aus mehreren Teilen, die berechnet werden müssen. Der Steuerkurs ist eine Zustandsvariable und daher immer verfügbar. Für den Kreuzspurfehler und den Kurs muss der richtige Bahnpunkt gewählt werden. Der Stanley-Regler verwendet den nächstgelegenen Bahnpunkt, um den erforderlichen Kurs und den aktuellen Querfehler zu bestimmen. Für die Simulation wird dieser durch die Suche nach dem Punkt mit dem geringsten Abstand zum Vorderachsmittelpunkt bestimmt. Der Algorithmus wird wie folgt dargestellt: 
+Wie bereits erwähnt, besteht der Stanley-Regler aus mehreren Teilen, die
+berechnet werden müssen. Der Steuerkurs ist eine Zustandsvariable und daher 
+immer verfügbar. Für den Kreuzspurfehler und den Kurs muss der richtige 
+Bahnpunkt gewählt werden. Der Stanley-Regler verwendet den nächstgelegenen 
+Bahnpunkt, um den erforderlichen Kurs und den aktuellen Querfehler zu bestimmen.
+Für die Simulation wird dieser durch die Suche nach dem Punkt mit dem geringsten
+Abstand zum Vorderachsmittelpunkt bestimmt. Der Algorithmus wird wie folgt 
+dargestellt: 
 ---.
-Durch diesen gefundenen Punkt wird der Kursweg bestimmt. Der Querabweichungsfehler wird dann durch die folgende Gleichung bestimmt:
+Durch diesen gefundenen Punkt wird der Kursweg bestimmt. Der 
+Querabweichungsfehler wird dann durch die folgende Gleichung bestimmt:
 ---.
-Diese Gleichung stellt das Skalarprodukt des Vektors senkrecht zum Steuerkursvektor und des Vektors von der Vorderachse zum Bahnpunkt dar. ABBILDUNG ist eine visuelle Darstellung dieser beiden Vektoren.
-Der Kurs- und der Spurabweichungsvektor werden dann in den Stanley-Regler eingegeben, wobei der Ausgang des Reglers in das Fahrzeugmodell eingespeist wird. 
+Diese Gleichung stellt das Skalarprodukt des Vektors senkrecht zum 
+Steuerkursvektor und des Vektors von der Vorderachse zum Bahnpunkt dar. 
+ABBILDUNG ist eine visuelle Darstellung dieser beiden Vektoren.
+Der Kurs- und der Spurabweichungsvektor werden dann in den Stanley-Regler 
+eingegeben, wobei der Ausgang des Reglers in das Fahrzeugmodell eingespeist 
+wird. 
 
-Da der Stanley-Regler nur einen Lenkwinkel ausgibt, wird die Geschwindigkeit als konstant angenommen. 
+Da der Stanley-Regler nur einen Lenkwinkel ausgibt, wird die Geschwindigkeit als
+konstant angenommen. 
 Ein High-Level-Diagramm des Regelkreises ist in ABBILDUNG dargestellt.
 
 Die Simulation wird dann für eine ausgewählte Zeitspanne durchgeführt.
@@ -219,32 +250,8 @@ Die Simulation wird dann für eine ausgewählte Zeitspanne durchgeführt.
         \label{Zustandsvektor}
     \end{equation}
 
-    \begin{gather}
-        \dot{x_H} = v \cos(\theta) \\
-        \dot{y_H} = v \sin(\theta) \\
-        \dot{\theta} = \frac{v}{l}\tan(\theta)
-    \end{gather}
 
-    \begin{gather}
-        \underline{p}_H := 
-        \begin{bmatrix}
-            x_H & y_H
-        \end{bmatrix}^T \\
-        \underline{p}_V := 
-        \begin{bmatrix}
-            x_V & y_V
-        \end{bmatrix}^T
-        \label{eq:Hinterradachse und Vorderradachse}
-    \end{gather}
 
-    \begin{equation}
-        \underline{p}_V = \underline{p}_H + l 
-        \begin{bmatrix}
-            \cos(\theta + \pi/2) \\ 
-            \sin(\theta + \pi/2)
-        \end{bmatrix}
-        \label{eq:Transformation von Hinterradachse zu Vorderradachse}
-    \end{equation}
 
     \begin{gather}
         \underline{\nu} := 
@@ -405,6 +412,7 @@ Therefore, this is the third stage in the pipeline. As already discussed, in
 the second stage of the pipeline, the threshold stage removes the majority of 
 unnecessary information from the image, which reduces the amount of noise 
 caused by the perspective transform.
+
 \section{Histogram}
 After the perspective transformation stage, a histogram of the pixel density 
 is created. During this step, the start point for the sliding window method is
@@ -418,41 +426,72 @@ unnecessary parts of the image not containing lane information. A visual
 representation of the histogram can be seen in FIGURE.
 
 \section{Gleit-Fenster-Verfahren}
-At this stage of the pipeline, the heading and offset of the lane are calculated 
-through the sliding window method.
+In the fifth stage of the pipeline, the heading and offset of the lane are
+calculated through the sliding window method.
 
-First, a chosen number of rectangles (windows) are created. The windows are 
-aligned in a column and equally sized. Their height is chosen so that the column
-spans the entire height of the image, while their width is chosen to be a 
-multiple of the image width.
+First, a chosen number of rectangles (windows) are created. The windows are
+aligned in a column and equally sized. Their height is chosen so that the
+column spans the entire height of the image, while their width is chosen to be
+a factor of the image width. The number of windows is chosen so that the column
+entirely or almost entirely  contains the white pixels representing the lane,
+as can be seen in FIGURE. If the number of windows is too high, there is a
+chance that the method will falsely determine white pixels deep into the image
+as a part of the lane. 
 
-In the image coordinate system, the top left corner of the image is $(0, 0)$, 
-with the positive x-axis increasing to the right, while the positive y-axis 
-increases moving down the image. Therefore, the bottom edge of the image would 
-be any coordinate with a y component equal to the height of the image.
+Second, the x-coordinate of the midpoint of the first window is set to the peak
+of the histogram from the previous stage. Then, the number of white pixels are
+then counted inside the window. If the number is above a chosen threshold, the
+pixels are added to an array and the mean of the x-coordinates of the contained
+pixels is calculated. The x-coordinate of the next window is set to this
+calculated mean while being placed on top of the first window. This process is
+then repeated for all remaining windows. When no pixels are contained in a
+window, the window is ignored and the following window is placed on top of it.
+In the image coordinate system, the top left corner of the image is $(0, 0)$,
+with the positive x-axis increasing to the right, while the positive y-axis
+increases moving down the image. Therefore, the bottom edge of the image would
+be any coordinate with a y component equal to the height of the image. Seen
+from the engineer's perspective, the windows would be stacked from lowest to
+highest, however in the image coordinate space it is inverted. An example can
+be seen in FIGURE.
+
+The pixels not located within each window are then filtered out of the image.
+The image before and after the filtering process can be seen in FIGURE. Using
+the the least squares method, a polynomial is approximated through remaining
+pixels.
 
 \section{Berechnung von Ausrichtung und Abstand}
-In the final stage of the pipeline, the heading and offset from the lane line 
+In the final stage of the pipeline, the heading and offset from the lane line
 are calculated. 
- 
-From the fitted polynomial calculated in the previous stage, an analytical 
-heading is found at a chosen point along the path with the following equation:
-$$\theta = \arctan(f^\prime(y))$$.
-The inverse tangent of the derivative of the polynomial returns the heading at
-a chosen point. For the stanley controller, only the difference between the 
-path heading and vehicle heading is needed, therefore as there is no global 
-frame for the vehicle, the heading of the vehicle is chosen to be 0!!!!!! at 
-all times. 
 
-The offset from the lane line is calculated from the fitted polynomial with 
-the following function: $$e_{fa} = (\frac{w}{2} - f(h))\cdot x_{mpp}$$, where 
-$w$ is the width of the image, $f(h)$ is the output of the fitted polynomial at 
-the bottom of the image, $x_{mpp}$ is a scaling constant to translate pixels 
-into meters and $e_{fa}$ is the offset from the vehicle to the lane. All 
-together, the difference of the x-component of the midpoint and the 
+
+From the fitted polynomial calculated in the previous stage, an analytical
+heading is found at a chosen point along the path with the following equation:
+$$\theta = \arctan(f^\prime(y))$$. The inverse tangent of the derivative of
+the polynomial returns the heading at a chosen point. For the stanley
+controller, only the difference between the path heading and vehicle heading
+is needed, therefore as there is no global frame for the vehicle, the heading
+of the vehicle is chosen to be 0!!!!!! at all times. PICTURE WITH VISUAL
+REPRSENTATION 
+
+The classic stanley controller, as described in chapter 2, uses the heading
+calculated from the nearest path point. However, as a side effect of the
+polynomial fitting, the heading calculated at the bottom of the image is
+incorrect. As can be seen in FIGURE, the sliding window method can on average
+not detect the lane line close to the bottom of the frame. Due to this, the
+fitted polynomial incorrectly approximates the heading. Therefore, the heading
+is calculated at a point located within the detected lane line instead.
+Moreover, this adds a degree of freedom to the controller. The consequences of
+this are discussed in chapter 4.
+
+
+The offset from the lane line is calculated from the fitted polynomial with
+the following function: $$e_{fa} = (\frac{w}{2} - f(h))\cdot x_{mpp}$$, where
+$w$ is the width of the image, $f(h)$ is the output of the fitted polynomial
+at the bottom of the image, $x_{mpp}$ is a scaling constant to translate
+pixels into meters and $e_{fa}$ is the offset from the vehicle to the lane.
+All together, the difference of the x-component of the midpoint and the
 x-component of the polynomial point located on the bottom edge of the image is
 translated into meters.
-
 \section{Pipeline-Optimierungen}
 One of the obstacles encountered during the creation of the image processing
 pipeline, is that the image would be processed too slowly. 
@@ -483,5 +522,45 @@ the speed improvement. The values are in TABLE, showing that by caching the
 expensive function calls, the pipeline processing speed improved by VALUE%.
 
 \chapter{Experiment}
+\section{Hardware Setup}
+The CoRoLa car platform is composed of a Raspberry Pi, a fisheye lens camera, a
+DC motor and a motor controller to control the vehicle speed and a servo motor
+to control the steering angle of the vehicle. The Raspberry Pi sends PWM
+signals to the motor controller and the servo controller in order to control
+the vehicle. Using Robot Operating System 2 (ros2), the Raspberry Pi is
+connected over the network to a central computer. The stanley controller runs
+on the central computer, which processes the data from the camera and sends the
+output of the stanley controller to the vehicle.
+
+\section{Experiment Setup}
+In order to compare the stanley controller and the sliding window method with
+the PID controller, 4 test criteria are chosen: maximum acceptable velocity and
+maximum offset angle, as well as the root mean square values of the vehicle
+offset and controller outputs.
+
+In order to measure the maximum acceptable velocity, vehicle drives around the
+track at a given forward velocity. If the behavior of the vehicle is seen as
+"acceptable", then the vehicle is stopped and the velocity is increased. This
+process repeats until the behavior of the vehicle is no longer "acceptable".
+"Acceptable" behavior of the vehicle is defined empirically under the following
+two criteria: ability to follow the lane line and an absence of observed
+oscillations.
+
+The measurement of vehicle offset is conducted through the following two
+experiments. First, the vehicle starts driving around the track. Then using an
+overhead camera, video of the vehicle driving around the curves is recorded.
+The vehicle is recorded at differing forward velocities. For the first round of
+recordings, the vehicle is controlled by the PID controller and for the second,
+it is controlled by the stanley controller. This experiment is then repeated
+with the camera recording video of the vehicle driving along the straights
+instead. 
+
+In order to measure the controller output of the two controllers, the vehicle
+is commanded to drive around the track at least 3 times. During the drive, the
+controller output is recorded with an approximate sampling rate of 20 Hz. After
+the drive, the data is graphed over time and a subset of the data is selected.
+The subset of the data is selected under the following criteria: 
+
+
 \chapter{Conclusion}
 \end{document}
