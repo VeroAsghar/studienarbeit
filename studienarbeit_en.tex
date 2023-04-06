@@ -512,6 +512,30 @@ pixels into meters and $e_{fa}$ is the offset from the vehicle to the lane.
 All together, the difference of the x-component of the midpoint and the
 x-component of the polynomial point located on the bottom edge of the image is
 translated into meters.
+
+\section{Ausrei{\ss}er}
+A side effect of the sliding window method is a phenomenom termed "outliers".
+Outliers are any frame where the lane line is incorrectely determined. In
+FIGURE, a sequence of three frames with an outlier are observed with the left
+frame being the start. In the first frame, the lane line is correctly
+determined. In the second frame, the lane line is incorrectly determined. In
+the last frame, the lane line is once again correctly determined. 
+The incorrect selection of HSV values is the largest contributor to the
+occurence of outliers. When the HSV values are not restrictive enough, colors
+besides yellow are not filtered out of the image. Which leads to incorrect
+determination of the lane line.
+Outliers are most common on the curves of the track, due a disadvantage of the
+pipeline implementation. As discussed previously, the first window of the sliding
+window method is selected at the x-position of the peak of the pixel histogram.
+Along the straight part of the track, the lane line is the densest object in the 
+image. Therefore the peak of the histogram will be along the lane line. Along 
+the curves, the lane line will be spread across the x-axis leading to a reduced 
+peak in the histogram. A visual representation can be seen in FIGURE. 
+A combination of the two previous factors led to the outlier seen in FIGURE.
+
+
+
+
 \section{Pipeline-Optimierungen}
 One of the obstacles encountered during the creation of the image processing
 pipeline, is that the image would be processed too slowly. 
@@ -565,6 +589,18 @@ process repeats until the behavior of the vehicle is no longer "acceptable".
 "Acceptable" behavior of the vehicle is defined empirically under the following
 two criteria: ability to follow the lane line and an absence of observed
 oscillations.
+
+The maximum offset angles are defined as the maximum angles at which the
+vehicle is able to find the path again, on the left and right of the lane line
+respectively. In order to measure this, the vehicle is placed collinear with
+the lane line with the motor controller disabled. The vehicle is then turned
+clockwise, with the output of the respective controller displayed in realtime.
+The vehicle is turned until the output of the controller becomes either chaotic
+or the output is consistently zero. The experiment is then executed for the
+Stanley Controller and PID Controller. The occurence of chaotic output is
+nondeterministic, however empirically it is when the vehicle cannot detect the
+lane line reliably. An output of zero also means that the vehicle cannot detect
+the lane line at all.
 
 The measurement of vehicle offset is conducted through the following two
 experiments. First, the vehicle starts driving around the track. Then using an
