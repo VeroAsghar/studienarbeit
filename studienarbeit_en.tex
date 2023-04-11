@@ -2,24 +2,24 @@
 \documentclass[arbeit=studie,oneside,BCOR=12mm]{ArbeitRST}
 \usepackage{amsmath} 
 \hypersetup{
-    unicode=false,          % non-Latin characters in Acrobat’s bookmarks
-    pdftoolbar=true,        % show Acrobat’s toolbar?
-    pdfmenubar=true,        % show Acrobat’s menu?
-    pdffitwindow=false,     % window fit to page when opened
-    pdfstartview={FitH},    % fits the width of the page to the window
-    pdftitle={Verbessung der Spurerkennung und -verfolgung autonomer Modellfahrzeuge}, % title
-    pdfauthor={James Vero Asghar},     % author
-    pdfsubject={Subject},   % subject of the document
-    pdfcreator={James Vero Asghar},   % creator of the document
-    pdfproducer={Producer}, % producer of the document
-    pdfkeywords={Stanley controller} {sliding window method} {model cars}, % list of keywords
-    pdfnewwindow=true,      % links in new window
-    colorlinks=true,        % false: boxed links; true: colored links
-    linkcolor=blue,         % color of internal links (change box color with linkbordercolor)
-    citecolor=green,        % color of links to bibliography
-    filecolor=magenta,      % color of file links
-    urlcolor=cyan           % color of external links
-}
+  unicode=false,          % non-Latin characters in Acrobat’s bookmarks
+  pdftoolbar=true,        % show Acrobat’s toolbar?
+  pdfmenubar=true,        % show Acrobat’s menu?
+  pdffitwindow=false,     % window fit to page when opened
+  pdfstartview={FitH},    % fits the width of the page to the window
+  pdftitle={Verbessung der Spurerkennung und -verfolgung autonomer Modellfahrzeuge}, % title
+  pdfauthor={James Vero Asghar},     % author
+  pdfsubject={Subject},   % subject of the document
+  pdfcreator={James Vero Asghar},   % creator of the document
+  pdfproducer={Producer}, % producer of the document
+  pdfkeywords={Stanley controller} {sliding window method} {model cars}, % list of keywords
+  pdfnewwindow=true,      % links in new window
+  colorlinks=true,        % false: boxed links; true: colored links
+  linkcolor=blue,         % color of internal links (change box color with linkbordercolor)
+  citecolor=green,        % color of links to bibliography
+  filecolor=magenta,      % color of file links
+  urlcolor=cyan           % color of external links
+  }
 \setlength{\parindent}{0ex}
 \setlength{\parskip}{2ex}
 
@@ -145,10 +145,12 @@ speed, which can be selected as required for a given application, subject to
 dynamic effects.
 
 The Stanley controller is represented mathematically by the following equation:
+
 \begin{equation}
-    u = \theta - \theta_d + \arctan\left(\frac{ke_{fa}}{v}\right),
-    \label{eq:Stanley-Regler}
+  u = \theta - \theta_d + \arctan\left(\frac{ke_{fa}}{v}\right),
+  \label{eq:Stanley Controller}
 \end{equation}
+
 where $u$ represents the controller output, $\theta$ is the current heading of
 the vehicle, $\theta_d$ is the heading of the path, $k$ is a scaling factor,
 $v$ is the velocity of the vehicle, and $e_{fa}$ is the cross track error from
@@ -175,7 +177,9 @@ vehicle.
 The path that the vehicle must follow is a virtual version of the real world
 track that the vehicle will use. A visual representation of the path is FIGURE.
 In the simulation, the path is represented with the following continuous static
-function: ----, with the input t and the output (x, y, h). This function is
+function: 
+---, 
+with the input t and the output (x, y, h). This function is
 then discretized for any chosen amount of t values, in order to create an array
 of (x, y, theta) values. This array is then fed into the differential equation
 solver that encapsulates the Stanley controller and the vehicle model. 
@@ -183,10 +187,10 @@ solver that encapsulates the Stanley controller and the vehicle model.
 The vehicle model used is the rear axle vehicle model. This model is
 represented by the following nonlinear state space representation: 
 \begin{gather}
-    \dot{x} = v \cos(\theta) \\
-    \dot{y} = v \sin(\theta) \\
-    \dot{\theta} = \frac{v}{l}\tan(\varphi) \\
-    \dot{\varphi} = \frac{-1}{T}\left(\varphi - \delta\right).
+  \dot{x} = v \cos(\theta) \\
+  \dot{y} = v \sin(\theta) \\
+  \dot{\theta} = \frac{v}{l}\tan(\varphi) \\
+  \dot{\varphi} = \frac{-1}{T}\left(\varphi - \delta\right).
 \end{gather}
 
 The state variables of the model are $x_H$, $y_H$, $\phi$ und $\theta$, where
@@ -205,23 +209,23 @@ track error, it must be calculated from the rear axle. The midpoint of the
 front axle is calculated from the state variables through the following static
 function:
 \begin{gather}
-    \underline{p}_H := 
-    \begin{bmatrix}
-        x_H & y_H
-    \end{bmatrix}^T \\
-    \underline{p}_V := 
-    \begin{bmatrix}
-        x_V & y_V
-    \end{bmatrix}^T
-    \label{eq:Hinterradachse und Vorderradachse}
+  \underline{p}_H := 
+  \begin{bmatrix}
+    x_H & y_H
+  \end{bmatrix}^T \\
+  \underline{p}_V := 
+  \begin{bmatrix}
+    x_V & y_V
+  \end{bmatrix}^T
+  \label{eq:Rear Axle and Front Axle}
 \end{gather}
 \begin{equation}
-    \underline{p}_V = \underline{p}_H + l 
-    \begin{bmatrix}
-        \cos(\theta + \pi/2) \\ 
-        \sin(\theta + \pi/2),
-    \end{bmatrix}
-    \label{eq:Transformation von Hinterradachse zu Vorderradachse}
+  \underline{p}_V = \underline{p}_H + l 
+  \begin{bmatrix}
+    \cos(\theta + \pi/2) \\ 
+    \sin(\theta + \pi/2),
+  \end{bmatrix}
+  \label{eq:Transformation from Rear Axle to Front Axle}
 \end{equation}
 where xf and yf are the x/y coordinates of this midpoint. 
 
@@ -231,9 +235,12 @@ available. For the cross track error and the heading path, the correct path
 point must be chosen. The Stanley controller uses the closest path point to
 determine the required heading and current cross track error. For the
 simulation this is determined by finding the point with the smallest distance
-from the front axle midpoint. The algorithm is represented as follows: ---.
+from the front axle midpoint. The algorithm is represented as follows: 
+---.
 Through this found point, the heading path is determined. The cross track error
-is then determined through the following equation: ---. This equation
+is then determined through the following equation: 
+---. 
+This equation
 represents the dot product of the vector perpendicular to the heading vector
 and the vector from the front axle to the path point. FIGURE is a visual
 representation of these two vectors. The heading path and cross track error are
@@ -246,11 +253,11 @@ in FIGURE.
 
 The Stanley controller works with continuous time signals, which is different
 from what is used on the vehicle. The vehicle captures images at a specific
-frequency, which are then processed by the pipeline before being fed into the
-controller. In order to simulate this behavior, a cache was built into the
-simulator, where the heading path and cross track error are saved. The Stanley
-controller is then fed these saved values for a chosen amount of time. By
-caching these values, the behavior of a zero-order hold is simulated. The
+sampling frequency, which are then processed by the pipeline before being fed
+into the controller. In order to simulate this behavior, a cache was built into
+the simulator, where the heading path and cross track error are saved. The
+Stanley controller is then fed these saved values for a chosen amount of time.
+By caching these values, the behavior of a zero-order hold is simulated. The
 output of this zero-order hold is then fed into the Stanley controller. This
 allows for the behavior of the vehicle to be investigated for different
 sampling frequencies, which allows for a tolerance to be set for the processing
@@ -262,47 +269,45 @@ sampling frequency, however above X Hz the behavior of the vehicle is not
 noticeably different. 
 
 The simulation is then executed for a chosen amount of time. 
-    \begin{equation} 
-        \underline{x} := 
-        \begin{bmatrix}
-            x_H & y_H & \theta
-        \end{bmatrix}^T 
-        \label{Zustandsvektor}
-    \end{equation}
+\begin{equation} 
+  \underline{x} := 
+  \begin{bmatrix}
+    x_H & y_H & \theta
+  \end{bmatrix}^T 
+  \label{Zustandsvektor}
+\end{equation}
 
 
 
 
-    \begin{gather}
-        \underline{\nu} := 
-        \begin{bmatrix}
-            -\cos(\theta + \pi/2) \\
-            -\sin(\theta + \pi/2)
-        \end{bmatrix} \\
-        \underline{p}_P := 
-        \begin{bmatrix}
-            x_P & y_P
-        \end{bmatrix}^T
-    \end{gather}
+\begin{gather}
+  \underline{\nu} := 
+  \begin{bmatrix}
+    -\cos(\theta + \pi/2) \\
+    -\sin(\theta + \pi/2)
+  \end{bmatrix} \\
+  \underline{p}_P := 
+  \begin{bmatrix}
+    x_P & y_P
+  \end{bmatrix}^T
+\end{gather}
 
-    \begin{equation}
-        e_V :=  \underline{\nu} \cdot \min_i |\underline{p}_V -  \underline{p}_{Pi}| ?
-        \label{eq:Querabweichung}
-    \end{equation}
+\begin{equation}
+  e_V :=  \underline{\nu} \cdot \min_i |\underline{p}_V -  \underline{p}_{Pi}| ?
+  \label{eq:Querabweichung}
+\end{equation}
 
 \chapter{Bildverarbeitung}
 \section{Kamera-Kalibrierung}
-The start of the image processing pipeline is the camera calibration. In this 
-project, a fisheye camera was chosen as opposed to a rectilinear camera. The 
-benefit of a 
-fisheye camera arises from its wider angle of view in comparison to a 
-rectilinear camera. However, a fisheye camera distorts(?) an image differently 
-from a rectilinear 
-camera. A rectilinear camera preserves straight lines, when no distortion is 
-present, as opposed to a fisheye camera, which will always curve straight lines. 
-The 
-curvature of these straight lines is dependent on their radial distance from 
-the center of the image.  An example is in FIGURE.
+The start of the image processing pipeline is the camera calibration. In this
+project, a fisheye camera was chosen as opposed to a rectilinear camera. The
+benefit of a fisheye camera arises from its wider angle of view in comparison
+to a rectilinear camera. However, a fisheye camera distorts(?) an image
+differently from a rectilinear camera. A rectilinear camera preserves straight
+lines, when no distortion is present, as opposed to a fisheye camera, which
+will always curve straight lines. The curvature of these straight lines is
+dependent on their radial distance from the center of the image.  An example is
+in FIGURE.
 
 Camera calibration is used in order to approximate the extrinsic and intrinsic 
 parameters of a camera (MATLAB). A calibrated camera allows for 3-D information
@@ -343,22 +348,20 @@ calibrated using images at 900p and the right image is calibrated using images
 at 240p. As can be seen, the image on the right straightens the ruler, while 
 the middle image leaves it curved.
 
-One downside to camera calibration is that any calibrated image has a lower 
-resolution than the original image. This is a consequence of the calibration 
-process, as the process will distort a subset of the image, particularly 
-involving the pixels around the corners of the image. 
-Therefore the calibration process will remove these pixels from the resulting 
-image. In order to recreate the image in its original resolution, an 
-interpolator is used. 
-However, the interpolator will return a blurrier image than the original. 
-In order to compensate for this, it is recommended to calibrate a camera with 
-high resolution images and then capture images at that resolution. 
-Then, instead of using the interpolator, shrink the images down to a resolution
-that is necessary for the application.  
-This results in a more accurate image without any blurriness. 
-Unfortunately, this process is computationally heavy and with the processor 
-used on the vehicle, it was decided to only use the images from the interpolator
-in order to increase the processing speed.
+One downside to camera calibration is that any calibrated image has a lower
+resolution than the original image. This is a consequence of the calibration
+process, as the process will distort a subset of the image, particularly
+involving the pixels around the corners of the image. Therefore the calibration
+process will remove these pixels from the resulting image. In order to recreate
+the image in its original resolution, an interpolator is used. However, the
+interpolator will return a blurrier image than the original. In order to
+compensate for this, it is recommended to calibrate a camera with high
+resolution images and then capture images at that resolution. Then, instead of
+using the interpolator, shrink the images down to a resolution that is
+necessary for the application.  This results in a more accurate image without
+any blurriness. Unfortunately, this process is computationally heavy and with
+the processor used on the vehicle, it was decided to only use the images from
+the interpolator in order to increase the processing speed.
 
 Another downside from the camera calibration as that the midpoint of the camera
 shifts. An example of this can be seen in FIGURE. $C_{3,1}$ and $C_{3,2}$ 
@@ -367,15 +370,15 @@ changing this value, the midpoint of the image can be shifted back to its
 original location.
 
 \section{Color Thresholding}
+
 After the camera calibration comes the color thresholding stage of the pipeline.
 This stage removes all pixels from the image that are not yellow with a high
 saturation and brightness. 
 
-At first, the image is filtered of all pixels without a high red component, as 
-bright yellow in the red, green and blue (RGB) color space has a high red 
-component. 
-Afterwards, the image is converted into the Hue, Lightness and Saturation (HLS)
-color space. 
+At first, the image is filtered of all pixels without a high red component, as
+bright yellow in the red, green and blue (RGB) color space has a high red
+component. Afterwards, the image is converted into the Hue, Lightness and
+Saturation (HLS) color space. 
 
 Under the RGB color space, yellow is represented as a combination of the red 
 and green channels with the blue channel set to 0. Pure yellow is also defined 
@@ -384,6 +387,7 @@ allowing only 1 degree of freedom to tune the pipeline.  Having only 1 degree
 of freedom leads to issues with tuning, as this reduces the ability for the 
 pipeline to account for disturbances, such as differing lighting conditions or 
 reflective surfaces.
+
 Under the HLS color space, the hue channel selects the color, the lightness 
 channel corresponds to the amount of white or black in the color and the 
 saturation channel is a measure of the purity of a hue. (MS ANNO) Once the hue 
@@ -402,31 +406,29 @@ TABLE.
 An example of the output from this stage of the pipeline is FIGURE.
 
 \section{Perspective Transformation}
+
 The third part of the image processing pipeline is the perspective 
 transformation. 
-Whenever an image is captured with a camera mounted to the vehicle, the lane 
-line will be trapezoidal as opposed to straight and lane seems to end in a 
-point at the center of the image. This perspective requires that all 
-calculations 
-regarding the lane line must compensate for the decreasing width of the line. 
-Therefore, to remove this requirement, a perspective transformation is 
-employed. Perspective transformation is the process 
-by which a subset of an image is sheared and made to fit the entirety of a new 
-image. An example is in FIGURE. For this project, the shape of the subset of 
-the 
-image is selected to be a trapezoid, shown in FIGURE. 
-Using this perspective transform, the trapezoidal shape of the lane line is 
-corrected 
-into one that is straight, shown in FIGURE.
 
-A consequence of this new perspective, is that the resulting 
-image is similar to a 2-D plane of the track. The perspective transformation 
-simplifies further image processing as well, as all objects outside of the 
-trapezoid 
-are cropped, leaving only the track. However, as can be seen in FIGURE, the 
-perspective transform introduces extra noise into the image. The shearing 
-caused by the perspective transform causes pixels from the original image to 
-be stretched, thereby polluting the image with noise. 
+Whenever an image is captured with a camera mounted to the vehicle, the lane
+line will be trapezoidal as opposed to straight and lane seems to end in a
+point at the center of the image. This perspective requires that all
+calculations regarding the lane line must compensate for the decreasing width
+of the line. Therefore, to remove this requirement, a perspective
+transformation is employed. Perspective transformation is the process by which
+a subset of an image is sheared and made to fit the entirety of a new image. An
+example is in FIGURE. For this project, the shape of the subset of the image is
+a trapezoid due to how lines in the image converge into a point far in the
+distance. Using this perspective transform, the trapezoidal shape of the lane
+line is corrected into one that is straight, shown in FIGURE.
+
+A consequence of this new perspective, is that the resulting image is similar
+to a 2-D plane of the track. The perspective transformation simplifies further
+image processing as well, as all objects outside of the trapezoid are cropped,
+leaving only the track. However, as can be seen in FIGURE, the perspective
+transform introduces extra noise into the image. The shearing caused by the
+perspective transform causes pixels from the original image to be stretched,
+thereby polluting the image with noise. 
 
 Therefore, this is the third stage in the pipeline. As already discussed, in 
 the second stage of the pipeline, the threshold stage removes the majority of 
@@ -434,9 +436,11 @@ unnecessary information from the image, which reduces the amount of noise
 caused by the perspective transform.
 
 \section{Histogram}
+
 After the perspective transformation stage, a histogram of the pixel density 
 is created. During this step, the start point for the sliding window method is
 found. 
+
 At every column of the image, the number of white pixels are counted. 
 The numbers are then placed into a list. The assumption is then that the 
 columns containing the largest numbers contain the lane information. The 
@@ -446,6 +450,7 @@ unnecessary parts of the image not containing lane information. A visual
 representation of the histogram can be seen in FIGURE.
 
 \section{Gleit-Fenster-Verfahren}
+
 In the fifth stage of the pipeline, the heading and offset of the lane are
 calculated through the sliding window method.
 
@@ -489,8 +494,8 @@ heading is found at a chosen point along the path with the following equation:
 $$\theta = \arctan(f^\prime(y))$$. The inverse tangent of the derivative of
 the polynomial returns the heading at a chosen point. For the Stanley
 controller, only the difference between the path heading and vehicle heading
-is needed, therefore as there is no global frame for the vehicle, the heading
-of the vehicle is chosen to be 0!!!!!! at all times. PICTURE WITH VISUAL
+is needed as there is no global frame for the vehicle, the heading
+of the vehicle is chosen to be zero degrees at all times. PICTURE WITH VISUAL
 REPRSENTATION 
 
 The classic Stanley controller, as described in chapter 2, uses the heading
@@ -582,6 +587,7 @@ the PID controller, 4 test criteria are chosen: maximum acceptable velocity and
 maximum offset angles, as well as the root mean square values of the vehicle
 offset and controller outputs.
 
+\subsection{H"ochstgeschwindigkeit}
 In order to measure the maximum acceptable velocity, vehicle drives around the
 track at a given forward velocity. If the behavior of the vehicle is seen as
 "acceptable", then the vehicle is stopped and the velocity is increased. This
@@ -590,6 +596,7 @@ process repeats until the behavior of the vehicle is no longer "acceptable".
 two criteria: ability to follow the lane line and an absence of observed
 oscillations.
 
+\subsection{Maximal m"oglicher Fehlerwinkel}
 The maximum offset angles are defined as the maximum angles at which the
 vehicle is able to find the path again, on the left and right of the lane line
 respectively. In order to measure this, the vehicle is placed collinear with
@@ -602,15 +609,17 @@ nondeterministic, however empirically it is when the vehicle cannot detect the
 lane line reliably. An output of zero also means that the vehicle cannot detect
 the lane line at all.
 
+\subsection{Abstand von der Linie}
 The measurement of vehicle offset is conducted through the following two
 experiments. First, the vehicle starts driving around the track. Then using an
-overhead camera, video of the vehicle driving around the curves is recorded.
-The vehicle is recorded at differing forward velocities. For the first round of
-recordings, the vehicle is controlled by the PID controller and for the second,
-it is controlled by the Stanley controller. This experiment is then repeated
-with the camera recording video of the vehicle driving along the straights
-instead. 
+overhead camera, video of the vehicle driving around the curves is recorded
+from a top down view. The vehicle is recorded at differing forward velocities.
+For the first round of recordings, the vehicle is controlled by the PID
+controller and for the second, it is controlled by the Stanley controller. This
+experiment is then repeated with the camera recording video of the vehicle
+driving along the straights instead. 
 
+\subsection{Reglerausgang}
 In order to measure the controller output of the two controllers, the vehicle
 is commanded to drive around the track at least 3 times. During the drive, the
 controller output is recorded. After the drive, the data is graphed over time
