@@ -148,9 +148,8 @@ The Stanley controller is represented mathematically by the following equation:
 
 \begin{equation}
   u = \theta - \theta_d + \arctan\left(\frac{ke_{fa}}{v}\right),
-  \label{eq:Stanley Controller}
+  \label{eq:Stanley-Regler}
 \end{equation}
-
 where $u$ represents the controller output, $\theta$ is the current heading of
 the vehicle, $\theta_d$ is the heading of the path, $k$ is a scaling factor,
 $v$ is the velocity of the vehicle, and $e_{fa}$ is the cross track error from
@@ -297,56 +296,62 @@ The simulation is then executed for a chosen amount of time.
   \label{eq:Querabweichung}
 \end{equation}
 
-\chapter{Bildverarbeitung}
-\section{Kamera-Kalibrierung}
-The start of the image processing pipeline is the camera calibration. In this
-project, a fisheye camera was chosen as opposed to a rectilinear camera. The
-benefit of a fisheye camera arises from its wider angle of view in comparison
-to a rectilinear camera. However, a fisheye camera distorts(?) an image
-differently from a rectilinear camera. A rectilinear camera preserves straight
-lines, when no distortion is present, as opposed to a fisheye camera, which
-will always curve straight lines. The curvature of these straight lines is
+\chapter{Bildverarbeitung} \section{Kamera-Kalibrierung} The start of the image
+processing pipeline is the camera calibration. In this project, a fisheye
+camera was chosen as opposed to a rectilinear camera. The benefit of a fisheye
+camera arises from its wider angle of view in comparison to a rectilinear
+camera. However, a fisheye camera inherently has barrel distortion causing
+straight lines to become curved. The curvature of these straight lines is
 dependent on their radial distance from the center of the image.  An example is
-in FIGURE.
+in FIGURE. Compensation for this distortion is possible through softeware,
+using the process known as camera calibration. 
 
-Camera calibration is used in order to approximate the extrinsic and intrinsic 
+Camera calibration is used in order to approximate the extrinsic and intrinsic
 parameters of a camera (MATLAB). A calibrated camera allows for 3-D information
-to be recovered from a 2-D image. The intrinsic parameters of a camera are often 
-represented by the following 3x3 matrix:
+to be recovered from a 2-D image. The intrinsic parameters of a camera are
+often represented by the following 3x3 matrix:
 
-$$K = matrix$$, where fx, fy, cx, and cy MEAN SOMETHING. The extrinsic
+\begin{equation}
+  K = 
+  \begin{bmatrix} 
+    f_x & 0 & c_x\\ 
+    0 & f_y & c_y\\
+    0 & 0 & 1 
+  \end{bmatrix},
+\end{equation}
+
+
+where $f_x$, $f_y$, $c_x$ and $c_y$ MEAN SOMETHING. The extrinsic
 parameters are often represented by the following row vector:
 $$vector$$, where $R$ is the rotation of the camera with respect to a world 
 frame and $t$ is the translation from the same world frame. The row 
 vector-matrix multiplication of the extrinsics vector and the intrinsics matrix
 result in the camera matrix $P$.
 
-A camera is calibrated by using a collection of photos with known straight 
-lines. Commonly, a series of checkerboard images with known dimensions are used. 
-Photos of the checkerboard are then captured at varying angles and locations in 
-the scene. This series of images is then fed to the camera calibration 
-algorithm, which will first determine the locations of the checkerboard squares
-and the lines connecting them.  Afterwards, using the model of a fisheye camera,
-the algorithm 
-compensates for the distortion of the fisheye camera. 
-For example, as seen in FIGURE, the curved lines of the checkerboard are made 
-straight again after calibration. The number of needed images is dependent on 
-the specific camera, however a large collection of photos will lead to a more 
-accurate parameter approximation. (OPENCV Citation) Using images with a higher 
-resolution will also lead to a more accurate parameters. (OPENCV/BLOG Citation)
-However, the approximated parameters are only accurate for the calibration of 
-images taken at the same resolution as the images used for the calibration. In
-order to use the camera matrix for images with a lower resolution, the camera 
-must be scaled with the following formula:
+A camera is calibrated by using a collection of photos with known straight
+lines. Commonly, a series of checkerboard images with known dimensions are
+used. Photos of the checkerboard are then captured at varying angles and
+locations in the scene. This series of images is then fed to the camera
+calibration algorithm, which will first determine the locations of the
+checkerboard squares and the lines connecting them.  Afterwards, using the
+model of a fisheye camera, the algorithm compensates for the distortion of the
+fisheye camera. For example, as seen in FIGURE, the curved lines of the
+checkerboard are made straight again after calibration. The number of needed
+images is dependent on the specific camera, however a large collection of
+photos will lead to a more accurate parameter approximation. (OPENCV Citation)
+Using images with a higher resolution will also lead to a more accurate
+parameters. (OPENCV/BLOG Citation) However, the approximated parameters are
+only accurate for the calibration of images taken at the same resolution as the
+images used for the calibration. In order to use the camera matrix for images
+with a lower resolution, the camera must be scaled with the following formula:
 (EQUATION). As the camera matrix is an example of an affine transformation, the
-value at $C_{3, 3}$ must be reset to 1.
-The resulting camera matrix will work for smaller resolutions matching the 
-aspect ratio of the images used for calibration, but it has been noticed that 
-when the difference in resolution is too large, distortion is added back into 
-the image. In FIGURE, the original image is on the left, the middle image is 
-calibrated using images at 900p and the right image is calibrated using images 
-at 240p. As can be seen, the image on the right straightens the ruler, while 
-the middle image leaves it curved.
+value at $C_{3, 3}$ must be reset to 1. The resulting camera matrix will work
+for smaller resolutions matching the aspect ratio of the images used for
+calibration, but it has been noticed that when the difference in resolution is
+too large, distortion is added back into the image. In FIGURE, the original
+image is on the left, the middle image is calibrated using images at 900p and
+the right image is calibrated using images at 240p. As can be seen, the image
+on the right straightens the ruler, while the middle image leaves it curved.
 
 One downside to camera calibration is that any calibrated image has a lower
 resolution than the original image. This is a consequence of the calibration
@@ -368,6 +373,10 @@ shifts. An example of this can be seen in FIGURE. $C_{3,1}$ and $C_{3,2}$
 represent the image center, with $C_{3,1}$ being the $x$ coordinate. By manually
 changing this value, the midpoint of the image can be shifted back to its 
 original location.
+
+\begin{equation}
+  (k_1, k_2, k_3, k_4)
+\end{equation}
 
 \section{Color Thresholding}
 
@@ -609,15 +618,15 @@ nondeterministic, however empirically it is when the vehicle cannot detect the
 lane line reliably. An output of zero also means that the vehicle cannot detect
 the lane line at all.
 
-\subsection{Abstand von der Linie}
-The measurement of vehicle offset is conducted through the following two
-experiments. First, the vehicle starts driving around the track. Then using an
+\subsection{Abstand von der Linie} The measurement of vehicle offset is
+conducted through the following two experiments. First, the vehicle starts
+driving around the track with a selected forward velocity. Then using an
 overhead camera, video of the vehicle driving around the curves is recorded
 from a top down view. The vehicle is recorded at differing forward velocities.
 For the first round of recordings, the vehicle is controlled by the PID
 controller and for the second, it is controlled by the Stanley controller. This
-experiment is then repeated with the camera recording video of the vehicle
-driving along the straights instead. 
+experiment is then repeated for the chosen velocities of 1.0, 1.25, 1.5, 1.75
+and 2.0 meters per second.
 
 \subsection{Reglerausgang}
 In order to measure the controller output of the two controllers, the vehicle
@@ -625,6 +634,9 @@ is commanded to drive around the track at least 3 times. During the drive, the
 controller output is recorded. After the drive, the data is graphed over time
 and a subset of the data is selected. The subset of the data is selected under
 the following criteria: periodicity and absence of outliers.
+
+\section{Ergebnisse}
+The results of the experiments are list in TABLE. 
 
 
 \chapter{Conclusion}
