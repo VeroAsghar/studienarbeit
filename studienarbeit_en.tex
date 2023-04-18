@@ -18,10 +18,12 @@
   linkcolor=blue,         % color of internal links (change box color with linkbordercolor)
   citecolor=green,        % color of links to bibliography
   filecolor=magenta,      % color of file links
-  urlcolor=cyan           % color of external links
+  urlcolor=cyan           % color oPf external links
   }
 \setlength{\parindent}{0ex}
 \setlength{\parskip}{2ex}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 % Entfernt die farbigen Markierungen - bitte Druckversion mit dieser Option kompilieren
 %\hypersetup{hidelinks}
@@ -145,7 +147,6 @@ speed, which can be selected as required for a given application, subject to
 dynamic effects.
 
 The Stanley controller is represented mathematically by the following equation:
-
 \begin{equation}
   u = \theta - \theta_d + \arctan\left(\frac{ke_{fa}}{v}\right),
   \label{eq:Stanley-Regler}
@@ -164,24 +165,57 @@ represented by $\theta_d - \theta$, controls the steering angle to stay
 parallel with the path to be followed. Together, these two components work to
 steer the vehicle onto the desired path.
 
+\subsection{Kleinsignalverhalten}
+In order to better understand the behaviour of the Stanley Controller, the
+controller is linearized about the point \(\left(x_V, \theta_d\right)\)=
+\(\left(0, 0\right)\), which results in the following equation:
+\begin{equation}
+  \bar{u} \approx \bar{\theta} + \frac{ke_{fa}}{v}.
+  \label{eq:linearer Stanley-Regler}
+\end{equation}
+
+The resulting equation \eqref{eq:linearer Stanley-Regler} has the form of a PID
+(Proportional, Integral and Derivative) controller, with only its P and D
+components. The P component is represented by \(\frac{ke_{fa}}{v}\). As the
+velocity for the vehicle is assumed to be constant, there is a proportionality
+between the derivatives of \(e_{fa}\) with respect to time and space. The
+derivative of \(e_{fa}\) with respect to space is \(\theta\). Therefore
+\(\theta\) is the D component of the linearized Stanley controller.
+
+As a consequence, the behaviour of the Stanley controller for small input
+signals is similar to a PD controller with error term \(e_{fa}\). 
+
+\subsection{Gro{\ss}signalverhalten}
+
+For large signals the Stanley controller is dominated by the behavior of the
+\(arctan(...)\) function, as well as the cyclic nature of the heading
+\(\theta\). The \(arctan(...)\) function is limited between -90 and 90 degrees
+and is smooth. The heading is also limited to the front semicircle, or -90 and
+90 degrees, as the vehicle is assumed to be traveling in one direction.
+Together these components limit the steering angle of the vehicle.
 
 \section{Simulation}
-In order to investigate the behavior of the Stanley controller on the remote
-controlled vehicle, a simulation of the control loop was used. The simulation
-has 3 major components: first is the path that the vehicle must follow, second
-is the Stanley controller and third is the vehicle model. A differential
-equation solver is used in order to analyze the time series of the 2 axle
-vehicle. 
+
+In order to more closely investigate the behavior of the Stanley controller on
+the remote controlled vehicle, a simulation of the control loop was used. The
+simulation has 3 major components: first is the path that the vehicle must
+follow, second is the Stanley controller and third is the vehicle model. A
+differential equation solver is used in order to analyze the time series of the
+2 axle vehicle. 
 
 The path that the vehicle must follow is a virtual version of the real world
 track that the vehicle will use. A visual representation of the path is FIGURE.
 In the simulation, the path is represented with the following continuous static
 function: 
----, 
-with the input t and the output (x, y, h). This function is
-then discretized for any chosen amount of t values, in order to create an array
-of (x, y, theta) values. This array is then fed into the differential equation
-solver that encapsulates the Stanley controller and the vehicle model. 
+\begin{equation}
+  (x, y, h) = f(t, t_f),
+\end{equation}
+with the inputs time $t$ and simulation end time $t_f$ and output $(x, y, h)$
+as the cartesian coordinates of the path point and the heading at that point.
+This function is then discretized for any chosen amount of t values, in order
+to create an array of (x, y, theta) values. This array is then fed into the
+differential equation solver that encapsulates the Stanley controller and the
+vehicle model. 
 
 The vehicle model used is the rear axle vehicle model. This model is
 represented by the following nonlinear state space representation: 
@@ -189,19 +223,19 @@ represented by the following nonlinear state space representation:
   \dot{x} = v \cos(\theta) \\
   \dot{y} = v \sin(\theta) \\
   \dot{\theta} = \frac{v}{l}\tan(\varphi) \\
-  \dot{\varphi} = \frac{-1}{T}\left(\varphi - \delta\right).
+  \dot{\varphi} = \frac{\left(\delta\right - u)}{T}.
 \end{gather}
 
 The state variables of the model are $x_H$, $y_H$, $\phi$ und $\theta$, where
-$x_H$ und $y_H$ are the XY-coordinates of the midpoint of the rear axle and
-$\theta$ is the heading of the vehicle. $\phi$ is the steering angle of the
-vehicle. The input variables of the model are $v$ und $\phi_d$, where $v$ is
-the velocity of the vehicle and $\varphi$ is the output of the Stanley
-controller. The steering angle $\varphi$ is represented by a first order linear
-differential equation with the configurable time constant $T$  The behavior of
-the Stanley controller when subjected to dynamic effects on the steering angle,
-is of great importance, as the global asymptotic stability of the controller
-was only proven on the kinematic model, with a springable steering angle. 
+$x_H$ und $y_H$ are the cartesian coordinates of the midpoint of the rear axle
+and $\theta$ is the heading of the vehicle. $\varphi$ is the steering angle of
+the vehicle. The input variables of the model are $v$ und $\varphi$, where $v$
+is the velocity of the vehicle and $\varphi$ is the steering angle. The
+steering angle $\varphi$ is itself a dynamic system represented by a first
+order linear differential equation with the configurable time constant $T$  The
+behavior of the Stanley controller when subjected to dynamic effects on the
+steering angle is of great importance, as the global asymptotic stability of
+the controller was only proven on the kinematic two-axle model.
 
 As the Stanley controller requires the midpoint of the front axle for the cross
 track error, it must be calculated from the rear axle. The midpoint of the
@@ -226,29 +260,37 @@ function:
   \end{bmatrix}
   \label{eq:Transformation from Rear Axle to Front Axle}
 \end{equation}
-where xf and yf are the x/y coordinates of this midpoint. 
+where $x_V$ and $y_V$ are the cartesian coordinates of this midpoint. 
 
 As seen before, the Stanley controller is composed of multiple parts, which
-must be calculated. The heading is a state variable, therefore it is always
-available. For the cross track error and the heading path, the correct path
-point must be chosen. The Stanley controller uses the closest path point to
-determine the required heading and current cross track error. For the
+must be seperately calculated. The heading $\theta$ is a state variable,
+therefore it is always available. In order to calculate the cross track error
+and the heading path, the correct path point must be chosen. The Stanley
+controller uses the closest path point from the vehicle front axle to determine
+the path heading $\theta_d$ and current cross track error $e_{fa}$. For the
 simulation this is determined by finding the point with the smallest distance
-from the front axle midpoint. The algorithm is represented as follows: 
----.
-Through this found point, the heading path is determined. The cross track error
-is then determined through the following equation: 
----. 
-This equation
-represents the dot product of the vector perpendicular to the heading vector
-and the vector from the front axle to the path point. FIGURE is a visual
-representation of these two vectors. The heading path and cross track error are
-then fed into the Stanley controller, whereby the output of the controller is
-fed into the vehicle model.
+from the front axle midpoint $\delta\underline{x}$. The path heading is then
+found from this point. The dot product between the vector perpendicular to the
+vehicle heading $\underline{x}_{\perp}$ and vector from the path point to the
+vehicle front axle $\delta\underline{x}$. For clarity, FIGURE is a visual
+representation of these two vectors and their dot product. This algorithm is
+represented in ALGORITHM. 
+\begin{algorithm}
+  \caption{Berechnung von Querabweichung}
+  \label{alg:path point}
+  \begin{algorithmic}
+    \State $\underline{v}_{\perp} \gets \left[-\cos(\theta + \pi/2),  -\sin(\theta + \pi/2)\right]^T$
+    \State $\Delta\underline{x} \gets \underline{p}_V - \underline{p}_P$
+    \State $\delta\underline{x} \gets \min \left{ || \Delta\underline{x} ||_2 \right}$
+    \State $\theta_d \gets \arctan\left(\frac{\frac{d}{dy}\delta\underline{x}}{\frac{d}{dx}\delta\underline{x}}\right)$
+    \State $e_{fa} \gets \delta\underline{x} \cdot \underline{v}_{\perp}$
+  \end{algorithmic}
+\end{algorithm}
 
-As the Stanley controller only outputs a steering angle, the velocity is
-assumed to be constant. A high level diagram of the control loop is represented
-in FIGURE.
+
+The heading path and cross track error are then fed into the Stanley
+controller, whereby the output of the controller is fed into the vehicle model.
+A high level diagram of the control loop is represented in FIGURE.
 
 The Stanley controller works with continuous time signals, which is different
 from what is used on the vehicle. The vehicle captures images at a specific
@@ -268,49 +310,24 @@ sampling frequency, however above X Hz the behavior of the vehicle is not
 noticeably different. 
 
 The simulation is then executed for a chosen amount of time. 
-\begin{equation} 
-  \underline{x} := 
-  \begin{bmatrix}
-    x_H & y_H & \theta
-  \end{bmatrix}^T 
-  \label{Zustandsvektor}
-\end{equation}
 
+\chapter{Bildverarbeitung} 
 
+\section{Kamera-Kalibrierung} 
 
-
-\begin{gather}
-  \underline{\nu} := 
-  \begin{bmatrix}
-    -\cos(\theta + \pi/2) \\
-    -\sin(\theta + \pi/2)
-  \end{bmatrix} \\
-  \underline{p}_P := 
-  \begin{bmatrix}
-    x_P & y_P
-  \end{bmatrix}^T
-\end{gather}
-
-\begin{equation}
-  e_V :=  \underline{\nu} \cdot \min_i |\underline{p}_V -  \underline{p}_{Pi}| ?
-  \label{eq:Querabweichung}
-\end{equation}
-
-\chapter{Bildverarbeitung} \section{Kamera-Kalibrierung} The start of the image
-processing pipeline is the camera calibration. In this project, a fisheye
-camera was chosen as opposed to a rectilinear camera. The benefit of a fisheye
-camera arises from its wider angle of view in comparison to a rectilinear
-camera. However, a fisheye camera inherently has barrel distortion causing
-straight lines to become curved. The curvature of these straight lines is
-dependent on their radial distance from the center of the image.  An example is
-in FIGURE. Compensation for this distortion is possible through softeware,
-using the process known as camera calibration. 
+The start of the image processing pipeline is the camera calibration. In this
+project, a fisheye camera was chosen as opposed to a rectilinear camera. The
+benefit of a fisheye camera arises from its wider angle of view in comparison
+to a rectilinear camera. However, a fisheye camera inherently has barrel
+distortion causing straight lines to become curved. The curvature of these
+straight lines is dependent on their radial distance from the center of the
+image. An example can be seen in FIGURE. Compensation for this distortion is
+possible through softeware, using the process known as camera calibration. 
 
 Camera calibration is used in order to approximate the extrinsic and intrinsic
 parameters of a camera (MATLAB). A calibrated camera allows for 3-D information
 to be recovered from a 2-D image. The intrinsic parameters of a camera are
 often represented by the following 3x3 matrix:
-
 \begin{equation}
   K = 
   \begin{bmatrix} 
@@ -319,14 +336,28 @@ often represented by the following 3x3 matrix:
     0 & 0 & 1 
   \end{bmatrix},
 \end{equation}
-
-
-where $f_x$, $f_y$, $c_x$ and $c_y$ MEAN SOMETHING. The extrinsic
-parameters are often represented by the following row vector:
-$$vector$$, where $R$ is the rotation of the camera with respect to a world 
-frame and $t$ is the translation from the same world frame. The row 
-vector-matrix multiplication of the extrinsics vector and the intrinsics matrix
-result in the camera matrix $P$.
+where $f_x$ and $f_y$ are the focal lengths of the camera in terms of pixels in
+the $x$ and $y$ directions and $c_x$ and $c_y$ are the coordinates of the
+principal point, ideally in the center of the image. (WIKIPEDIA) The extrinsic
+parameters are often represented by the following matrix: 
+\begin{equation}
+  \begin{bmatrix}
+    R & T
+  \end{bmatrix},
+\end{equation}
+where $R$ is the rotation of the camera with respect to the world frame and $T$
+is the position of the origin of the world frame expressed in the coordinates
+of the camera frame. (WIKIPEDIA) The camera matrix $M$ is then the mapping from
+the world coordinates to pixel coordinates represented by the matrix-matrix 
+multiplication,
+\begin{equation}
+  M = K 
+  \begin{bmatrix}
+    R & T
+  \end{bmatrix}.
+\end{equation}
+By recreating the $M$ matrix through software, the image can be unmapped into
+the world frame causing lines to become straight.
 
 A camera is calibrated by using a collection of photos with known straight
 lines. Commonly, a series of checkerboard images with known dimensions are
@@ -344,14 +375,18 @@ parameters. (OPENCV/BLOG Citation) However, the approximated parameters are
 only accurate for the calibration of images taken at the same resolution as the
 images used for the calibration. In order to use the camera matrix for images
 with a lower resolution, the camera must be scaled with the following formula:
-(EQUATION). As the camera matrix is an example of an affine transformation, the
-value at $C_{3, 3}$ must be reset to 1. The resulting camera matrix will work
-for smaller resolutions matching the aspect ratio of the images used for
-calibration, but it has been noticed that when the difference in resolution is
-too large, distortion is added back into the image. In FIGURE, the original
-image is on the left, the middle image is calibrated using images at 900p and
-the right image is calibrated using images at 240p. As can be seen, the image
-on the right straightens the ruler, while the middle image leaves it curved.
+\begin{equation}
+  K_n = k K,
+\end{equation}
+where $k$ is a scalar value representing the scale-down factor. As the camera
+matrix is an instance of an affine transformation, the value at $K_{3, 3}$ must
+be set to 1. The resulting camera matrix will work for smaller resolutions
+matching the aspect ratio of the images used for calibration, but it has been
+noticed that when the difference in resolution is too large, distortion is
+added back into the image. In FIGURE, the original image is on the left, the
+middle image is calibrated using images at 900p and the right image is
+calibrated using images at 240p. As can be seen, the image on the right
+straightens the ruler, while the middle image leaves it curved.
 
 One downside to camera calibration is that any calibrated image has a lower
 resolution than the original image. This is a consequence of the calibration
@@ -364,19 +399,14 @@ compensate for this, it is recommended to calibrate a camera with high
 resolution images and then capture images at that resolution. Then, instead of
 using the interpolator, shrink the images down to a resolution that is
 necessary for the application.  This results in a more accurate image without
-any blurriness. Unfortunately, this process is computationally heavy and with
-the processor used on the vehicle, it was decided to only use the images from
-the interpolator in order to increase the processing speed.
+any blurriness. Unfortunately, this process is computationally heavy and it was
+decided to only use the images from the interpolator in order to increase the
+performance of the pipeline.
 
-Another downside from the camera calibration as that the midpoint of the camera
-shifts. An example of this can be seen in FIGURE. $C_{3,1}$ and $C_{3,2}$ 
-represent the image center, with $C_{3,1}$ being the $x$ coordinate. By manually
-changing this value, the midpoint of the image can be shifted back to its 
+Another downside from the camera calibration is that the midpoint of the camera
+shifts. An example of this can be seen in FIGURE. By manually
+changing $c_x$, the midpoint of the image can be shifted back to its 
 original location.
-
-\begin{equation}
-  (k_1, k_2, k_3, k_4)
-\end{equation}
 
 \section{Color Thresholding}
 
@@ -497,10 +527,12 @@ pixels.
 In the final stage of the pipeline, the heading and offset from the lane line
 are calculated. 
 
-
 From the fitted polynomial calculated in the previous stage, an analytical
-heading is found at a chosen point along the path with the following equation:
-$$\theta = \arctan(f^\prime(y))$$. The inverse tangent of the derivative of
+heading is found at a chosen point along the path with the following equation,
+\begin{equation}
+  \theta = \arctan(f^\prime(y)).
+\end{equation}
+The inverse tangent of the derivative of
 the polynomial returns the heading at a chosen point. For the Stanley
 controller, only the difference between the path heading and vehicle heading
 is needed as there is no global frame for the vehicle, the heading
@@ -528,59 +560,65 @@ x-component of the polynomial point located on the bottom edge of the image is
 translated into meters.
 
 \section{Ausrei{\ss}er}
+
 A side effect of the sliding window method is a phenomenom termed "outliers".
 Outliers are any frame where the lane line is incorrectely determined. In
 FIGURE, a sequence of three frames with an outlier are observed with the left
 frame being the start. In the first frame, the lane line is correctly
 determined. In the second frame, the lane line is incorrectly determined. In
-the last frame, the lane line is once again correctly determined. 
-The incorrect selection of HSV values is the largest contributor to the
-occurence of outliers. When the HSV values are not restrictive enough, colors
-besides yellow are not filtered out of the image. Which leads to incorrect
-determination of the lane line.
+the last frame, the lane line is once again correctly determined. The incorrect
+selection of HSV values is the largest contributor to the occurence of
+outliers. When the HSV values are not restrictive enough, colors besides yellow
+are not filtered out of the image. Which leads to incorrect determination of
+the lane line.
+
 Outliers are most common on the curves of the track, due a disadvantage of the
-pipeline implementation. As discussed previously, the first window of the sliding
-window method is selected at the x-position of the peak of the pixel histogram.
-Along the straight part of the track, the lane line is the densest object in the 
-image. Therefore the peak of the histogram will be along the lane line. Along 
-the curves, the lane line will be spread across the x-axis leading to a reduced 
-peak in the histogram. A visual representation can be seen in FIGURE. 
-A combination of the two previous factors led to the outlier seen in FIGURE.
+pipeline implementation. As discussed previously, the first window of the
+sliding window method is selected at the x-position of the peak of the pixel
+histogram. Along the straight part of the track, the lane line is the densest
+object in the image. Therefore the peak of the histogram will be along the lane
+line. Along the curves, the lane line will be spread across the x-axis leading
+to a reduced peak in the histogram. A visual representation can be seen in
+FIGURE. A combination of the two previous factors led to the outlier seen in
+FIGURE.
 
 
 
 
 \section{Pipeline-Optimierungen}
+
 One of the obstacles encountered during the creation of the image processing
-pipeline, is that the image would be processed too slowly. 
-The initial implementation of the pipeline ran at approximately 15 Hz, which was
-decided to be close to the lower bound of our chosen tolerance for the 
-processing frequency. 
-In order to improve the processing speed of the pipeline to an acceptable level,
-only 1 optimization was needed. 
-While further optimizations are possible, they were considered to be out of the
-scope of the assignment and are therefore not discussed here.
+pipeline, is that the image would be processed too slowly. The initial
+implementation of the pipeline ran at approximately 15 Hz, which was decided to
+be close to the lower bound of our chosen tolerance for the processing
+frequency. In order to improve the processing speed of the pipeline to an
+acceptable level, only 1 optimization was needed. While further optimizations
+are possible, they were considered to be out of the scope of the assignment and
+are therefore not discussed here.
 
-The Python program cProfiler was used in order to tabulate the function calls of
-the pipeline, as well as the runtime of each function call. As the pipeline is a
-deterministic program, an simple runtime improvement is to cache the output of 
-expensive function calls into memory. Therefore during all subsequent function 
-calls, the cached result is returned instead of running the calculation again. 
-As an example, the perspective transformation matrices are an expensive 
-calculation, which when cached led to a speed improvement of the pipeline.
+The Python program cProfiler was used in order to tabulate the function calls
+of the pipeline, as well as the runtime of each function call. As the pipeline
+is a deterministic program, an simple runtime improvement is to cache the
+output of expensive function calls into memory. Therefore during all subsequent
+function calls, the cached result is returned instead of running the
+calculation again. As an example, the perspective transformation matrices are
+an expensive calculation, which when cached led to a speed improvement of the
+pipeline.
 
-In order to prove the speed improvement of the pipeline, an experiment was 
+In order to prove the speed improvement of the pipeline, an experiment was
 implemented. First, the pipeline is run through once and the runtime ignored as
-the speed improvement is only relevant to subsequent runs of the pipeline. Then,
-on the second run of the pipeline, the runtime is measured for both variants, 
-with and without caching the expensive function calls from the first run. The 
-experiment is then run 100 times and the result tabulated. The arithmetic mean 
-of the runtimes for both variants are then compared to one another to measure 
-the speed improvement. The values are in TABLE, showing that by caching the 
-expensive function calls, the pipeline processing speed improved by VALUE%.
+the speed improvement is only relevant to subsequent runs of the pipeline.
+Then, on the second run of the pipeline, the runtime is measured for both
+variants, with and without caching the expensive function calls from the first
+run. The experiment is then run 100 times and the result tabulated. The
+arithmetic mean of the runtimes for both variants are then compared to one
+another to measure the speed improvement. The values are in TABLE, showing that
+by caching the expensive function calls, the pipeline processing speed improved
+by VALUE%.
 
 \chapter{Experiment}
 \section{Hardware Setup}
+
 The CoRoLa car platform is composed of a Raspberry Pi, a fisheye lens camera, a
 DC motor and a motor controller to control the vehicle speed and a servo motor
 to control the steering angle of the vehicle. The Raspberry Pi sends PWM
@@ -591,12 +629,14 @@ on the central computer, which processes the data from the camera and sends the
 output of the Stanley controller to the vehicle.
 
 \section{Experiment Setup}
+
 In order to compare the Stanley controller and the sliding window method with
 the PID controller, 4 test criteria are chosen: maximum acceptable velocity and
 maximum offset angles, as well as the root mean square values of the vehicle
 offset and controller outputs.
 
 \subsection{H"ochstgeschwindigkeit}
+
 In order to measure the maximum acceptable velocity, vehicle drives around the
 track at a given forward velocity. If the behavior of the vehicle is seen as
 "acceptable", then the vehicle is stopped and the velocity is increased. This
@@ -606,6 +646,7 @@ two criteria: ability to follow the lane line and an absence of observed
 oscillations.
 
 \subsection{Maximal m"oglicher Fehlerwinkel}
+
 The maximum offset angles are defined as the maximum angles at which the
 vehicle is able to find the path again, on the left and right of the lane line
 respectively. In order to measure this, the vehicle is placed collinear with
@@ -618,17 +659,19 @@ nondeterministic, however empirically it is when the vehicle cannot detect the
 lane line reliably. An output of zero also means that the vehicle cannot detect
 the lane line at all.
 
-\subsection{Abstand von der Linie} The measurement of vehicle offset is
-conducted through the following two experiments. First, the vehicle starts
-driving around the track with a selected forward velocity. Then using an
-overhead camera, video of the vehicle driving around the curves is recorded
-from a top down view. The vehicle is recorded at differing forward velocities.
-For the first round of recordings, the vehicle is controlled by the PID
-controller and for the second, it is controlled by the Stanley controller. This
-experiment is then repeated for the chosen velocities of 1.0, 1.25, 1.5, 1.75
-and 2.0 meters per second.
+\subsection{Abstand von der Linie}
+
+The measurement of vehicle offset is conducted through the following two
+experiments. First, the vehicle starts driving around the track with a selected
+forward velocity. Then using an overhead camera, video of the vehicle driving
+around the curves is recorded from a top down view. The vehicle is recorded at
+differing forward velocities. For the first round of recordings, the vehicle is
+controlled by the PID controller and for the second, it is controlled by the
+Stanley controller. This experiment is then repeated for the chosen velocities
+of 1.0, 1.25, 1.5, 1.75 and 2.0 meters per second.
 
 \subsection{Reglerausgang}
+
 In order to measure the controller output of the two controllers, the vehicle
 is commanded to drive around the track at least 3 times. During the drive, the
 controller output is recorded. After the drive, the data is graphed over time
@@ -636,6 +679,7 @@ and a subset of the data is selected. The subset of the data is selected under
 the following criteria: periodicity and absence of outliers.
 
 \section{Ergebnisse}
+
 The results of the experiments are list in TABLE. 
 
 
