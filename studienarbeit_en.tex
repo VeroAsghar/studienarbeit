@@ -135,52 +135,45 @@ The Stanley controller is a non-linear control algorithm that was developed in
 2005 by Stanford University with the purpose of controlling a two-axle vehicle
 using only the heading and the cross track error from the path to be followed.
 The algorithm has been proven to be asymptotically globally stable for the
-kinematic model of a two-axle vehicle. However, it should be noted that the
-model used in this thesis accounts for the dynamics of the steering angle
-rather than being based solely on the kinematic model of the vehicle.
+kinematic model of a two-axle vehicle. (STANFORD)
 
-The Stanley controller is a path following controller rather than a trajectory
-following algorithm. As a lateral controller, it is designed to keep the
+The Stanley controller is a path following controller instead of a trajectory
+following controller. As a lateral controller, it is designed to keep the
 vehicle on the path but has no impact on the speed at which the vehicle travels
 along the path. This approach allows for a flexible choice of the vehicle
 speed, which can be selected as required for a given application, subject to
-dynamic effects.
-
-The Stanley controller is represented mathematically by the following equation:
-\begin{equation}
-  u = \theta - \theta_d + \arctan\left(\frac{ke_{fa}}{v}\right),
-  \label{eq:Stanley-Regler}
-\end{equation}
+dynamic effects. The Stanley controller is represented mathematically by the
+following equation: \begin{equation} u = \theta - \theta_d +
+\arctan\left(\frac{ke_{fa}}{v}\right), \label{eq:Stanley-Regler} \end{equation}
 where $u$ represents the controller output, $\theta$ is the current heading of
 the vehicle, $\theta_d$ is the heading of the path, $k$ is a scaling factor,
 $v$ is the velocity of the vehicle, and $e_{fa}$ is the cross track error from
 the midpoint of the vehicle's front axle to the path.
 
 The Stanley controller consists of two components: a component that handles the
-offset of the vehicle from the path and a component that handles the derivative
-of the offset (difference in heading). The first component is represented by
-$\arctan(\frac{ke_{fa}}{v})$ and drives the steering angle to turn more towards
-the path as the car gets farther away from it. The second component,
-represented by $\theta_d - \theta$, controls the steering angle to stay
-parallel with the path to be followed. Together, these two components work to
-steer the vehicle onto the desired path.
+offset of the vehicle from the path and a component handles the difference in
+vehicle heading and path heading. The first component is represented by
+$\arctan(\frac{ke_{fa}}{v})$ and drives the steering angle to turn towards the
+path as the car gets farther away from it. The second component, represented by
+$\theta_d - \theta$, controls the steering angle to stay parallel to the path
+to be followed. Together, these two components work to steer the vehicle onto
+the desired path.
 
 \subsection{Kleinsignalverhalten}
+
 In order to better understand the behaviour of the Stanley Controller, the
 controller is linearized about the point \(\left(x_V, \theta_d\right)\)=
 \(\left(0, 0\right)\), which results in the following equation:
-\begin{equation}
-  \bar{u} \approx \bar{\theta} + \frac{ke_{fa}}{v}.
-  \label{eq:linearer Stanley-Regler}
-\end{equation}
+\begin{equation} \bar{u} \approx \bar{\theta} + \frac{ke_{fa}}{v}.
+\label{eq:linearer Stanley-Regler} \end{equation}
 
 The resulting equation \eqref{eq:linearer Stanley-Regler} has the form of a PID
-(Proportional, Integral and Derivative) controller, with only its P and D
+(Proportional, Integral and Derivative) controller, with only P and D
 components. The P component is represented by \(\frac{ke_{fa}}{v}\). As the
-velocity for the vehicle is assumed to be constant, there is a proportionality
-between the derivatives of \(e_{fa}\) with respect to time and space. The
-derivative of \(e_{fa}\) with respect to space is \(\theta\). Therefore
-\(\theta\) is the D component of the linearized Stanley controller.
+forward velocity for the vehicle is assumed to be constant, there is a
+proportionality between the derivatives of \(e_{fa}\) with respect to time and
+space. The derivative of \(e_{fa}\) with respect to space is \(\theta\).
+Therefore \(\theta\) is the D component of the linearized Stanley controller.
 
 As a consequence, the behaviour of the Stanley controller for small input
 signals is similar to a PD controller with error term \(e_{fa}\). 
@@ -194,87 +187,98 @@ and is smooth. The heading is also limited to the front semicircle, or -90 and
 90 degrees, as the vehicle is assumed to be traveling in one direction.
 Together these components limit the steering angle of the vehicle.
 
+
+%When dealing with large signals, the behavior of the Stanley controller is
+%mainly influenced by two factors: the cyclic nature of the heading \(\theta\)
+%and the \(arctan(...)\) function. The \(arctan(...)\) function is a smooth
+%function that is limited to a range between -90 and 90 degrees. On the other
+%hand, the heading is constrained to the front semicircle, which is between -90
+%and 90 degrees, as the vehicle is assumed to be traveling in one direction. As
+%a result, these two factors work in tandem to restrict the steering angle of
+%the vehicle, preventing it from becoming too large.
+
 \section{Simulation}
 
-In order to more closely investigate the behavior of the Stanley controller on
-the remote controlled vehicle, a simulation of the control loop was used. The
-simulation has 3 major components: first is the path that the vehicle must
-follow, second is the Stanley controller and third is the vehicle model. A
-differential equation solver is used in order to analyze the time series of the
-2 axle vehicle. 
+%In order to more closely investigate the behavior of the Stanley controller on
+%the remote controlled vehicle, a simulation of the control loop was used. The
+%simulation has 3 major components: first is the path that the vehicle must
+%follow, second is the Stanley controller and third is the vehicle model. A
+%differential equation solver is used in order to analyze the time series of the
+%two axle vehicle. 
 
-The path that the vehicle must follow is a virtual version of the real world
-track that the vehicle will use. A visual representation of the path is FIGURE.
-In the simulation, the path is represented with the following continuous static
-function: 
-\begin{equation}
-  (x, y, h) = f(t, t_f),
-\end{equation}
-with the inputs time $t$ and simulation end time $t_f$ and output $(x, y, h)$
-as the cartesian coordinates of the path point and the heading at that point.
-This function is then discretized for any chosen amount of t values, in order
-to create an array of (x, y, theta) values. This array is then fed into the
-differential equation solver that encapsulates the Stanley controller and the
-vehicle model. 
 
-The vehicle model used is the rear axle vehicle model. This model is
-represented by the following nonlinear state space representation: 
-\begin{gather}
-  \dot{x} = v \cos(\theta) \\
-  \dot{y} = v \sin(\theta) \\
-  \dot{\theta} = \frac{v}{l}\tan(\varphi) \\
-  \dot{\varphi} = \frac{\left(\delta\right - u)}{T}.
-\end{gather}
+%The path that the vehicle must follow is a virtual version of the real world
+%track that the vehicle will use. A visual representation of the path is FIGURE.
+%In the simulation, the path is represented with the following continuous static
+%function: 
+%\begin{equation}
+%  (x, y, h) = f(t, t_f),
+%\end{equation}
+%with the inputs time $t$ and simulation end time $t_f$ and output $(x, y, h)$
+%as the cartesian coordinates of the path point and the heading at that point.
+%This function is then discretized for any chosen amount of $t$ values, in order
+%to create an array of (x, y, theta) values. This array is then fed into the
+%differential equation solver that encapsulates the Stanley controller and the
+%vehicle model. 
 
-The state variables of the model are $x_H$, $y_H$, $\phi$ und $\theta$, where
-$x_H$ und $y_H$ are the cartesian coordinates of the midpoint of the rear axle
-and $\theta$ is the heading of the vehicle. $\varphi$ is the steering angle of
-the vehicle. The input variables of the model are $v$ und $\varphi$, where $v$
-is the velocity of the vehicle and $\varphi$ is the steering angle. The
-steering angle $\varphi$ is itself a dynamic system represented by a first
-order linear differential equation with the configurable time constant $T$  The
-behavior of the Stanley controller when subjected to dynamic effects on the
-steering angle is of great importance, as the global asymptotic stability of
-the controller was only proven on the kinematic two-axle model.
+%The vehicle model used is the rear axle vehicle model. This model is
+%represented by the following nonlinear state space representation: 
+%\begin{gather}
+%  \dot{x} = v \cos(\theta) \\
+%  \dot{y} = v \sin(\theta) \\
+%  \dot{\theta} = \frac{v}{l}\tan(\varphi) \\
+%  \dot{\varphi} = \frac{\left(\delta\right - u)}{T}.
+%\end{gather}
 
-As the Stanley controller requires the midpoint of the front axle for the cross
-track error, it must be calculated from the rear axle. The midpoint of the
-front axle is calculated from the state variables through the following static
-function:
-\begin{gather}
-  \underline{p}_H := 
-  \begin{bmatrix}
-    x_H & y_H
-  \end{bmatrix}^T \\
-  \underline{p}_V := 
-  \begin{bmatrix}
-    x_V & y_V
-  \end{bmatrix}^T
-  \label{eq:Rear Axle and Front Axle}
-\end{gather}
-\begin{equation}
-  \underline{p}_V = \underline{p}_H + l 
-  \begin{bmatrix}
-    \cos(\theta + \pi/2) \\ 
-    \sin(\theta + \pi/2),
-  \end{bmatrix}
-  \label{eq:Transformation from Rear Axle to Front Axle}
-\end{equation}
-where $x_V$ and $y_V$ are the cartesian coordinates of this midpoint. 
+%The state variables of the model are $x_H$, $y_H$, $\phi$ und $\theta$, where
+%$x_H$ und $y_H$ are the cartesian coordinates of the midpoint of the rear axle
+%and $\theta$ is the heading of the vehicle. $\varphi$ is the steering angle of
+%the vehicle. The input variables of the model are $v$ und $\varphi$, where $v$
+%is the velocity of the vehicle and $\varphi$ is the steering angle. The
+%steering angle $\varphi$ is itself a dynamic system represented by a first
+%order linear differential equation with the configurable time constant $T$  The
+%behavior of the Stanley controller when subjected to dynamic effects on the
+%steering angle is of great importance, as the global asymptotic stability of
+%the controller was only proven on the kinematic two-axle model.
+
+%As the Stanley controller requires the midpoint of the front axle for the cross
+%track error, it must be calculated from the rear axle. The midpoint of the
+%front axle is calculated from the state variables through the following static
+%function:
+%\begin{gather}
+%  \underline{p}_H := 
+%  \begin{bmatrix}
+%    x_H & y_H
+%  \end{bmatrix}^T \\
+%  \underline{p}_V := 
+%  \begin{bmatrix}
+%    x_V & y_V
+%  \end{bmatrix}^T
+%  \label{eq:Rear Axle and Front Axle}
+%\end{gather}
+%\begin{equation}
+%  \underline{p}_V = \underline{p}_H + l 
+%  \begin{bmatrix}
+%    \cos(\theta + \pi/2) \\ 
+%    \sin(\theta + \pi/2),
+%  \end{bmatrix}
+%  \label{eq:Transformation from Rear Axle to Front Axle}
+%\end{equation}
+%where $x_V$ and $y_V$ are the cartesian coordinates of this midpoint. 
 
 As seen before, the Stanley controller is composed of multiple parts, which
 must be seperately calculated. The heading $\theta$ is a state variable,
 therefore it is always available. In order to calculate the cross track error
 and the heading path, the correct path point must be chosen. The Stanley
-controller uses the closest path point from the vehicle front axle to determine
-the path heading $\theta_d$ and current cross track error $e_{fa}$. For the
-simulation this is determined by finding the point with the smallest distance
-from the front axle midpoint $\delta\underline{x}$. The path heading is then
-found from this point. The dot product between the vector perpendicular to the
-vehicle heading $\underline{x}_{\perp}$ and vector from the path point to the
-vehicle front axle $\delta\underline{x}$. For clarity, FIGURE is a visual
-representation of these two vectors and their dot product. This algorithm is
-represented in ALGORITHM. 
+controller uses the closest path point from the vehicle front axle midpoint to
+determine the path heading $\theta_d$ and current cross track error $e_{fa}$.
+For the simulation this is determined by finding the point with the smallest
+distance from the front axle midpoint $\delta\underline{x}$. The path heading
+is then found at this point. The dot product between the vector perpendicular
+to the vehicle heading $\underline{x}_{\perp}$ and vector from the path point
+to the vehicle front axle $\delta\underline{x}$ is the cross track error
+$e_{fa}$. For clarity, FIGURE is a visual representation of these two vectors
+and their dot product. This algorithm is represented in ALGORITHM. 
 \begin{algorithm}
   \caption{Berechnung von Querabweichung}
   \label{alg:path point}
@@ -308,6 +312,132 @@ frequencies is shown in FIGURE.
 As can be seen in FIGURE, the Stanley controller is indeed affected by the
 sampling frequency, however above X Hz the behavior of the vehicle is not
 noticeably different. 
+
+The simulation is then executed for a chosen amount of time. 
+
+
+
+
+
+
+
+
+
+To gain a deeper understanding of the behavior of the Stanley controller on a
+remote-controlled vehicle, we conducted a simulation of the control loop. The
+simulation comprises three primary components: the path that the vehicle must
+follow, the Stanley controller, and the vehicle model. We utilized a
+differential equation solver to examine the time series data of the two-axle
+vehicle in the simulation.
+
+
+The path that the vehicle must follow is a virtual representation of the
+real-world track that the vehicle will traverse. A visual depiction of the path
+is provided in FIGURE. In the simulation, the path is defined by the following
+continuous static function:
+\begin{equation}
+  (x, y, h) = f(t, t_f),
+\end{equation}
+where $t$ and $t_f$ are the input parameters of time and simulation end time,
+respectively, and $(x, y, h)$ represents the Cartesian coordinates of the path
+point and the corresponding heading at that point. This function is discretized
+for a user-defined number of $t$ values to generate an array of (x, y, theta)
+values. The differential equation solver incorporates the Stanley controller
+and the vehicle model to analyze the time series of the two-axle vehicle using
+this array as input.
+
+The vehicle model used is the rear axle vehicle model. This model is
+represented by the following nonlinear state space representation: 
+\begin{gather}
+  \dot{x} = v \cos(\theta) \\
+  \dot{y} = v \sin(\theta) \\
+  \dot{\theta} = \frac{v}{l}\tan(\varphi) \\
+  \dot{\varphi} = \frac{\left(\delta\right - u)}{T}.
+\end{gather}
+
+The state variables of the model are $x_H$, $y_H$, $\phi$ und $\theta$, where
+$x_H$ und $y_H$ are the cartesian coordinates of the midpoint of the rear axle
+and $\theta$ is the heading of the vehicle. $\varphi$ is the steering angle of
+the vehicle. The input variables of the model are $v$ und $\varphi$, where $v$
+is the velocity of the vehicle and $\varphi$ is the steering angle. The
+steering angle $\varphi$ is itself a dynamic system represented by a first
+order linear differential equation with the configurable time constant $T$  The
+behavior of the Stanley controller when subjected to dynamic effects on the
+steering angle is of great importance, as the global asymptotic stability of
+the controller was only proven on the kinematic two-axle model.
+
+
+As the Stanley controller requires the midpoint of the front axle for the cross
+track error, it must be calculated from the rear axle. The midpoint of the
+front axle is calculated from the state variables through the following static
+function:
+\begin{gather}
+  \underline{p}_H := 
+  \begin{bmatrix}
+    x_H & y_H
+  \end{bmatrix}^T \\
+  \underline{p}_V := 
+  \begin{bmatrix}
+    x_V & y_V
+  \end{bmatrix}^T
+  \label{eq:Rear Axle and Front Axle}
+\end{gather}
+\begin{equation}
+  \underline{p}_V = \underline{p}_H + l 
+  \begin{bmatrix}
+    \cos(\theta + \pi/2) \\ 
+    \sin(\theta + \pi/2),
+  \end{bmatrix}
+  \label{eq:Transformation from Rear Axle to Front Axle}
+\end{equation}
+where $x_V$ and $y_V$ are the cartesian coordinates of this midpoint. 
+
+As previously discussed, the Stanley controller is composed of multiple parts, which
+must be seperately calculated. The heading $\theta$ is a state variable,
+therefore it is always available. In order to calculate the cross track error
+and the heading path, the correct path point must be chosen. The Stanley
+controller uses the closest path point from the vehicle front axle midpoint to
+determine the path heading $\theta_d$ and current cross track error $e_{fa}$.
+For the simulation this is determined by finding the point with the smallest
+distance from the front axle midpoint $\delta\underline{x}$. The path heading
+is then found at this point. The dot product between the vector perpendicular
+to the vehicle heading $\underline{x}_{\perp}$ and vector from the path point
+to the vehicle front axle $\delta\underline{x}$ is the cross track error
+$e_{fa}$. For clarity, FIGURE is a visual representation of these two vectors
+and their dot product. This algorithm is represented in ALGORITHM. 
+\begin{algorithm}
+  \caption{Berechnung von Querabweichung}
+  \label{alg:path point}
+  \begin{algorithmic}
+    \State $\underline{v}_{\perp} \gets \left[-\cos(\theta + \pi/2),  -\sin(\theta + \pi/2)\right]^T$
+    \State $\Delta\underline{x} \gets \underline{p}_V - \underline{p}_P$
+    \State $\delta\underline{x} \gets \min \left{ || \Delta\underline{x} ||_2 \right}$
+    \State $\theta_d \gets \arctan\left(\frac{\frac{d}{dy}\delta\underline{x}}{\frac{d}{dx}\delta\underline{x}}\right)$
+    \State $e_{fa} \gets \delta\underline{x} \cdot \underline{v}_{\perp}$
+  \end{algorithmic}
+\end{algorithm}
+
+The heading path and cross track error are then input into the Stanley
+controller, and the output of the controller is fed into the vehicle model. A
+high-level diagram of the control loop is illustrated in FIGURE.
+
+The Stanley controller operates on continuous-time signals, which differs from
+the discrete-time signals used by the vehicle. The vehicle captures images at a
+fixed sampling frequency, which are processed by the pipeline before being fed
+into the controller. To simulate this behavior, a cache is incorporated into
+the simulator to store the heading path and cross track error. The Stanley
+controller then uses these cached values for a specified duration. This caching
+approach mimics the behavior of a zero-order hold, and the output is
+subsequently fed into the Stanley controller. This simulation approach enables
+the investigation of the vehicle behavior for different sampling frequencies
+and permits the setting of a tolerance for the pipeline's processing speed. The
+comparison of the simulation results at different sampling frequencies is
+presented in FIGURE.
+
+As depicted in FIGURE, the Stanley controller is impacted by the sampling
+frequency, with a noticeable effect observed at lower frequencies. However,
+above a certain threshold of X Hz, the behavior of the vehicle does not appear
+to be significantly affected by the sampling frequency.
 
 The simulation is then executed for a chosen amount of time. 
 
@@ -416,8 +546,8 @@ saturation and brightness.
 
 At first, the image is filtered of all pixels without a high red component, as
 bright yellow in the red, green and blue (RGB) color space has a high red
-component. Afterwards, the image is converted into the Hue, Lightness and
-Saturation (HLS) color space. 
+component. Afterwards, the image is converted into the hue, saturation and
+value (HSV) color space. 
 
 Under the RGB color space, yellow is represented as a combination of the red 
 and green channels with the blue channel set to 0. Pure yellow is also defined 
@@ -427,12 +557,12 @@ of freedom leads to issues with tuning, as this reduces the ability for the
 pipeline to account for disturbances, such as differing lighting conditions or 
 reflective surfaces.
 
-Under the HLS color space, the hue channel selects the color, the lightness 
-channel corresponds to the amount of white or black in the color and the 
-saturation channel is a measure of the purity of a hue. (MS ANNO) Once the hue 
-is selected, here yellow, the lightness and saturation channels are then used 
-to select the specific shade of yellow. Using these 2 channels allows for a 
-more robust detection of color.
+Under the HSV color space, the hue channel selects the color, saturation
+channel is a measure of the purity of a hue and the value channel corresponds
+to the amount of white or black in the color. (MS ANNO) Once the hue is
+selected, here yellow, the lightness and saturation channels are then used to
+select the specific shade of yellow. Using these 2 channels allows for a more
+robust detection of color.
 
 In order to detect the yellow lane, the pipeline will filter out colors outside 
 of the yellow hue range, with a small tolerance, and then truncate the lower 
@@ -476,19 +606,22 @@ caused by the perspective transform.
 
 \section{Histogram}
 
-After the perspective transformation stage, a histogram of the pixel density 
-is created. During this step, the start point for the sliding window method is
-found. 
+%After the perspective transformation stage, a histogram of the pixel density 
+%is created. During this step, the start point for the sliding window method is
+%found. 
+%
+%At every column of the image, the number of white pixels are counted. 
+%The numbers are then placed into a list. The assumption is then that the 
+%columns containing the largest numbers contain the lane information. The 
+%index with the number is then selected as the start point for the sliding 
+%window method. This pipeline stage reduces computation time by filtering out 
+%unnecessary parts of the image not containing lane information. A visual 
+%representation of the histogram can be seen in FIGURE.
 
-At every column of the image, the number of white pixels are counted. 
-The numbers are then placed into a list. The assumption is then that the 
-columns containing the largest numbers contain the lane information. The 
-index with the number is then selected as the start point for the sliding 
-window method. This pipeline stage reduces computation time by filtering out 
-unnecessary parts of the image not containing lane information. A visual 
-representation of the histogram can be seen in FIGURE.
+After the perspective transformation stage, a histogram of the pixel density is created to determine the start point for the sliding window method. The number of white pixels is counted for each column of the image, and these numbers are stored in a list. The columns with the highest numbers are assumed to contain lane information, and the index of the column with the highest number is selected as the start point for the sliding window method. This step helps to reduce computation time by filtering out parts of the image that do not contain lane information. A visual representation of the histogram can be seen in FIGURE.
 
-\section{Gleit-Fenster-Verfahren}
+\section{Gleitfenstermethode}
+
 
 In the fifth stage of the pipeline, the heading and offset of the lane are
 calculated through the sliding window method.
