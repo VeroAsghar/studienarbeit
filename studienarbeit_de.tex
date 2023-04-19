@@ -98,189 +98,243 @@ to follow.}
 
 \section{Stanley-Regler}
 
-Der Stanley-Regler ist ein nichtlinearer Regelalgorithmus, der 2005 von der
-Stanford University entwickelt wurde. Er wurde entwickelt, um ein zweiachsiges 
-Fahrzeug zu steuern, wobei nur der Ausrichtung und der Querfehler des zu verfolgenden 
-Weges verwendet werden. Für die Dauer dieser Arbeit wird jedoch nicht das 
-kinematische Modell eines zweiachsigen Fahrzeugs verwendet, sondern ein Modell,
-das auch die Dynamik des Lenkwinkels berücksichtigt.
 
-Der Stanley-Regler ist ein Pfadfolgerregler im Gegensatz zu einem 
-Trajektoriefolgerregler. Der Stanley-Regler ist als Querregler konzipiert, so 
-dass das Fahrzeug auf der Bahn bleibt, aber keinen Einfluss auf die 
-Geschwindigkeit hat, mit der es der Bahn folgt. Die Vorteile dieses Ansatzes 
-liegen darin, dass die Geschwindigkeit des Fahrzeugs flexibel gewählt werden 
-kann, so dass der Ingenieur, abgesehen von dynamischen Effekten, jede für 
-seine Anwendung erforderliche Geschwindigkeit wählen kann.
+Der Stanley-Controller ist ein nichtlinearer Regelungsalgorithmus, der 2005 von
+der Stanford University entwickelt wurde, um ein zweiachsiges Fahrzeug nur
+anhand der Ausrichtung und der Querabweichung des zu verfolgenden Kurses zu
+steuern. Der Algorithmus hat sich für das kinematische Modell eines
+zweiachsigen Fahrzeugs als asymptotisch global stabil erwiesen.
 
-Der Stanley-Regler wird durch die folgende Gleichung dargestellt:
+Der Stanley-Regler ist ein Kursfolger anstelle eines Trajektorienfolgers. Als
+Querregler (?) soll er das Fahrzeug auf dem Kurs halten, hat aber keinen
+Einfluss auf die Geschwindigkeit, mit der sich das Fahrzeug auf dem Kurs
+bewegt. Dieser Ansatz ermöglicht eine flexible Wahl der
+Fahrzeuggeschwindigkeit, die unter Berücksichtigung dynamischer Effekte nach
+Bedarf für eine bestimmte Anwendung gewählt werden kann. (?)
 
-\begin{equation}
-    u = \theta - \theta_d + \arctan\left(\frac{ke_{fa}}{v}\right)
-    \label{eq:Stanley-Regler}
+Der Stanley-Regler wird mathematisch durch die folgende Gleichung dargestellt:
+\begin{equation} 
+  u = \theta - \theta_d + \arctan\left(\frac{ke_{fa}}{v}\right),
+  \label{eq:Stanley-Regler} 
+\end{equation}
+wobei $u$ den Reglerausgang, $\theta$ die aktuelle Ausrichtung des Fahrzeugs,
+$\theta_d$ die Pfadausrichtung, $k$ einen Skalierungsfaktor, $v$ die
+Geschwindigkeit des Fahrzeugs und $e_{fa}$ die Querabweichung vom Mittelpunkt
+der Vorderachse des Fahrzeugs zum Kurs darstellt.
+
+Der Stanley-Regler besteht aus zwei Komponenten: einer Komponente, die die
+Abweichung des Fahrzeugs vom Kurs behandelt, und einer Komponente, die die
+Differenz zwischen der Ausrichtung des Fahrzeugs und der des Kurses behandelt.
+Die erste Komponente wird durch $\arctan(\frac{ke_{fa}}{v})$ dargestellt und
+steuert den Lenkwinkel so, dass er sich auf den Kurs zubewegt, wenn sich das
+Fahrzeug weiter von ihm entfernt. Die zweite Komponente, dargestellt durch
+$\theta_d - \theta$, steuert den Lenkwinkel so, dass er parallel zum zu
+verfolgenden Kurs bleibt. Zusammen bewirken diese beiden Komponenten, dass das
+Fahrzeug auf den gewünschten Kurs gelenkt wird.
+
+
+\subsection{Kleinsignalverhalten}
+
+
+Um das Verhalten des Stanley-Reglers besser zu verstehen, wird der Regler um
+den Punkt \(\links(x_V, \theta_d\rechts)\)= \(\links(0, 0\rechts)\)
+linearisiert, was zu folgender Gleichung führt: \begin{equation} \bar{u}
+\approx \bar{\theta} + \frac{ke_{fa}}{v}. \label{eq:linearer Stanley-Regler}
 \end{equation}
 
-wobei $u$ das Ausgangssignal des Reglers, theta der aktuelle Ausrichtung des 
-Fahrzeugs, $\theta_d$ der Ausrichtung des Pfads, $k$ ein Skalierungsfaktor, 
-$v$ die Geschwindigkeit des 
-Fahrzeugs und $e_{fa}$ der Spurabweichungswert vom Mittelpunkt der Vorderachse des 
-Fahrzeugs zum Pfad ist.
+Die sich daraus ergebende Gleichung \eqref{eq:linearer Stanley-Regler} hat die
+Form eines PID-Reglers (Proportional-, Integral- und Derivativregler), der nur
+P- und D-Komponenten hat. Die P-Komponente wird durch \(\frac{ke_{fa}}{v}\)
+dargestellt. Da die Vorwärtsgeschwindigkeit des Fahrzeugs als konstant
+angenommen wird, besteht eine Proportionalität zwischen den Ableitungen von
+\(e_{fa}\) nach Zeit und Raum. Die Ableitung von \(e_{fa}\) nach dem Raum ist
+\(\theta\). Daher ist \(\theta\) die D-Komponente des linearisierten
+Stanley-Reglers.
+
+Folglich ist das Verhalten des Stanley-Reglers für kleine Eingangssignale
+ähnlich wie das eines PD-Reglers mit dem Fehlerterm \(e_{fa}\). 
 
 
-Der Stanley-Regler besteht aus zwei Komponenten: eine Komponente h"andelt sich 
-um den Abstand von dem Fahrzeug zu dem Pfad und die andere Komponente h"andelt
-sich mit der Ableitung des Abstands oder genauer geschreiben, die Ausrichtung.
+\subsection{Gro{\ss}signalverhalten}
 
-Die erste Komponente, die um den Abstand geht, steuert die Lenkwinkelstrecke des 
-Fahrzeugs so, dass das Fahrzeug in der Richtung des Pfads je mehr lenkt, desto 
-weiter 
-das Fahrzeug von dem Pfad ist. Diese Komponente ist durch 
-$\arctan\left(\frac{ke_V}{v}\right)$ dargestellt.
-
-Die zweite Komponente steuert die Lenkwinkelstrecke so, dass sie parallel zu
-dem Pfad bleibt. Diese Komponente ist durch $\theta - \theta_d$ dargestellt.
-
-Zussamen arbeiten Komponenten miteinander, sodass das Fahrzeug auf den Pfad
-kommt. 
+Bei großen Signalen wird der Stanley-Regler durch das Verhalten der
+\(arctan(...)\)-Funktion sowie durch die zyklische Natur der Ausrichtung
+\(\theta\) dominiert. Die Funktion \(arctan(...)\) ist auf einen Wert zwischen
+-90 und 90 Grad begrenzt und ist glatt. Die Ausrichtung ist ebenfalls auf den
+vorderen Halbkreis bzw. -90 und 90 Grad begrenzt, da davon ausgegangen wird,
+dass sich das Fahrzeug in eine Richtung bewegt. (?) Zusammen begrenzen diese
+Komponenten den Lenkwinkel (?) des Fahrzeugs.
 
 
-
-
-
-
+%Beim Umgang mit großen Signalen wird das Verhalten des Stanley-Reglers
+%hauptsächlich von zwei Faktoren beeinflusst: der zyklischen Natur der
+%Ausrichtung \(\theta\) und der \(arctan(...)\)-Funktion. Die Funktion
+%\(arctan(...)\) ist eine glatte Funktion, die auf einen Bereich zwischen -90
+%und 90 Grad begrenzt ist. Andererseits ist die Ausrichtung auf den vorderen
+%Halbkreis beschränkt, der zwischen -90 und 90 Grad liegt, da davon ausgegangen
+%wird, dass sich das Fahrzeug in eine Richtung bewegt. Diese beiden Faktoren
+%wirken also zusammen, um den Lenkeinschlag des Fahrzeugs zu begrenzen und zu
+%verhindern, dass er zu groß wird.
 
 \section{Simulation}
 
 
-Um das Verhalten des Stanley-Reglers auf dem ferngesteuerten Fahrzeug zu 
-untersuchen, wurde eine Simulation des Regelkreises verwendet.
-Die Simulation besteht aus drei Hauptkomponenten: erstens die Bahn, der das 
-Fahrzeug folgen muss, zweitens der Stanley-Regler und drittens das 
-Fahrzeugmodell. Ein Differentialgleichungslöser wird verwendet, um die 
-Zeitreihen des zweiachsigen Fahrzeugs zu analysieren. 
+Um ein besseres Verständnis für das Verhalten des Stanley-Reglers in einem
+ferngesteuerten Fahrzeug zu gewinnen, haben wir eine Simulation des
+Regelkreises durchgeführt. Die Simulation umfasst drei Hauptkomponenten: den
+Kurs, dem das Fahrzeug folgen muss, den Stanley-Regler und das Fahrzeugmodell.
+Zur Untersuchung der Zeitreihendaten des zweiachsigen Fahrzeugs in der
+Simulation wurde ein Differentialgleichungslöser eingesetzt.
 
-Der Pfad, dem das Fahrzeug folgen muss, ist eine virtuelle Version der realen 
-Strecke, die das Fahrzeug benutzen wird. Eine visuelle Darstellung des Weges 
-ist ABBILDUNG. In der Simulation wird der Weg durch die folgende kontinuierliche
-statische Funktion dargestellt:
-----, 
-mit dem Eingang t und dem Ausgang (x, y, h). Diese Funktion wird dann für eine 
-beliebige Anzahl von t-Werten diskretisiert, um ein Array von 
-(x, y, theta)-Werten zu erstellen. Dieses Array wird dann in den 
-Differentialgleichungslöser eingespeist, der den Stanley-Regler und das 
-Fahrzeugmodell kapselt. 
+Der Kurs, dem das Fahrzeug folgen muss, ist eine virtuelle Darstellung der
+realen Strecke (?), die das Fahrzeug durchfahren wird. (?) Eine visuelle
+Darstellung des Kurses findet sich in ABBILDUNG. In der Simulation wird der
+Kurs durch die folgende kontinuierliche statische Funktion definiert:
+\begin{equation} 
+  (x, y, h) = f(t, t_f), 
+\end{equation} 
+wobei $t$ und $t_f$ die Eingangsparameter Zeit bzw. Simulationsendzeit (?)sind
+und $(x, y, h)$ die kartesischen Koordinaten des Pfadpunkts und die
+entsprechende Ausrichtung an diesem Punkt darstellt. Diese Funktion wird für
+eine beliebige Anzahl von $t$-Werten diskretisiert, um ein Array von $(x, y,
+theta)$-Werten zu erzeugen. Der Differentialgleichungslöser bezieht den
+Stanley-Controller und das Fahrzeugmodell ein, um die Zeitreihen des
+zweiachsigen Fahrzeugs unter Verwendung dieses Arrays als Eingabe zu
+analysieren. (?)
 
-Bei dem verwendeten Fahrzeugmodell handelt es sich um das Modell eines 
-Hinterachsfahrzeugs. Dieses Modell wird durch die folgende nichtlineare 
-Zustandsraumdarstellung dargestellt:
-\begin{gather}
-    \dot{x} = v \cos(\theta) \\
-    \dot{y} = v \sin(\theta) \\
-    \dot{\theta} = \frac{v}{l}\tan(\varphi) \\
-    \dot{\varphi} = \frac{-1}{T}\left(\varphi - \delta\right).
+
+Das verwendete Fahrzeugmodell ist das Modell eines Hinterachsfahrzeugs. Dieses
+Modell wird durch die folgende nichtlineare Zustandsraumdarstellung
+dargestellt: 
+\begin{gather} 
+  \dot{x} = v \cos(\theta) \\ 
+  \dot{y} = v \sin(\theta) \\ 
+  \dot{\theta} = \frac{v}{l}\tan(\varphi) \\
+  \dot{\varphi} = \frac{\left(\delta\right - u)}{T}. 
 \end{gather}
-Die Zustandsvariablen des Modells sind $x_H$, $y_H$, $\phi$ und $\theta$, wobei
-$x_H$ und $y_H$ die XY-Koordinaten des Mittelpunkts der Hinterachse sind und
-$\theta$ der Kurs des Fahrzeugs ist. Die Eingangsvariablen des Modells sind $v$
-und $\phi_d$, wobei $v$ die Geschwindigkeit des Fahrzeugs und $\varphi$ der
-Ausgang des Stanley-Reglers ist. Der Lenkwinkel $\varphi$ wird durch eine
-lineare Differentialgleichung erster Ordnung mit der konfigurierbaren
-Zeitkonstante $T$ dargestellt. Das Verhalten des Stanley-Reglers bei
-dynamischen Einflüssen auf den Lenkwinkel ist von großer Bedeutung, da die
-globale asymptotische Stabilität des Reglers nur für das kinematische Modell
-mit federndem Lenkwinkel nachgewiesen wurde. 
 
-Da der Stanley-Regler den Mittelpunkt der Vorderachse für den Querspurfehler 
-benötigt, muss dieser aus der Hinterachse berechnet werden.
-Der Mittelpunkt der Vorderachse wird über die folgende statische Funktion aus 
-den Zustandsgrößen berechnet:
+Die Zustandsvariablen des Modells sind $x_H$, $y_H$, $\phi$ und $\theta$, wobei
+$x_H$ und $y_H$ die kartesischen Koordinaten des Mittelpunkts der Hinterachse
+sind und $\theta$ die Ausrichtung des Fahrzeugs ist. $\varphi$ ist der
+Lenkwinkel des Fahrzeugs. Die Eingangsgrößen des Modells sind $v$ und
+$\varphi$, wobei $v$ die Geschwindigkeit des Fahrzeugs und $\varphi$ der
+Lenkwinkel ist. Der Lenkwinkel $\varphi$ ist selbst ein dynamisches System, das
+durch eine lineare Differentialgleichung erster Ordnung mit der
+konfigurierbaren Zeitkonstante $T$ dargestellt wird. Das Verhalten des
+Stanley-Reglers bei dynamischen Einflüssen auf den Lenkwinkel ist von großer
+Bedeutung, da die globale asymptotische Stabilität des Reglers nur für das
+kinematische Zweiachsmodell nachgewiesen wurde.
+
+Da der Stanley-Regler für die Querabweichung den Mittelpunkt der Vorderachse
+benötigt, muss dieser aus der Hinterachse berechnet werden. Der Mittelpunkt der
+Vorderachse wird aus den Zustandsvariablen durch die folgende statische
+Funktion berechnet: 
 \begin{gather}
-    \underline{p}_H := 
-    \begin{bmatrix}
-        x_H & y_H
-    \end{bmatrix}^T \\
-    \underline{p}_V := 
-    \begin{bmatrix}
-        x_V & y_V
-    \end{bmatrix}^T
-    \label{eq:Hinterradachse und Vorderradachse}
+  \underline{p}_H := 
+  \begin{bmatrix}
+    x_H & y_H
+  \end{bmatrix}^T \\
+  \underline{p}_V := 
+  \begin{bmatrix}
+    x_V & y_V
+  \end{bmatrix}^T
+  \label{eq:Rear Axle and Front Axle}
 \end{gather}
 \begin{equation}
-    \underline{p}_V = \underline{p}_H + l 
-    \begin{bmatrix}
-        \cos(\theta + \pi/2) \\ 
-        \sin(\theta + \pi/2),
-    \end{bmatrix}
-    \label{eq:Transformation von Hinterradachse zu Vorderradachse}
+  \underline{p}_V = \underline{p}_H + l 
+  \begin{bmatrix}
+    \cos(\theta + \pi/2) \\ 
+    \sin(\theta + \pi/2),
+  \end{bmatrix}
+  \label{eq:Transformation from Rear Axle to Front Axle}
 \end{equation}
-wobei xf und yf die x/y-Koordinaten dieses Mittelpunkts sind. 
+wobei $x_V$ und $y_V$ die kartesischen Koordinaten dieses Mittelpunkts sind. 
 
-Wie bereits erwähnt, besteht der Stanley-Regler aus mehreren Teilen, die
-berechnet werden müssen. Der Steuerkurs ist eine Zustandsvariable und daher 
-immer verfügbar. Für den Kreuzspurfehler und den Kurs muss der richtige 
-Bahnpunkt gewählt werden. Der Stanley-Regler verwendet den nächstgelegenen 
-Bahnpunkt, um den erforderlichen Kurs und den aktuellen Querfehler zu bestimmen.
-Für die Simulation wird dieser durch die Suche nach dem Punkt mit dem geringsten
-Abstand zum Vorderachsmittelpunkt bestimmt. Der Algorithmus wird wie folgt 
-dargestellt: 
----.
-Durch diesen gefundenen Punkt wird der Kursweg bestimmt. Der 
-Querabweichungsfehler wird dann durch die folgende Gleichung bestimmt:
----.
-Diese Gleichung stellt das Skalarprodukt des Vektors senkrecht zum 
-Steuerkursvektor und des Vektors von der Vorderachse zum Bahnpunkt dar. 
-ABBILDUNG ist eine visuelle Darstellung dieser beiden Vektoren.
-Der Kurs- und der Spurabweichungsvektor werden dann in den Stanley-Regler 
-eingegeben, wobei der Ausgang des Reglers in das Fahrzeugmodell eingespeist 
-wird. 
+Wie bereits erwähnt,(?) besteht der Stanley-Regler aus mehreren Teilen, die
+getrennt voneinander berechnet werden müssen. Die Ausrichtung $\theta$ ist eine
+Zustandsvariable, daher ist sie immer verfügbar. Um die Querabweichung und die
+Kursrichtung (?) zu berechnen, muss der richtige Bahnpunkt gewählt werden. Der
+Stanley-Regler verwendet den nächstliegenden Bahnpunkt vom
+Vorderachsmittelpunkt des Fahrzeugs, um die Ausrichtung des Kurses $\theta_d$
+und die aktuelle Querabweichung $e_{fa}$ zu bestimmen. Für die Simulation wird
+dies bestimmt, indem der Punkt mit dem geringsten Abstand zum
+Vorderachsmittelpunkt $\delta\unterline{x}$ gefunden wird. An diesem Punkt wird
+dann die Ausrichtung des Kurses ermittelt. Das Skalarprodukt zwischen dem
+Vektor senkrecht zur Fahrzeugausrichtung $\underline{x}_{\perp}$ und dem Vektor
+vom Pfadpunkt zur Fahrzeugvorderachse $\delta\underline{x}$ ist die
+Querabweichung $e_{fa}$. Zur Verdeutlichung ist in ABBILDUNG eine visuelle
+Darstellung dieser beiden Vektoren und ihres Skalarprodukts abgebildet. Dieser
+Algorithmus wird in ALGORITHM dargestellt. 
 
-Da der Stanley-Regler nur einen Lenkwinkel ausgibt, wird die Geschwindigkeit als
-konstant angenommen. 
-Ein High-Level-Diagramm des Regelkreises ist in ABBILDUNG dargestellt.
-
-Die Simulation wird dann für eine ausgewählte Zeitspanne durchgeführt.
-
-    \begin{equation} 
-        \underline{x} := 
-        \begin{bmatrix}
-            x_H & y_H & \theta
-        \end{bmatrix}^T 
-        \label{Zustandsvektor}
-    \end{equation}
+Der Kurs und die Querabweichung werden dann in den Stanley-Regler eingegeben,
+und der Ausgang des Reglers wird in das Fahrzeugmodell eingespeist. Ein
+Übersichtsdiagramm des Regelkreises ist in ABBILDUNG dargestellt.
 
 
+Der Stanley-Regler arbeitet mit zeitkontinuierlichen Signalen, die sich von den
+vom Fahrzeug verwendeten zeitdiskreten Signalen unterscheiden. Das Fahrzeug
+nimmt Bilder mit einer festen Abtastfrequenz auf, die von der Pipeline
+verarbeitet werden, bevor sie in den Regler eingespeist werden. Um dieses
+Verhalten zu simulieren, wird ein Cache in den Simulator eingebaut, um die
+Ausrichtung und die Querabweichung zu speichern. Der Stanley-Regler verwendet
+dann diese zwischengespeicherten Werte für eine bestimmte Dauer. Dieser
+Cache-Ansatz ahmt das Verhalten eines Halteglieds nullter Ordnung nach, und die
+Ausgabe wird anschließend in den Stanley-Regler eingespeist. Dieser
+Simulationsansatz ermöglicht die Untersuchung des Fahrzeugverhaltens für
+verschiedene Abtastfrequenzen und erlaubt die Festlegung einer Toleranz für die
+Rechengeschwindigkeit (?) der Pipeline. Der Vergleich der Simulationsergebnisse bei
+verschiedenen Abtastfrequenzen ist in ABBILDUNG dargestellt.
+
+Wie in ABBILDUNG dargestellt, wird der Stanley-Regler durch die Abtastfrequenz
+beeinflusst, wobei bei niedrigeren Frequenzen ein deutlicher Effekt zu
+beobachten ist. Oberhalb eines bestimmten Schwellenwerts von X Hz scheint das
+Verhalten des Fahrzeugs jedoch nicht wesentlich durch die Abtastfrequenz
+beeinflusst zu werden. (?)
+
+Die Simulation wird dann für eine ausgewählte Zeitspanne durchgeführt. 
 
 
-    \begin{gather}
-        \underline{\nu} := 
-        \begin{bmatrix}
-            -\cos(\theta + \pi/2) \\
-            -\sin(\theta + \pi/2)
-        \end{bmatrix} \\
-        \underline{p}_P := 
-        \begin{bmatrix}
-            x_P & y_P
-        \end{bmatrix}^T
-    \end{gather}
-
-    \begin{equation}
-        e_V :=  \underline{\nu} \cdot \min_i |\underline{p}_V -  \underline{p}_{Pi}| ?
-        \label{eq:Querabweichung}
-    \end{equation}
 
 \chapter{Bildverarbeitung}
 \section{Kamera-Kalibrierung}
 
+
+
+
 \section{Color Thresholding}
 
-\section{Perspective Transformation}
-\section{Histogram}
-\section{Gleit-Fenster-Verfahren}
+\section{Perspectivtransformation}
+
+\section{Histogramm}
+
+Nach der Perspektivtransformation wird ein Histogramm der Pixelanzahl erstellt,
+um den Startpunkt für die Gleitfenstermethode zu bestimmen. Die Anzahl der
+weißen Pixel wird für jede Spalte des Bildes gezählt, und diese Zahlen werden
+in einer Liste gespeichert. Es wird davon ausgegangen, dass die Spalten mit den
+höchsten Zahlen Fahrspurinformationen enthalten, und der Index der Spalte mit
+der höchsten Zahl wird als Startpunkt für die Gleitfenstermethode gewählt.
+Dieser Schritt trägt dazu bei, die Berechnungszeit zu verkürzen, indem Teile
+des Bildes herausgefiltert werden, die keine Fahrspurinformationen enthalten.
+Eine visuelle Darstellung des Histogramms ist in ABBILDUNG zu sehen.
+
+\section{Gleitfensterverfahren}
 \section{Berechnung von Ausrichtung und Abstand}
+\section{Ausrei{\ss}er}
 \section{Pipeline-Optimierungen}
 
 \chapter{Experiment}
 \section{Hardware Setup}
+
+Die CoRoLa-Car-Platform besteht aus einem Raspberry Pi, einer Fisheye-Kamera,
+einem Gleichstrommotor und einem Motorregler zur Steuerung der
+Fahrzeuggeschwindigkeit und einem Servomotor um den Lenkeinschlag des Fahrzeugs
+zu steuern. Der Raspberry Pi sendet PWM Signale an den Motorregler und den
+Servoregler, um das Fahrzeug zu steuern. das Fahrzeug zu steuern. Mit dem Robot
+Operating System 2 (ros2) wird der Raspberry Pi über das Netzwerk mit einem
+zentralen Computer verbunden. Der Stanley-Controller läuft auf dem
+Zentralrechner, der die Daten von der Kamera verarbeitet und die Ausgabe des
+Stanley-Reglers an das Fahrzeug sendet.
+
 \section{Experiment Setup}
 
 
