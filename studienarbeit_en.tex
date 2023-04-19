@@ -618,7 +618,15 @@ caused by the perspective transform.
 %unnecessary parts of the image not containing lane information. A visual 
 %representation of the histogram can be seen in FIGURE.
 
-After the perspective transformation stage, a histogram of the pixel density is created to determine the start point for the sliding window method. The number of white pixels is counted for each column of the image, and these numbers are stored in a list. The columns with the highest numbers are assumed to contain lane information, and the index of the column with the highest number is selected as the start point for the sliding window method. This step helps to reduce computation time by filtering out parts of the image that do not contain lane information. A visual representation of the histogram can be seen in FIGURE.
+After the perspective transformation stage, a histogram of the pixel density is
+created to determine the start point for the sliding window method. The number
+of white pixels is counted for each column of the image, and these numbers are
+stored in a list. The columns with the highest numbers are assumed to contain
+lane information, and the index of the column with the highest number is
+selected as the start point for the sliding window method. This step helps to
+reduce computation time by filtering out parts of the image that do not contain
+lane information. A visual representation of the histogram can be seen in
+FIGURE.
 
 \section{Gleitfenstermethode}
 
@@ -715,8 +723,28 @@ to a reduced peak in the histogram. A visual representation can be seen in
 FIGURE. A combination of the two previous factors led to the outlier seen in
 FIGURE.
 
+The sliding window method used in lane detection algorithms may result in a
+phenomenon known as "outliers". These occur when the algorithm incorrectly
+determines the lane line in a given frame. FIGURE shows a sequence of three
+frames, with the leftmost frame being the starting point. The first frame
+accurately detects the lane line, but in the second frame, an outlier occurs
+where the lane line is incorrectly determined. In the final frame, the lane
+line is once again correctly identified.
 
+One of the primary causes of outliers is the incorrect selection of HSV values.
+When the HSV values used in the algorithm are not restrictive enough, colors
+besides yellow may not be filtered out, leading to inaccurate determination of
+the lane line.
 
+Outliers are particularly prevalent on curved sections of a track due to a
+limitation of the pipeline implementation. As explained earlier, the first
+window of the sliding window method is placed at the x-position of the peak of
+the pixel histogram. Along the straight portions of the track, the lane line is
+the most prominent object in the image, resulting in a peak at the lane line
+position in the histogram. However, along curves, the lane line is distributed
+across the x-axis, leading to a weaker peak in the histogram. This can be seen
+visually in FIGURE. The outlier observed in FIGURE is a result of both
+these factors combined.
 
 \section{Pipeline-Optimierungen}
 
