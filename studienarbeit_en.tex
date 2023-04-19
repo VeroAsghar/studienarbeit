@@ -99,37 +99,40 @@ to follow.}
 \chapter{Regelalgorithmus}
 
 \section{Stanley-Regler}
-%The Stanley controller is a non-linear control algorithm developed in 2005 by
-%Stanford University. It was developed in order to control a 2 axle vehicle
-%using only the heading and the cross track error from the path to be followed.
-%It was proven to be asymptotically global stable for the kinematic model of a
-%two axle vehicle .However in for the duration of this thesis the the model used
-%is not the kinematic model of a 2 axle vehicle instead a model that also
-%accounts for the dynamics of the steering angle.
-%
-%The stanley controller is a path following controller as opposed to a
-%trajectory following algorithm. The stanley controller is designed as a lateral
-%controller,  so that the vehicle stays on the path, but has no bearing on the
-%speed at which it will follow the path. The positives of this approach allow
-%for a flexible choice of the speed of the vehicle, which barring dynamic
-%effects, allows for a engineer to choose any speed necessary for their
-%application.
-%
-%The stanley controller is represented by the following equation: $$u = \theta_d
-%- \theta + \arctan\left(\frac{ke_{fa}}{v}\right),$$ where $u$ is the controller
-%output, $\theta$ is the current heading of the vehicle, $\theta_d$ is the
-%heading of the path, $k$ is a scaling factor, $v$ is the velocity of the
-%vehicle, and $e_{fa}$ is the cross track error from the midpoint of the
-%vehicle’s front axle to the path. 
-%
-%The stanley controller is composed of two components:  a component handling the
-%offset of the vehicle from the path and a component handling the derivative of
-%the offset (difference in heading).  The first component, represented by
-%$\arctan(\frac{ke_{fa}}{v})$,  drives the steering angle to turn more towards
-%the path, the farther away the car currently is. The second component,
-%represented by $\theta_d - \theta$, controls the steering angle to stay
-%parallel with the path to be followed. Working together, the two components
-%steer the vehicle on to the path to be followed.
+\iffalse
+The Stanley controller is a non-linear control algorithm developed in 2005 by
+Stanford University. It was developed in order to control a 2 axle vehicle
+using only the heading and the cross track error from the path to be followed.
+It was proven to be asymptotically global stable for the kinematic model of a
+two axle vehicle .However in for the duration of this thesis the the model used
+is not the kinematic model of a 2 axle vehicle instead a model that also
+accounts for the dynamics of the steering angle.
+
+The stanley controller is a path following controller as opposed to a
+trajectory following algorithm. The stanley controller is designed as a lateral
+controller,  so that the vehicle stays on the path, but has no bearing on the
+speed at which it will follow the path. The positives of this approach allow
+for a flexible choice of the speed of the vehicle, which barring dynamic
+effects, allows for a engineer to choose any speed necessary for their
+application.
+
+The stanley controller is represented by the following equation: $$u = \theta_d
+- \theta + \arctan\left(\frac{ke_{fa}}{v}\right),$$ where $u$ is the controller
+output, $\theta$ is the current heading of the vehicle, $\theta_d$ is the
+heading of the path, $k$ is a scaling factor, $v$ is the velocity of the
+vehicle, and $e_{fa}$ is the cross track error from the midpoint of the
+vehicle’s front axle to the path. 
+
+The stanley controller is composed of two components:  a component handling the
+offset of the vehicle from the path and a component handling the derivative of
+the offset (difference in heading).  The first component, represented by
+$\arctan(\frac{ke_{fa}}{v})$,  drives the steering angle to turn more towards
+the path, the farther away the car currently is. The second component,
+represented by $\theta_d - \theta$, controls the steering angle to stay
+parallel with the path to be followed. Working together, the two components
+steer the vehicle on to the path to be followed.
+
+\fi
 
 The Stanley controller is a non-linear control algorithm that was developed in
 2005 by Stanford University with the purpose of controlling a two-axle vehicle
@@ -187,84 +190,90 @@ and is smooth. The heading is also limited to the front semicircle, or -90 and
 90 degrees, as the vehicle is assumed to be traveling in one direction.
 Together these components limit the steering angle of the vehicle.
 
+\iffalse
 
-%When dealing with large signals, the behavior of the Stanley controller is
-%mainly influenced by two factors: the cyclic nature of the heading \(\theta\)
-%and the \(arctan(...)\) function. The \(arctan(...)\) function is a smooth
-%function that is limited to a range between -90 and 90 degrees. On the other
-%hand, the heading is constrained to the front semicircle, which is between -90
-%and 90 degrees, as the vehicle is assumed to be traveling in one direction. As
-%a result, these two factors work in tandem to restrict the steering angle of
-%the vehicle, preventing it from becoming too large.
+When dealing with large signals, the behavior of the Stanley controller is
+mainly influenced by two factors: the cyclic nature of the heading \(\theta\)
+and the \(arctan(...)\) function. The \(arctan(...)\) function is a smooth
+function that is limited to a range between -90 and 90 degrees. On the other
+hand, the heading is constrained to the front semicircle, which is between -90
+and 90 degrees, as the vehicle is assumed to be traveling in one direction. As
+a result, these two factors work in tandem to restrict the steering angle of
+the vehicle, preventing it from becoming too large.
+
+\fi
 
 \section{Simulation}
 
-%In order to more closely investigate the behavior of the Stanley controller on
-%the remote controlled vehicle, a simulation of the control loop was used. The
-%simulation has 3 major components: first is the path that the vehicle must
-%follow, second is the Stanley controller and third is the vehicle model. A
-%differential equation solver is used in order to analyze the time series of the
-%two axle vehicle. 
+\iffalse
+In order to more closely investigate the behavior of the Stanley controller on
+the remote controlled vehicle, a simulation of the control loop was used. The
+simulation has 3 major components: first is the path that the vehicle must
+follow, second is the Stanley controller and third is the vehicle model. A
+differential equation solver is used in order to analyze the time series of the
+two axle vehicle. 
 
 
-%The path that the vehicle must follow is a virtual version of the real world
-%track that the vehicle will use. A visual representation of the path is FIGURE.
-%In the simulation, the path is represented with the following continuous static
-%function: 
-%\begin{equation}
-%  (x, y, h) = f(t, t_f),
-%\end{equation}
-%with the inputs time $t$ and simulation end time $t_f$ and output $(x, y, h)$
-%as the cartesian coordinates of the path point and the heading at that point.
-%This function is then discretized for any chosen amount of $t$ values, in order
-%to create an array of (x, y, theta) values. This array is then fed into the
-%differential equation solver that encapsulates the Stanley controller and the
-%vehicle model. 
+The path that the vehicle must follow is a virtual version of the real world
+track that the vehicle will use. A visual representation of the path is FIGURE.
+In the simulation, the path is represented with the following continuous static
+function: 
+\begin{equation}
+  (x, y, h) = f(t, t_f),
+\end{equation}
+with the inputs time $t$ and simulation end time $t_f$ and output $(x, y, h)$
+as the cartesian coordinates of the path point and the heading at that point.
+This function is then discretized for any chosen amount of $t$ values, in order
+to create an array of (x, y, theta) values. This array is then fed into the
+differential equation solver that encapsulates the Stanley controller and the
+vehicle model. 
 
-%The vehicle model used is the rear axle vehicle model. This model is
-%represented by the following nonlinear state space representation: 
-%\begin{gather}
-%  \dot{x} = v \cos(\theta) \\
-%  \dot{y} = v \sin(\theta) \\
-%  \dot{\theta} = \frac{v}{l}\tan(\varphi) \\
-%  \dot{\varphi} = \frac{\left(\delta\right - u)}{T}.
-%\end{gather}
+The vehicle model used is the rear axle vehicle model. This model is
+represented by the following nonlinear state space representation: 
+\begin{gather}
+  \dot{x} = v \cos(\theta) \\
+  \dot{y} = v \sin(\theta) \\
+  \dot{\theta} = \frac{v}{l}\tan(\varphi) \\
+  \dot{\varphi} = \frac{\left(\delta\right - u)}{T}.
+\end{gather}
 
-%The state variables of the model are $x_H$, $y_H$, $\phi$ und $\theta$, where
-%$x_H$ und $y_H$ are the cartesian coordinates of the midpoint of the rear axle
-%and $\theta$ is the heading of the vehicle. $\varphi$ is the steering angle of
-%the vehicle. The input variables of the model are $v$ und $\varphi$, where $v$
-%is the velocity of the vehicle and $\varphi$ is the steering angle. The
-%steering angle $\varphi$ is itself a dynamic system represented by a first
-%order linear differential equation with the configurable time constant $T$  The
-%behavior of the Stanley controller when subjected to dynamic effects on the
-%steering angle is of great importance, as the global asymptotic stability of
-%the controller was only proven on the kinematic two-axle model.
+The state variables of the model are $x_H$, $y_H$, $\phi$ und $\theta$, where
+$x_H$ und $y_H$ are the cartesian coordinates of the midpoint of the rear axle
+and $\theta$ is the heading of the vehicle. $\varphi$ is the steering angle of
+the vehicle. The input variables of the model are $v$ und $\varphi$, where $v$
+is the velocity of the vehicle and $\varphi$ is the steering angle. The
+steering angle $\varphi$ is itself a dynamic system represented by a first
+order linear differential equation with the configurable time constant $T$  The
+behavior of the Stanley controller when subjected to dynamic effects on the
+steering angle is of great importance, as the global asymptotic stability of
+the controller was only proven on the kinematic two-axle model.
 
-%As the Stanley controller requires the midpoint of the front axle for the cross
-%track error, it must be calculated from the rear axle. The midpoint of the
-%front axle is calculated from the state variables through the following static
-%function:
-%\begin{gather}
-%  \underline{p}_H := 
-%  \begin{bmatrix}
-%    x_H & y_H
-%  \end{bmatrix}^T \\
-%  \underline{p}_V := 
-%  \begin{bmatrix}
-%    x_V & y_V
-%  \end{bmatrix}^T
-%  \label{eq:Rear Axle and Front Axle}
-%\end{gather}
-%\begin{equation}
-%  \underline{p}_V = \underline{p}_H + l 
-%  \begin{bmatrix}
-%    \cos(\theta + \pi/2) \\ 
-%    \sin(\theta + \pi/2),
-%  \end{bmatrix}
-%  \label{eq:Transformation from Rear Axle to Front Axle}
-%\end{equation}
-%where $x_V$ and $y_V$ are the cartesian coordinates of this midpoint. 
+As the Stanley controller requires the midpoint of the front axle for the cross
+track error, it must be calculated from the rear axle. The midpoint of the
+front axle is calculated from the state variables through the following static
+function:
+\begin{gather}
+  \underline{p}_H := 
+  \begin{bmatrix}
+    x_H & y_H
+  \end{bmatrix}^T \\
+  \underline{p}_V := 
+  \begin{bmatrix}
+    x_V & y_V
+  \end{bmatrix}^T
+  \label{eq:Rear Axle and Front Axle}
+\end{gather}
+\begin{equation}
+  \underline{p}_V = \underline{p}_H + l 
+  \begin{bmatrix}
+    \cos(\theta + \pi/2) \\ 
+    \sin(\theta + \pi/2),
+  \end{bmatrix}
+  \label{eq:Transformation from Rear Axle to Front Axle}
+\end{equation}
+where $x_V$ and $y_V$ are the cartesian coordinates of this midpoint. 
+
+\fi
 
 As seen before, the Stanley controller is composed of multiple parts, which
 must be seperately calculated. The heading $\theta$ is a state variable,
@@ -606,17 +615,21 @@ caused by the perspective transform.
 
 \section{Histogram}
 
-%After the perspective transformation stage, a histogram of the pixel density 
-%is created. During this step, the start point for the sliding window method is
-%found. 
-%
-%At every column of the image, the number of white pixels are counted. 
-%The numbers are then placed into a list. The assumption is then that the 
-%columns containing the largest numbers contain the lane information. The 
-%index with the number is then selected as the start point for the sliding 
-%window method. This pipeline stage reduces computation time by filtering out 
-%unnecessary parts of the image not containing lane information. A visual 
-%representation of the histogram can be seen in FIGURE.
+\iffalse
+
+After the perspective transformation stage, a histogram of the pixel density 
+is created. During this step, the start point for the sliding window method is
+found. 
+
+At every column of the image, the number of white pixels are counted. 
+The numbers are then placed into a list. The assumption is then that the 
+columns containing the largest numbers contain the lane information. The 
+index with the number is then selected as the start point for the sliding 
+window method. This pipeline stage reduces computation time by filtering out 
+unnecessary parts of the image not containing lane information. A visual 
+representation of the histogram can be seen in FIGURE.
+
+\fi
 
 After the perspective transformation stage, a histogram of the pixel density is
 created to determine the start point for the sliding window method. The number
@@ -702,6 +715,8 @@ translated into meters.
 
 \section{Ausrei{\ss}er}
 
+\iffalse
+
 A side effect of the sliding window method is a phenomenom termed "outliers".
 Outliers are any frame where the lane line is incorrectely determined. In
 FIGURE, a sequence of three frames with an outlier are observed with the left
@@ -722,6 +737,8 @@ line. Along the curves, the lane line will be spread across the x-axis leading
 to a reduced peak in the histogram. A visual representation can be seen in
 FIGURE. A combination of the two previous factors led to the outlier seen in
 FIGURE.
+
+\fi
 
 The sliding window method used in lane detection algorithms may result in a
 phenomenon known as "outliers". These occur when the algorithm incorrectly
