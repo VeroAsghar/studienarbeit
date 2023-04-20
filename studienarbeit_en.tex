@@ -456,14 +456,14 @@ The simulation is then executed for a chosen amount of time.
 
 \section{Kamera-Kalibrierung} 
 
-The start of the image processing pipeline is the camera calibration. In this
-project, a fisheye camera was chosen as opposed to a rectilinear camera. The
-benefit of a fisheye camera arises from its wider angle of view in comparison
-to a rectilinear camera. However, a fisheye camera inherently has barrel
-distortion causing straight lines to become curved. The curvature of these
-straight lines is dependent on their radial distance from the center of the
-image. An example can be seen in FIGURE. Compensation for this distortion is
-possible through softeware, using the process known as camera calibration. 
+The start of the image processing pipeline is the camera calibration. For the
+CoRoLa Car Platform, a fisheye camera was chosen as opposed to a rectilinear
+camera. The benefit of a fisheye camera arises from its wider angle of view in
+comparison to a rectilinear camera. However, a fisheye camera inherently has
+barrel distortion causing straight lines to become curved. The curvature of
+these lines is dependent on their radial distance from the center of
+the image. An example can be seen in FIGURE. Compensation for this distortion
+is possible through software, using the process known as camera calibration. 
 
 Camera calibration is used in order to approximate the extrinsic and intrinsic
 parameters of a camera (MATLAB). A calibrated camera allows for 3-D information
@@ -479,26 +479,26 @@ often represented by the following 3x3 matrix:
 \end{equation}
 where $f_x$ and $f_y$ are the focal lengths of the camera in terms of pixels in
 the $x$ and $y$ directions and $c_x$ and $c_y$ are the coordinates of the
-principal point, ideally in the center of the image. (WIKIPEDIA) The extrinsic
-parameters are often represented by the following matrix: 
+principal point. (WIKIPEDIA) The extrinsic parameters are often represented by
+the following matrix: 
 \begin{equation}
   \begin{bmatrix}
     R & T
   \end{bmatrix},
 \end{equation}
-where $R$ is the rotation of the camera with respect to the world frame and $T$
-is the position of the origin of the world frame expressed in the coordinates
-of the camera frame. (WIKIPEDIA) The camera matrix $M$ is then the mapping from
-the world coordinates to pixel coordinates represented by the matrix-matrix 
-multiplication,
+where $R$ is the rotation matrix of the camera with respect to the world frame
+and $T$ is the position column vector of the origin of the world frame
+expressed in the coordinates of the camera frame. (WIKIPEDIA) The camera matrix
+$M$ is the mapping from the world coordinates to pixel coordinates
+represented by the matrix-matrix multiplication,
 \begin{equation}
   M = K 
   \begin{bmatrix}
     R & T
   \end{bmatrix}.
 \end{equation}
-By recreating the $M$ matrix through software, the image can be unmapped into
-the world frame causing lines to become straight.
+By recreating the $M$ matrix through software, the distorted image can be
+unmapped into the world frame causing curved lines to become straight.
 
 A camera is calibrated by using a collection of photos with known straight
 lines. Commonly, a series of checkerboard images with known dimensions are
@@ -511,23 +511,24 @@ fisheye camera. For example, as seen in FIGURE, the curved lines of the
 checkerboard are made straight again after calibration. The number of needed
 images is dependent on the specific camera, however a large collection of
 photos will lead to a more accurate parameter approximation. (OPENCV Citation)
-Using images with a higher resolution will also lead to a more accurate
+Using images with a higher resolution will also lead to more accurate
 parameters. (OPENCV/BLOG Citation) However, the approximated parameters are
 only accurate for the calibration of images taken at the same resolution as the
 images used for the calibration. In order to use the camera matrix for images
-with a lower resolution, the camera must be scaled with the following formula:
+with a lower resolution, the intrinsic camera matrix $K$ must be scaled with
+the following formula:
 \begin{equation}
   K_n = k K,
 \end{equation}
-where $k$ is a scalar value representing the scale-down factor. As the camera
-matrix is an instance of an affine transformation, the value at $K_{3, 3}$ must
-be set to 1. The resulting camera matrix will work for smaller resolutions
-matching the aspect ratio of the images used for calibration, but it has been
-noticed that when the difference in resolution is too large, distortion is
-added back into the image. In FIGURE, the original image is on the left, the
-middle image is calibrated using images at 900p and the right image is
-calibrated using images at 240p. As can be seen, the image on the right
-straightens the ruler, while the middle image leaves it curved.
+where $k$ is a scalar value representing the scale-down factor. As the
+intrinsic camera matrix is an instance of an affine transformation, the value
+at $K_{n3, 3}$ must be set to 1. The resulting intrinsic camera matrix will
+work for smaller resolutions matching the aspect ratio of the images used for
+calibration, but it has been observed that when the difference in resolution is
+too large, distortion is added back into the image. In FIGURE, the original
+image is on the left, the middle image is calibrated using images at 900p and
+the right image is calibrated using images at 240p. As can be seen, the image
+on the right straightens the ruler, while the middle image leaves it curved.
 
 One downside to camera calibration is that any calibrated image has a lower
 resolution than the original image. This is a consequence of the calibration
