@@ -167,8 +167,10 @@ the desired path.
 In order to better understand the behaviour of the Stanley Controller, the
 controller is linearized about the point \(\left(x_V, \theta_d\right)\)=
 \(\left(0, 0\right)\), which results in the following equation:
-\begin{equation} \bar{u} \approx \bar{\theta} + \frac{ke_{fa}}{v}.
-\label{eq:linearer Stanley-Regler} \end{equation}
+\begin{equation} 
+    \bar{u} \approx \bar{\theta} + \frac{k}{v}e_{fa}.
+    \label{eq:linearer Stanley-Regler} 
+\end{equation}
 
 The resulting equation \eqref{eq:linearer Stanley-Regler} has the form of a PID
 (Proportional, Integral and Derivative) controller, with only P and D
