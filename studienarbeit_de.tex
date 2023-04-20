@@ -300,6 +300,50 @@ Die Simulation wird dann für eine ausgewählte Zeitspanne durchgeführt.
 \chapter{Bildverarbeitung}
 \section{Kamera-Kalibrierung}
 
+Am Anfang der Bildverarbeitungspipeline steht die Kamerakalibrierung. Für die
+CoRoLa Car Platform wurde eine Fischaugenkamera im Gegensatz zu einer
+geradlinigen Kamera gewählt. Der Vorteil einer Fischaugenkamera ergibt sich aus
+ihrem größeren Blickwinkel im Vergleich zu einer geradlinigen Kamera. Eine
+Fischaugenkamera hat jedoch von Natur (?) aus eine tonnenförmige Verzeichnung,
+wodurch gerade Linien gekrümmt werden. Die Krümmung dieser Linien hängt von
+ihrem radialen Abstand vom Bildmittelpunkt ab. Ein Beispiel ist in ABBILDUNG zu
+sehen. Diese Verzeichnung kann mit Hilfe der Software durch die sogenannte
+Kamerakalibrierung kompensiert werden. 
+
+Die Kamerakalibrierung wird verwendet, um die extrinsischen und intrinsischen
+Parameter einer Kamera anzunähern. Eine kalibrierte Kamera ermöglicht es,
+3-D-Informationen aus einem 2-D-Bild zu gewinnen. Die intrinsischen Parameter
+einer Kamera werden häufig durch die folgende 3x3-Matrix dargestellt:
+\begin{equation} 
+    K = 
+    \begin{bmatrix} 
+        f_x & 0 & c_x\\ 
+        0 & f_y & c_y\\ 
+        0 & 0 & 1
+    \end{bmatrix}, 
+\end{equation} 
+wobei $f_x$ und $f_y$ die Brennweiten der Kamera in Form von Pixeln in den
+Richtungen $x$ und $y$ und $c_x$ und $c_y$ die Koordinaten des Hauptpunkts
+sind. Die extrinsischen Parameter werden häufig durch die folgende Matrix
+dargestellt: 
+\begin{equation}
+    \begin{bmatrix} R & T \end{bmatrix}, 
+\end{equation}, 
+wobei $R$ die Rotationsmatrix der Kamera in Bezug auf das Weltbild (?) und $T$
+der Positionsspaltenvektor des Ursprungs des Weltbildes, ausgedrückt (?) in den
+Koordinaten des Kamerabildes, ist. Die Kameramatrix $M$ ist die Abbildung von
+den Weltkoordinaten auf Pixelkoordinaten, die durch die
+Matrix-Matrix-Multiplikation dargestellt wird, 
+\begin{equation} 
+    M = K 
+    \begin{bmatrix} 
+        R & T
+    \end{bmatrix}. 
+\end{equation} 
+Durch Rekonstruieren der $M$-Matrix mit Hilfe von Software kann das verzerrte
+Bild wieder in das Weltbild eingefügt werden, wodurch gekrümmte Linien gerade
+werden.
+
 
 
 
