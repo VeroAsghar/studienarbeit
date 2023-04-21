@@ -506,17 +506,16 @@ used. Photos of the checkerboard are then captured at varying angles and
 locations in the scene. This series of images is then fed to the camera
 calibration algorithm, which will first determine the locations of the
 checkerboard squares and the lines connecting them.  Afterwards, using the
-model of a fisheye camera, the algorithm compensates for the distortion of the
-fisheye camera. For example, as seen in FIGURE, the curved lines of the
-checkerboard are made straight again after calibration. The number of needed
-images is dependent on the specific camera, however a large collection of
-photos will lead to a more accurate parameter approximation. (OPENCV Citation)
-Using images with a higher resolution will also lead to more accurate
-parameters. (OPENCV/BLOG Citation) However, the approximated parameters are
-only accurate for the calibration of images taken at the same resolution as the
-images used for the calibration. In order to use the camera matrix for images
-with a lower resolution, the intrinsic camera matrix $K$ must be scaled with
-the following formula:
+model of a fisheye camera, the algorithm compensates for the distortion. For
+example, as seen in FIGURE, the curved lines of the checkerboard are made
+straight again after calibration. The number of needed images is dependent on
+the specific camera, however a large collection of photos will lead to a more
+accurate parameter approximation. (OPENCV Citation) Using images with a higher
+resolution will also lead to more accurate parameters. (OPENCV/BLOG Citation)
+However, the approximated parameters are only accurate for the calibration of
+images taken at the same resolution as the images used for the calibration. In
+order to use the camera matrix for images with a lower resolution, the
+intrinsic camera matrix $K$ must be scaled with the following formula:
 \begin{equation}
   K_n = k K,
 \end{equation}
@@ -550,57 +549,52 @@ shifts. An example of this can be seen in FIGURE. By manually
 changing $c_x$, the midpoint of the image can be shifted back to its 
 original location.
 
-\section{Color Thresholding}
+\section{\glqq Color Thresholding\grqq}
 
-After the camera calibration comes the color thresholding stage of the pipeline.
-This stage removes all pixels from the image that are not yellow with a high
-saturation and brightness. 
+Next ist the the color thresholding stage of the pipeline. This stage removes
+all pixels from the image that are not bright yellow.
 
 At first, the image is filtered of all pixels without a high red component, as
 bright yellow in the red, green and blue (RGB) color space has a high red
 component. Afterwards, the image is converted into the hue, saturation and
 value (HSV) color space. 
 
-Under the RGB color space, yellow is represented as a combination of the red 
-and green channels with the blue channel set to 0. Pure yellow is also defined 
-as having both the red and green channels equal to one another, therefore 
-allowing only 1 degree of freedom to tune the pipeline.  Having only 1 degree 
-of freedom leads to issues with tuning, as this reduces the ability for the 
-pipeline to account for disturbances, such as differing lighting conditions or 
-reflective surfaces.
+Under the RGB color space, pure yellow is defined as having both the red and
+green channels equal to one another with the blue channel set to zero,
+therefore allowing only one degree of freedom to tune the pipeline.  Having
+only one degree of freedom leads to issues with tuning, as this reduces the
+ability for the pipeline to account for disturbances, such as differing
+lighting conditions or reflective surfaces.
 
 Under the HSV color space, the hue channel selects the color, saturation
-channel is a measure of the purity of a hue and the value channel corresponds
-to the amount of white or black in the color. (MS ANNO) Once the hue is
-selected, here yellow, the lightness and saturation channels are then used to
-select the specific shade of yellow. Using these 2 channels allows for a more
-robust detection of color.
+channel selects the purity of the hue and the value channel corresponds to the
+brightness of the hue. (MS ANNO) Once the hue is selected, here yellow, the
+lightness and saturation channels are then used to select the specific shade of
+yellow. Using these 2 channels allows for a more robust detection of color.
 
-In order to detect the yellow lane, the pipeline will filter out colors outside 
-of the yellow hue range, with a small tolerance, and then truncate the lower 
-part of the lightness and saturation channels. As a result of this, only 
-relatively pure yellow is left in the image.
-The values used in the pipeline for yellow is represented by the following 
-range,
-TABLE.
+In order to detect the yellow lane, the pipeline will filter out colors outside
+of the yellow hue range and then truncate the lower section of the lightness
+and saturation channels. As a result of this, only pure yellow is left in the
+image. The values used in the pipeline for yellow is represented by the
+following range, TABLE.
 
 An example of the output from this stage of the pipeline is FIGURE.
 
-\section{Perspective Transformation}
+\section{Perspectivtransformation}
 
 The third part of the image processing pipeline is the perspective 
 transformation. 
 
 Whenever an image is captured with a camera mounted to the vehicle, the lane
-line will be trapezoidal as opposed to straight and lane seems to end in a
-point at the center of the image. This perspective requires that all
-calculations regarding the lane line must compensate for the decreasing width
-of the line. Therefore, to remove this requirement, a perspective
-transformation is employed. Perspective transformation is the process by which
+line will be trapezoidal as opposed to rectangular. This perspective requires
+that all calculations regarding the lane line must compensate for its
+decreasing width. In order to avoid this requirement, a perspective
+transformation is employed. 
+
+Perspective transformation is the process by which
 a subset of an image is sheared and made to fit the entirety of a new image. An
 example is in FIGURE. For this project, the shape of the subset of the image is
-a trapezoid due to how lines in the image converge into a point far in the
-distance. Using this perspective transform, the trapezoidal shape of the lane
+a trapezoid. Using this perspective transform, the trapezoidal shape of the lane
 line is corrected into one that is straight, shown in FIGURE.
 
 A consequence of this new perspective, is that the resulting image is similar
@@ -609,12 +603,8 @@ image processing as well, as all objects outside of the trapezoid are cropped,
 leaving only the track. However, as can be seen in FIGURE, the perspective
 transform introduces extra noise into the image. The shearing caused by the
 perspective transform causes pixels from the original image to be stretched,
-thereby polluting the image with noise. 
-
-Therefore, this is the third stage in the pipeline. As already discussed, in 
-the second stage of the pipeline, the threshold stage removes the majority of 
-unnecessary information from the image, which reduces the amount of noise 
-caused by the perspective transform.
+thereby polluting the image with noise. Therefore requiring that this stage
+is after the color thresholding stage.
 
 \section{Histogram}
 
@@ -654,14 +644,14 @@ First, a chosen number of rectangles (windows) are created. The windows are
 aligned in a column and equally sized. Their height is chosen so that the
 column spans the entire height of the image, while their width is chosen to be
 a factor of the image width. The number of windows is chosen so that the column
-entirely or almost entirely  contains the white pixels representing the lane,
-as can be seen in FIGURE. If the number of windows is too high, there is a
+encompasses the white pixels representing the lane,
+as can be seen in FIGURE. If the number of windows is too many, there is a
 chance that the method will falsely determine white pixels deep into the image
 as a part of the lane. 
 
-Second, the x-coordinate of the midpoint of the first window is set to the peak
+Second, the x-coordinate of the center of the first window is set to the peak
 of the histogram from the previous stage. Then, the number of white pixels are
-then counted inside the window. If the number is above a chosen threshold, the
+counted inside the window. If the number is above a chosen threshold, the
 pixels are added to an array and the mean of the x-coordinates of the contained
 pixels is calculated. The x-coordinate of the next window is set to this
 calculated mean while being placed on top of the first window. This process is
@@ -672,8 +662,7 @@ with the positive x-axis increasing to the right, while the positive y-axis
 increases moving down the image. Therefore, the bottom edge of the image would
 be any coordinate with a y component equal to the height of the image. Seen
 from the engineer's perspective, the windows would be stacked from lowest to
-highest, however in the image coordinate space it is inverted. An example can
-be seen in FIGURE.
+highest, however in the image coordinate space it is inverted. 
 
 The pixels not located within each window are then filtered out of the image.
 The image before and after the filtering process can be seen in FIGURE. Using
@@ -699,13 +688,12 @@ REPRSENTATION
 The classic Stanley controller, as described in chapter 2, uses the heading
 calculated from the nearest path point. However, as a side effect of the
 polynomial fitting, the heading calculated at the bottom of the image is
-incorrect. As can be seen in FIGURE, the sliding window method can on average
-not detect the lane line close to the bottom of the frame. Due to this, the
+incorrect. As can be seen in FIGURE, the sliding window method cannot consistently
+detect the lane line at the bottom of the frame. Due to this, the
 fitted polynomial incorrectly approximates the heading. Therefore, the heading
 is calculated at a point located within the detected lane line instead.
 Moreover, this adds a degree of freedom to the controller. The consequences of
 this are discussed in chapter 4.
-
 
 The offset from the lane line is calculated from the fitted polynomial with
 the following function: $$e_{fa} = (\frac{w}{2} - f(h))\cdot x_{mpp},$$ where
@@ -743,7 +731,7 @@ FIGURE.
 
 \fi
 
-The sliding window method used in lane detection algorithms may result in a
+The sliding window method used in the lane detection algorithm may result in a
 phenomenon known as "outliers". These occur when the algorithm incorrectly
 determines the lane line in a given frame. FIGURE shows a sequence of three
 frames, with the leftmost frame being the starting point. The first frame
@@ -763,42 +751,43 @@ the pixel histogram. Along the straight portions of the track, the lane line is
 the most prominent object in the image, resulting in a peak at the lane line
 position in the histogram. However, along curves, the lane line is distributed
 across the x-axis, leading to a weaker peak in the histogram. This can be seen
-visually in FIGURE. The outlier observed in FIGURE is a result of both
-these factors combined.
+visually in FIGURE. The outlier observed in FIGURE is a result of both these
+factors combined.
 
 \section{Pipeline-Optimierungen}
 
-One of the obstacles encountered during the creation of the image processing
-pipeline, is that the image would be processed too slowly. The initial
-implementation of the pipeline ran at approximately 15 Hz, which was decided to
-be close to the lower bound of our chosen tolerance for the processing
-frequency. In order to improve the processing speed of the pipeline to an
-acceptable level, only 1 optimization was needed. While further optimizations
-are possible, they were considered to be out of the scope of the assignment and
-are therefore not discussed here.
+One of the obstacles encountered during the development of the image processing
+pipeline, is that the runtime of the pipeline was too slow. In order to improve
+the processing speed of the pipeline to an acceptable level, one optimization
+was introduced. While further optimizations are possible, they were considered
+to be out of the scope of the assignment and are therefore not discussed here.
 
-The Python program cProfiler was used in order to tabulate the function calls
-of the pipeline, as well as the runtime of each function call. As the pipeline
-is a deterministic program, an simple runtime improvement is to cache the
-output of expensive function calls into memory. Therefore during all subsequent
-function calls, the cached result is returned instead of running the
-calculation again. As an example, the perspective transformation matrices are
-an expensive calculation, which when cached led to a speed improvement of the
-pipeline.
+The Python program cProfiler was used in order to tabulate the pipeline
+function calls with their respective runtimes. As the pipeline is a
+deterministic program, caching the output of the expensive function calls into
+memory improves the runtime of the pipeline. Therefore during all subsequent
+pipeline executions, the cached result is returned instead of running the
+calculation again. As an example, calculation of the the perspective
+transformation matrices are expensive, which when cached leads to a performance
+improvement of the pipeline.
 
-In order to prove the speed improvement of the pipeline, an experiment was
-implemented. First, the pipeline is run through once and the runtime ignored as
-the speed improvement is only relevant to subsequent runs of the pipeline.
-Then, on the second run of the pipeline, the runtime is measured for both
-variants, with and without caching the expensive function calls from the first
-run. The experiment is then run 100 times and the result tabulated. The
-arithmetic mean of the runtimes for both variants are then compared to one
-another to measure the speed improvement. The values are in TABLE, showing that
-by caching the expensive function calls, the pipeline processing speed improved
-by VALUE%.
+\iffalse
+
+In order to prove the performance improvement of the pipeline, an experiment
+was implemented. First, the pipeline is executed once and the runtime ignored
+as the performance improvement is only relevant to subsequent executions of the
+pipeline. Therefore, on the second execution of the pipeline, the runtime is
+measured for both pipeline variants, with and without caching the expensive
+function calls from the first execution. The experiment is then run 100 times
+and the result tabulated. The arithmetic mean of the runtimes for both variants
+are then compared to one another to measure the speed improvement. The values
+are in TABLE, showing that by caching the expensive function calls, the
+pipeline processing speed improved by VALUE%.
+
+\fi
 
 \chapter{Experiment}
-\section{Hardware Setup}
+\section{Hardware}
 
 The CoRoLa car platform is composed of a Raspberry Pi, a fisheye lens camera, a
 DC motor and a motor controller to control the vehicle speed and a servo motor
@@ -809,11 +798,11 @@ connected over the network to a central computer. The Stanley controller runs
 on the central computer, which processes the data from the camera and sends the
 output of the Stanley controller to the vehicle.
 
-\section{Experiment Setup}
+\section{Experimentkriterien}
 
 In order to compare the Stanley controller and the sliding window method with
 the PID controller, 4 test criteria are chosen: maximum acceptable velocity and
-maximum offset angles, as well as the root mean square values of the vehicle
+maximum offset angles, as well as the mean values of the vehicle
 offset and controller outputs.
 
 \subsection{H"ochstgeschwindigkeit}
@@ -848,13 +837,13 @@ forward velocity. Then using an overhead camera, video of the vehicle driving
 around the curves is recorded from a top down view. The vehicle is recorded at
 differing forward velocities. For the first round of recordings, the vehicle is
 controlled by the PID controller and for the second, it is controlled by the
-Stanley controller. This experiment is then repeated for the chosen velocities
+Stanley controller. This experiment is executed for the chosen velocities
 of 1.0, 1.25, 1.5, 1.75 and 2.0 meters per second.
 
 \subsection{Reglerausgang}
 
 In order to measure the controller output of the two controllers, the vehicle
-is commanded to drive around the track at least 3 times. During the drive, the
+is commanded to drive around the track at least three times. During the drive, the
 controller output is recorded. After the drive, the data is graphed over time
 and a subset of the data is selected. The subset of the data is selected under
 the following criteria: periodicity and absence of outliers.
