@@ -322,16 +322,16 @@ einer Kamera werden häufig durch die folgende 3x3-Matrix dargestellt:
         0 & 0 & 1
     \end{bmatrix}, 
 \end{equation} 
-wobei $f_x$ und $f_y$ die Brennweiten der Kamera in Form von Pixeln in den
+wobei $f_x$ und $f_y$ die Brennweiten der Kamera in Form von Pixeln (?) in den
 Richtungen $x$ und $y$ und $c_x$ und $c_y$ die Koordinaten des Hauptpunkts
 sind. Die extrinsischen Parameter werden häufig durch die folgende Matrix
 dargestellt: 
 \begin{equation}
-    \begin{bmatrix} R & T \end{bmatrix}, 
-\end{equation}, 
-wobei $R$ die Rotationsmatrix der Kamera in Bezug auf das Weltbild (?) und $T$
-der Positionsspaltenvektor des Ursprungs des Weltbildes, ausgedrückt (?) in den
-Koordinaten des Kamerabildes, ist. Die Kameramatrix $M$ ist die Abbildung von
+    \begin{bmatrix} R & T \end{bmatrix}. 
+\end{equation} 
+Dabei ist $R$ die Rotationsmatrix der Kamera in Bezug auf das Laborsystem und $T$
+der Positionsspaltenvektor des Ursprungs des Laborsystems, ausgedrückt (?) in den
+Koordinaten des Kamerabildes. Die Kameramatrix $M$ ist die Abbildung von
 den Weltkoordinaten auf Pixelkoordinaten, die durch die
 Matrix-Matrix-Multiplikation dargestellt wird, 
 \begin{equation} 
@@ -344,12 +344,119 @@ Durch Rekonstruieren der $M$-Matrix mit Hilfe von Software kann das verzerrte
 Bild wieder in das Weltbild eingefügt werden, wodurch gekrümmte Linien gerade
 werden.
 
+Eine Kamera wird anhand einer Sammlung von Fotos mit bekannten geraden Linien
+kalibriert. In der Regel wird eine Reihe von Schachbrettbildern mit bekannten
+Dimensionen verwendet. Danach werden Fotos des Schachbretts in verschiedenen
+Winkeln und an verschiedenen Stellen der Szene aufgenommen. Diese Bilderserie
+wird dann in den Algorithmus zur Kamerakalibrierung eingespeist, der zunächst
+die Positionen der Schachbrettfelder und der sie verbindenden Linien bestimmt.
+Anschließend gleicht der Algorithmus anhand des Modells einer Fischaugenkamera
+die Verzeichnung aus. Wie in ABBILDUNG zu sehen, werden beispielsweise die
+gekrümmten Linien des Schachbretts nach der Kalibrierung wieder gerade gemacht.
+Die Anzahl der benötigten Bilder hängt von der jeweiligen Kamera ab, eine große
+Sammlung von Fotos führt jedoch zu einer genaueren Annäherung an die Parameter.
+(Zitat OPENCV) Die Verwendung von Bildern mit einer höheren Auflösung führt
+ebenfalls zu genaueren Parametern. (Zitat OPENCV/BLOG) Die angenäherten
+Parameter sind jedoch nur für die Kalibrierung von Bildern genau, die mit der
+gleichen Auflösung aufgenommen wurden wie die für die Kalibrierung verwendeten
+Bilder. Um die Kameramatrix für Bilder mit einer niedrigeren Auflösung zu
+verwenden, muss die intrinsische Kameramatrix $K$ mit der folgenden Formel
+skaliert werden: 
+\begin{equation} 
+    K_n = k K, 
+\end{equation} 
+wobei $k$ ein skalarer Wert ist, der den Verkleinerungsfaktor darstellt. Da es
+sich bei der intrinsischen Kameramatrix um eine affine Abbildung handelt, muss
+der Wert bei $K_{n3, 3}$ auf 1 gesetzt werden. Die resultierende intrinsische
+Kameramatrix funktioniert bei kleineren Auflösungen, die dem Aspektverhältnis
+der für die Kalibrierung verwendeten Bilder gleich sind. Allerdings wurde
+beobachtet, dass bei einem zu großen Auflösungsunterschied Verzeichnungen
+wieder in das Bild eingefügt werden. In ABBILDUNG ist links das Originalbild zu
+sehen, das mittlere Bild wurde mit Bildern von 900p kalibriert und das rechte
+Bild mit Bildern von 240p. Wie man sieht, wird das Lineal im rechten Bild
+gerade, während es im mittleren Bild gekrümmt bleibt.
+
+Ein Nachteil der Kamerakalibrierung ist, dass jedes kalibrierte Bild eine
+geringere Auflösung hat als das Originalbild. Dies ist eine Folge des
+Kalibrierungsprozesses, da dieser eine Teilmenge des Bildes verzerrt,
+insbesondere die Pixel in den Ecken des Bildes. Daher werden diese Pixel beim
+Kalibrierungsprozess aus dem resultierenden Bild entfernt. Um das Bild in
+seiner ursprünglichen Auflösung zu rekonstruieren, wird ein Interpolator
+verwendet. Der Interpolator liefert jedoch ein unschärferes Bild als das
+Original. Um dies zu kompensieren, empfiehlt es sich, eine Kamera mit
+hochauflösenden Bildern zu kalibrieren und dann Bilder mit dieser Auflösung
+aufzunehmen. Anstatt den Interpolator zu verwenden, verkleinern Sie die Bilder
+dann auf eine Auflösung, die für die jeweilige Anwendung erforderlich ist.  Das
+Ergebnis ist ein genaueres Bild ohne Unschärfe. Leider ist dieser Prozess sehr
+rechenintensiv, und es wurde beschlossen, nur die Bilder aus dem Interpolator
+zu verwenden, um die Rechenleistung der Pipeline zu erhöhen.
+
+Ein weiterer Nachteil der Kamerakalibrierung ist, dass sich der Mittelpunkt der
+Kamera verschiebt. Ein Beispiel dafür ist in ABBILDUNG zu sehen. Durch
+manuelles Ändern von $c_x$ kann der Bildmittelpunkt wieder an seine
+ursprüngliche Position verschoben werden.
 
 
+\section{\glqq Color Thresholding\grqq}
 
-\section{Color Thresholding}
+Als Nächstes folgt die Stufe des sogenannten "Color Thresholding". In dieser
+Stufe werden alle Pixel aus dem Bild entfernt, die nicht hellgelb sind.
 
-\section{Perspectivtransformation}
+Zunächst wird das Bild von allen Pixeln ohne hohen Rotanteil gefiltert, da
+Hellgelb im Rot-Grün-Blau-Farbraum (RGB) einen hohen Rotanteil hat.
+Anschließend wird das Bild in den HSV-Farbraum (Farbwert, Sättigung und
+Hellwert) umgewandelt. 
+
+Im RGB-Farbraum ist reines Gelb so definiert, dass sowohl der rote als auch der
+grüne Kanal gleich sind und der blaue Kanal auf Null gesetzt ist. Dies lässt
+nur einen Freiheitsgrad für die Justierung der Pipeline zu.  Ein einziger
+Freiheitsgrad führt zu Problemen bei der Abstimmung, da die Pipeline dadurch
+weniger in der Lage ist, Störungen zu berücksichtigen. Unterschiedliche
+Lichtverhältnisse oder reflektierende Oberflächen sind Beispiele für solche
+Störungen.
+
+Im HSV-Farbraum wählt der Farbwertkanal die Farbe aus, der Sättigungskanal die
+Reinheit des Farbtons und der Wertekanal die Helligkeit des Farbtons. (MS ANNO)
+Nach der Auswahl des Farbwerts, in diesem Fall Gelb, werden der Helligkeits-
+und der Sättigungskanal verwendet, um den spezifischen Gelbton auszuwählen. Die
+Verwendung dieser beiden Kanäle ermöglicht eine zuverlässigere Erkennung der
+Farbe.
+
+Um die gelbe Spur zu erkennen, filtert die Pipeline Farben außerhalb des gelben
+Farbtonbereichs heraus und schneidet dann den unteren Teil des Helligkeits- und
+Sättigungskanals ab. Das Ergebnis ist, dass nur reines Gelb im Bild übrig
+bleibt. Die in der Pipeline verwendeten Werte für Gelb werden durch den
+folgenden Bereich, TABLE, dargestellt.
+
+Das Ergebnis dieser Stufe der Pipeline ist beispielsweise in ABBILDUNG
+dargestellt.
+
+\section{Perspektivtransformation}
+
+Der dritte Teil der Bildverarbeitungspipeline ist die Perspektivtransformation. 
+
+Wenn ein Bild mit einer am Fahrzeug montierten Kamera aufgenommen wird, ist die
+Fahrspurlinie nicht rechteckig, sondern trapezförmig. Diese Perspektive
+erfordert, dass alle Berechnungen bezüglich der Fahrspurlinie deren abnehmende
+Breite kompensieren müssen. Um dies zu vermeiden, wird eine
+Perspektivtransformation durchgeführt. 
+
+Bei der Perspektivtransformation wird eine Teilmenge eines Bildes beschnitten
+(?) und so angepasst, dass sie das gesamte Bild umfasst. Ein Beispiel ist in
+ABBILDUNG dargestellt. Bei diesem Projekt ist die Form der Teilmenge des Bildes
+ein Trapez. Mithilfe dieser Perspektivtransformation wird die trapezförmige
+Form der Fahrbahnlinie in eine gerade Form korrigiert, wie in ABBILDUNG
+dargestellt.
+
+Eine Folge dieser neuen Perspektive ist, dass das resultierende Bild einer
+2-D-Ebene der Strecke ähnelt. Die Perspektivtransformation vereinfacht auch die
+weitere Bildverarbeitung, da alle Objekte außerhalb des Trapezes abgeschnitten
+werden und nur die Spur übrig bleibt. Wie in ABBILDUNG zu sehen ist, führt die
+Perspektivtransformation jedoch zu zusätzlichem Rauschen im Bild. Die durch die
+Perspektivtransformation verursachte Scherung (?) führt dazu, dass die Pixel des
+Originalbildes gestreckt werden, wodurch das Bild mit Rauschen verunreinigt
+wird. Daher ist es erforderlich, dass diese Stufe nach der
+\glqq Color-Thresholding\grqq-Stufe erfolgt.
 
 \section{Histogramm}
 
@@ -363,13 +470,134 @@ Dieser Schritt trägt dazu bei, die Berechnungszeit zu verkürzen, indem Teile
 des Bildes herausgefiltert werden, die keine Fahrspurinformationen enthalten.
 Eine visuelle Darstellung des Histogramms ist in ABBILDUNG zu sehen.
 
-\section{Gleitfensterverfahren}
+\section{Gleitfenstermethode}
+
+In der fünften Stufe der Pipeline werden die Richtung und der Versatz (?) der
+Fahrspur mit Hilfe der Gleitfenstermethode berechnet.
+
+Zunächst wird eine ausgewählte Anzahl von Rechtecken (Fenstern) erstellt. Die
+Fenster werden in einer Spalte ausgerichtet und sind gleich groß. Ihre Höhe
+wird so gewählt, dass die Spalte die gesamte Höhe des Bildes überspannt,
+während ihre Breite um einen Faktor der Bildbreite gewählt wird. Die Anzahl der
+Fenster wird so gewählt, dass die Spalte die weißen Pixel umfasst, die die
+Fahrspur darstellen, (?) wie in ABBILDUNG zu sehen ist. Wenn die Anzahl der
+Fenster zu groß ist, besteht die Gefahr, dass die Methode weiße Pixel, die tief
+im Bild liegen, fälschlicherweise als Teil der Fahrspur erkennt. 
+
+Zweitens wird die x-Koordinate des Mittelpunkts des ersten Fensters auf den
+Spitzenwert des Histogramms aus der vorherigen Stufe gesetzt. Dann wird die
+Anzahl der weißen Pixel innerhalb des Fensters gezählt. Wenn die Anzahl über
+einem gewählten Schwellenwert liegt, werden die Pixel zu einem Array
+hinzugefügt und der Mittelwert der x-Koordinaten der enthaltenen Pixel
+berechnet. (?) Die x-Koordinate des nächsten Fensters wird auf diesen
+berechneten Mittelwert gesetzt und über das erste Fenster gelegt. Dieser
+Vorgang wird dann für alle verbleibenden Fenster wiederholt. Wenn in einem
+Fenster keine Pixel enthalten sind, wird das Fenster ignoriert und das folgende
+Fenster darüber gelegt. Im Bildkoordinatensystem liegt die linke obere Ecke des
+Bildes bei $(0, 0)$, wobei die positive x-Achse nach rechts und die positive
+y-Achse nach unten im Bild ansteigt. Die untere Kante des Bildes wäre also jede
+Koordinate, deren y-Komponente gleich der Höhe des Bildes ist. Aus der Sicht
+des Ingenieurs wären die Fenster von unten nach oben gestapelt, im
+Bildkoordinatenraum ist es jedoch umgekehrt. 
+
+Die Pixel, die nicht innerhalb der einzelnen Fenster liegen, werden dann aus
+dem Bild herausgefiltert. Das Bild vor und nach dem Filterungsprozess ist in
+ABBILDUNG zu sehen. Mit Hilfe der Methode der kleinsten Quadrate wird ein
+Polynom durch die verbleibenden Pixel approximiert.
+
 \section{Berechnung von Ausrichtung und Abstand}
+
+In der letzten Stufe der Pipeline werden die Ausrichtung und die Abweichung von
+der Fahrspurlinie berechnet. 
+
+Aus dem in der vorangegangenen Stufe berechneten angepassten Polynom wird eine
+analytische Ausrichtung an einem ausgewählten Punkt entlang der Bahn mit der
+folgenden Gleichung ermittelt, \begin{equation} \theta = \arctan(f^\prime(y)).
+\end{equation} Der inverse Tangens der Ableitung des Polynoms liefert die
+Ausrichtung an einem bestimmten Punkt. Für den Stanley-Regler wird nur die
+Differenz zwischen der Bahnausrichtung und der Ausrichtung des Fahrzeugs
+benötigt, da es kein globales Koordinatensystem für das Fahrzeug gibt; die
+Ausrichtung des Fahrzeugs wird so gewählt, dass sie zu jeder Zeit null Grad
+beträgt. BILD MIT VISUELLER DARSTELLUNG 
+
+Der klassische Stanley-Regler, wie in Kapitel 2 beschrieben, verwendet die vom
+nächstgelegenen Bahnpunkt berechnete Ausrichtung. Als Nebeneffekt der
+Polynomanpassung ist jedoch die am unteren Bildrand berechnete Ausrichtung
+falsch. Wie in ABBILDUNG zu sehen ist, kann die Gleitfenstermethode die
+Fahrspurlinie in der Nähe des unteren Bildrandes nicht konsistent erkennen. Aus
+diesem Grund wird die Ausrichtung durch das angepasste Polynom falsch
+approximiert. Daher wird die Ausrichtung stattdessen an einem Punkt innerhalb
+der erkannten Fahrspurlinie berechnet. Außerdem wird dadurch ein zusätzlicher
+Freiheitsgrad für den Regler geschaffen. Die Konsequenzen daraus werden in
+Kapitel 4 erörtert.
+
+Die Abweichung von der Fahrspurlinie wird aus dem angepassten Polynom mit
+folgender Funktion berechnet: 
+\begin{equation}
+    e_{fa} = (\frac{w}{2} - f(h))\cdot x_{mpp}.
+\end{equation}
+Dabei ist $w$ die Breite des Bildes, $f(h)$ die Ausgabe des angepassten
+Polynoms am unteren Rand des Bildes, $x_{mpp}$ eine Skalierungskonstante zur
+Umrechnung von Pixeln in Meter und $e_{fa}$ der Abstand des Fahrzeugs zur
+Fahrspur. Zusammenfassend wird die Differenz aus der x-Komponente des
+Mittelpunkts und der x-Komponente des Polynompunkts am unteren Bildrand in
+Meter umgerechnet.
+
 \section{Ausrei{\ss}er}
+
+Die in Algorithmen zur Fahrspurerkennung verwendete Gleitfenstermethode kann zu
+einem Phänomen führen, das als \glqq Ausreißer\grqq bekannt ist. Diese treten auf, wenn
+der Algorithmus die Fahrspurlinie in einem bestimmten Bild falsch bestimmt.
+ABBILDUNG zeigt eine Sequenz von drei Einzelbildern, wobei das ganz linke
+Einzelbild den Ausgangspunkt bildet. Im ersten Bild wird die Fahrspurlinie
+richtig erkannt, aber im zweiten Bild tritt ein Ausreißer auf, bei dem die
+Fahrspurlinie falsch bestimmt wird. Im letzten Bild wird die Fahrspurlinie
+wieder korrekt erkannt.
+
+Eine der Hauptursachen für Ausreißer ist die falsche Auswahl der HSV-Werte.
+Wenn die im Algorithmus verwendeten HSV-Werte nicht restriktiv genug sind,
+werden Farben außer Gelb möglicherweise nicht herausgefiltert, was zu einer
+ungenauen Bestimmung der Fahrspurlinie führt.
+
+
 \section{Pipeline-Optimierungen}
 
+Bei der Entwicklung der Bildverarbeitungspipeline wurde festgestellt, dass die
+Laufzeit der Pipeline zu langsam war. Um die Rechenzeit der Pipeline auf ein
+akzeptables Niveau zu verbessern, wurde eine Optimierung eingeführt. Weitere
+Optimierungen sind zwar möglich, würden aber den Rahmen der Arbeit sprengen und
+werden daher hier nicht behandelt.
+
+Das Python-Programm cProfiler wurde verwendet, um die Funktionsaufrufe der
+Pipeline mit ihren jeweiligen Laufzeiten zu tabellieren. Da es sich bei der
+Pipeline um ein deterministisches Programm handelt, (?) verbessert die
+Zwischenspeicherung der Ausgabe der teuren Funktionsaufrufe im Speicher die
+Laufzeit der Pipeline. Daher wird bei allen nachfolgenden Pipeline-Ausführungen
+das zwischengespeicherte Ergebnis zurückgegeben, anstatt die Berechnung erneut
+auszuführen. Beispielsweise ist die Berechnung der perspektivischen
+Transformationsmatrizen kostspielig, was bei der Zwischenspeicherung zu einer
+Leistungssteigerung der Pipeline führt.
+
+FOR PAUL: 
+This next paragraph exists in the english version, but I removed it here as it
+no longer accurate due to our use of the corola brain.
+Do you think I should still have it?
+
+
+In order to prove the performance improvement of the pipeline, an experiment
+was implemented. First, the pipeline is executed once and the runtime ignored
+as the performance improvement is only relevant to subsequent executions of the
+pipeline. Therefore, on the second execution of the pipeline, the runtime is
+measured for both pipeline variants, with and without caching the expensive
+function calls from the first execution. The experiment is then run 100 times
+and the result tabulated. The arithmetic mean of the runtimes for both variants
+are then compared to one another to measure the speed improvement. The values
+are in TABLE, showing that by caching the expensive function calls, the
+pipeline processing speed improved by VALUE%.
+
+
 \chapter{Experiment}
-\section{Hardware Setup}
+\section{Hardware}
 
 Die CoRoLa-Car-Platform besteht aus einem Raspberry Pi, einer Fisheye-Kamera,
 einem Gleichstrommotor und einem Motorregler zur Steuerung der
@@ -381,8 +609,59 @@ zentralen Computer verbunden. Der Stanley-Controller läuft auf dem
 Zentralrechner, der die Daten von der Kamera verarbeitet und die Ausgabe des
 Stanley-Reglers an das Fahrzeug sendet.
 
-\section{Experiment Setup}
+\section{Experimentkriterien}
+
+\subsection{H"ochstgeschwindigkeit}
+
+Um die Höchstgeschwindigkeit zu messen, fährt das Fahrzeug mit einer bestimmten
+Vorwärtsgeschwindigkeit auf der Strecke. Wenn das Verhalten des Fahrzeugs als
+\glqq akzeptabel\grqq angesehen wird, wird das Fahrzeug angehalten und die
+Geschwindigkeit erhöht. Dieser Vorgang wird so lange wiederholt, bis das
+Verhalten des Fahrzeugs nicht mehr \glqq akzeptabel\grqq ist. Das \glqq
+akzeptable\grqq Verhalten des Fahrzeugs wird empirisch anhand der folgenden
+beiden Kriterien definiert: Fähigkeit, der Fahrspur zu folgen, und Fehlen von
+beobachteten Schwingungen.
+
+\subsection{Maximal m"oglicher Fehlerwinkel}
+
+Die maximalen Fehlerwinkel sind definiert als die maximalen Winkel, bei denen
+das Fahrzeug in der Lage ist, den Weg links bzw. rechts der Fahrspurlinie
+wiederzufinden. Um dies zu messen, wird das Fahrzeug bei deaktiviertem
+Motorregler kollinear mit der Fahrspurlinie platziert. Dann wird das Fahrzeug
+im Uhrzeigersinn gedreht, wobei der Ausgang des jeweiligen Reglers in Echtzeit
+angezeigt wird. Das Fahrzeug wird so lange gedreht, bis der Ausgang des Reglers
+entweder chaotisch wird oder konstant Null ist. Das Experiment wird dann für
+den Stanley-Regler und den PID-Regler durchgeführt. Das Auftreten eines
+chaotischen Ausgangs ist nicht deterministisch, empirisch gesehen ist dies
+jedoch der Fall, wenn das Fahrzeug die Fahrspurlinie nicht zuverlässig erkennen
+kann. Ein Ausgang von Null bedeutet auch, dass das Fahrzeug die Fahrspurlinie
+überhaupt nicht erkennen kann.
+
+\subsection{Abstand von der Linie}
+
+Die Messung des Fahrzeugversatzes erfolgt durch die folgenden zwei Versuche.
+Zunächst fährt das Fahrzeug mit einer bestimmten Vorwärtsgeschwindigkeit auf
+der Strecke. Dann wird mit einer Überwachungskamera ein Video von der
+Kurvenfahrt des Fahrzeugs aus der Vogelperspektive aufgenommen. Das Fahrzeug
+wird mit unterschiedlichen Vorwärtsgeschwindigkeiten aufgezeichnet. Bei der
+ersten Aufnahmerunde wird das Fahrzeug mit dem Stanley-Regler gesteuert, bei
+der zweiten mit dem PID-Regler. Dieses Experiment wird für die gewählten
+Geschwindigkeiten von 1,0, 1,25, 1,5, 1,75 und 2,0 Metern pro Sekunde
+durchgeführt.
+
+\subsection{Reglerausgang}
+
+Um den Reglerausgang der beiden Regler zu messen, wird das Fahrzeug angewiesen
+(?), mindestens dreimal um die Strecke zu fahren. Während der Fahrt wird der
+Ausgang des Reglers aufgenommen. Nach der Fahrt werden die Daten im Zeitverlauf
+grafisch dargestellt und eine Teilmenge der Daten ausgewählt. Die Teilmenge der
+Daten wird nach den folgenden Kriterien ausgewählt: Periodizität und Fehlen von
+Ausreißern.
+
+\section{Ergebnisse}
+
 
 
 \chapter{Conclusion}
+
 \end{document}
