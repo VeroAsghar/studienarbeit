@@ -142,12 +142,15 @@ kinematic model of a two-axle vehicle. (STANFORD)
 
 The Stanley controller is a path following controller instead of a trajectory
 following controller. As a lateral controller, it is designed to keep the
-vehicle on the path but has no impact on the speed at which the vehicle travels
-along the path. This approach allows for a flexible choice of the vehicle
-speed, which can be selected as required for a given application, subject to
-dynamic effects. The Stanley controller is represented mathematically by the
-following equation: \begin{equation} u = \theta - \theta_d +
-\arctan\left(\frac{ke_{fa}}{v}\right), \label{eq:Stanley-Regler} \end{equation}
+vehicle on the path but has no impact on the forward speed. This approach
+allows for a flexible choice of the vehicle speed, which can be selected as
+required for a given application, subject to dynamic effects. The Stanley
+controller is represented mathematically by the following equation: 
+\begin{equation} 
+    u = \theta - \theta_d +
+    \arctan\left(\frac{ke_{fa}}{v}\right), 
+    \label{eq:Stanley-Regler} 
+\end{equation}
 where $u$ represents the controller output, $\theta$ is the current heading of
 the vehicle, $\theta_d$ is the heading of the path, $k$ is a scaling factor,
 $v$ is the velocity of the vehicle, and $e_{fa}$ is the cross track error from
@@ -853,5 +856,13 @@ the following criteria: periodicity and absence of outliers.
 The results of the experiments are list in TABLE. 
 
 
+When comparing the results of the simulation of the Stanley controller in
+FIGURE with $v = 1.75 \frac{m}{s}$ and $fs = 50$ Hz and its behaviour on the
+track, the Stanley controller 
+
 \chapter{Conclusion}
+
+The stanley 
+
+
 \end{document}
