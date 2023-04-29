@@ -96,7 +96,19 @@ to follow.}
 
 \chapter{Einführung}
 
-\chapter{Regelalgorithmus}
+At the Connected Robotics Lab (CoRoLa) research group at the Barkhausen
+Institut, a demonstration using remote controlled two axle vehicles was
+developed. The demonstration is currently in use in order to model
+communications between vehicles similar to an Internet of Things (IoT) network.
+
+Due to issues regarding low forward velocity and robustness of the current vehicle controller,
+it was proposed to implement a new 
+
+In order to achieve the goals stated above, creation of an image processing pipeline and implementation of
+the Stanley controller are proposed.
+
+
+chapter{Regelalgorithmus}
 
 \section{Stanley-Regler}
 \iffalse
@@ -795,11 +807,8 @@ pipeline processing speed improved by VALUE%.
 The CoRoLa car platform is composed of a Raspberry Pi, a fisheye lens camera, a
 DC motor and a motor controller to control the vehicle speed and a servo motor
 to control the steering angle of the vehicle. The Raspberry Pi sends PWM
-signals to the motor controller and the servo controller in order to control
-the vehicle. Using Robot Operating System 2 (ros2), the Raspberry Pi is
-connected over the network to a central computer. The Stanley controller runs
-on the central computer, which processes the data from the camera and sends the
-output of the Stanley controller to the vehicle.
+signals to the motor controller and the servo controller with a sampling rate
+of 50 Hz in order to control the vehicle. 
 
 \section{Experimentkriterien}
 
@@ -846,23 +855,103 @@ of 1.0, 1.25, 1.5, 1.75 and 2.0 meters per second.
 \subsection{Reglerausgang}
 
 In order to measure the controller output of the two controllers, the vehicle
-is commanded to drive around the track at least three times. During the drive, the
-controller output is recorded. After the drive, the data is graphed over time
-and a subset of the data is selected. The subset of the data is selected under
-the following criteria: periodicity and absence of outliers.
+is commanded to drive around the track at least three times. During the drive,
+the controller output is recorded. After the drive, the data is graphed over
+time and a subset of the data is selected. The subset of the data is selected
+under the following criteria: periodicity and absence of outliers.
 
 \section{Ergebnisse}
 
-The results of the experiments are list in TABLE. 
+The results of the experiments are listed in TABLE. 
 
+\subsection{H"ochstgeschwindigkeit}
+
+When running the PID controller on the vehicle, velocities above $1.5 \frac{m}{s}$
+lead to issues with the robustness of the vehicle. In comparison to then Stanley 
+controller, whenever an outlier appears, the PID controller causes the vehicle to oscillate and
+requires a longer time than the Stanley controller to return to the lane. The oscillations 
+scale with the forward velocity of the vehicle. With velocities greater than or equal to 
+$2.0 \frac{m}{s}$, the PID controller will drive the vehicle into the wall of the track. Even 
+velocities between 1.5 and 1.75 $\frac{m}{s}$ require supervision in order to make sure that the 
+vehicle won't drive into the wall.
+
+In comparsion, the Stanley controller requires no supervision, until the
+forward velocity of the vehicle is above 2.3 $\frac{m}{s}$. However, at higher
+velocities, the vehicle will drift farther from the path, until the vehicle
+acts as a "guide", as opposed to something that needs to be followed. 
+
+\subsection{Maximal m"oglicher Fehlerwinkel}
+
+The Stanley controller can not be offset from the lane as much as the PID controller.
+Due to both the calibration stage of the pipeline and requiring an approximated polynomial,
+the requirements for the Stanley controller to detect the lane are higher than the PID 
+controller. The PID controller requires only that a grouping of yellow pixels exists in the
+image. The Stanley controller requires at least some geometry to the grouping of yellow pixels, typically
+in the form of a line or section of a curve.
+
+\subsection{Abstand von der Linie}
+
+As can be seen in FIGURE, the PID controller follows the path closer than the
+Stanley controller. Even accounting for the offset at the start of the curve,
+the Stanley controller does not drive the vehicle onto the lane until the end
+of the curve. In comparison, the PID controller forces the vehicle to stay on
+the path, while still drifting lightly to the left. This drift scales with the
+forward velocity of the vehicle.
 
 When comparing the results of the simulation of the Stanley controller in
 FIGURE with $v = 1.75 \frac{m}{s}$ and $fs = 50$ Hz and its behaviour on the
-track, the Stanley controller 
+track, the behaviour of the Stanley controller in reality matches with the
+simulation. However, as can be seen in FIGURE, the Stanley controller will
+drift away from the straight section of the track before the curve. 
+
+Compensation for this drift was attempted, but outside of setting the reference
+point for the cross-track-error to another value, the drift stayed. By changing
+the reference point manually, the vehicle requires different parameters when
+driving clockwise or counterclockwise around the track. To avoid this, it was
+decided to keep the drift included for now. In chapter 5, adjustments to the
+Stanley controller are discussed, that could lead to an improvement in the
+future.
+
+
+\subsection{Reglerausgang}
+
+The controller output of both controllers are similar, regardless of the
+velocity, except for the PID controller at velocity 1.5 $\frac{m}{s}$. As the
+forward velocity of the vehicle increases, the controller output scales
+appropiately. The difference between the two controllers comes in the form of
+both signals. Between forward velocities 1.0 and 1.5 $\frac{m}{s}$, the signal
+output of the two controllers are similar, however at 1.75 and 2.0
+$\frac{m}{s}$ the sinusoidal nature of the PID controller degrades, while the
+sinusoidal nature of the Stanley controller increases. 
+
+At 1.75 $\frac{m}{s}$, the PID controller can still control the vehicle onto the 
+lane, however as can be seen in FIGURE, outliers lead to high oscillations in controller output.
+When the PID controller incorrectly identifies the lane, the controller has difficulty 
+returning the vehicle to the lane and can instead drive the vehicle into the wall, which can be seen
+at the right end of the graph. In comparison, the Stanley controller has no issue following the path
+at the same velocity. 
+
+At 2.0 $\frac{m}{s}$, the PID controller is unable to control the vehicle and
+drives the vehicle into the wall. As can be seen in FIGURE, the output varies
+between -30 and 30 degrees and there is no periodicity. In comparision, the
+Stanley controller has a stable oscillation between -30 and 0 degrees and is
+periodic.
+
+Outliers do not lead to high oscillations when the vehicle is being controlled
+by the Stanley controller. It has been observed that the vehicle will reorient
+itself onto the path much quicker than the PID controller.
+
+
 
 \chapter{Conclusion}
 
-The stanley 
+When comparing only the path following behaviour of both controllers, the PID controller
+is still the best choice. However, when factoring in the other aspects of the problem statement,
+the Stanley controller is a better fit for the application. As the vehicle needs to be able to
+drive autonomously without supervision at a higher velocity than it can originally, the Stanley 
+controller fulfills these requirements. 
+
+\subsection{Future Work}
 
 
 \end{document}
