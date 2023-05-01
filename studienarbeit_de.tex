@@ -106,35 +106,35 @@ to follow.}
 
 Der Stanley-Regler ist ein nichtlinearer Regelungsalgorithmus, der 2005 von
 der Stanford University entwickelt wurde, um ein zweiachsiges Fahrzeug nur
-anhand der Ausrichtung und der Querabweichung der zu verfolgenden Bahn zu
+anhand der Ausrichtung des Fahrzeugs relativ zur Bahn und der Querabweichung der zu verfolgenden Bahn zu
 steuern. Der Algorithmus hat sich für das kinematische Modell eines
 zweiachsigen Fahrzeugs als asymptotisch global stabil erwiesen.
 
 Der Stanley-Regler ist ein Bahnfolgeregler anstelle eines
-Trajektorienfolgereglers. Als Querregler (?) soll er das Fahrzeug auf der Bahn
+Trajektorienfolgereglers. Als Querregler soll er das Fahrzeug auf der Bahn
 halten, hat aber keinen Einfluss auf die Vorw"artsgeschwindigkeit. Dieser
 Ansatz ermöglicht eine flexible Wahl der Fahrzeuggeschwindigkeit, die unter
 Berücksichtigung dynamischer Effekte nach Bedarf für eine bestimmte Anwendung
-gewählt werden kann. (?)
+gewählt werden kann. 
 
-Der Stanley-Regler wird mathematisch durch die folgende Gleichung dargestellt:
+Der Stanley-Regler wird mathematisch durch die folgende Gleichung beschrieben:
 \begin{equation} 
   u = \theta - \theta_d + \arctan\left(\frac{ke_{fa}}{v}\right).
   \label{eq:Stanley-Regler} 
 \end{equation}
 Dabei ist $u$ den Reglerausgang, $\theta$ die aktuelle Ausrichtung des Fahrzeugs,
-$\theta_d$ die Pfadausrichtung, $k$ einen Skalierungsfaktor, $v$ die
+$\theta_d$ die Kursausrichtung, $k$ ein Skalierungsfaktor, $v$ die
 Geschwindigkeit des Fahrzeugs und $e_{fa}$ die Querabweichung vom Mittelpunkt
 der Vorderachse des Fahrzeugs zum Kurs.
 
 Der Stanley-Regler besteht aus zwei Komponenten: einer Komponente, die die
-Abweichung des Fahrzeugs vom Kurs behandelt, und einer Komponente, die die
+Querabweichung des Fahrzeugs vom Kurs behandelt, und einer Komponente, die die
 Differenz zwischen der Ausrichtung des Fahrzeugs und der des Kurses behandelt.
 Die erste Komponente wird durch $\arctan(\frac{ke_{fa}}{v})$ dargestellt und
 steuert den Lenkwinkel so, dass er sich auf den Kurs zubewegt, wenn sich das
 Fahrzeug weiter von ihm entfernt. Die zweite Komponente, dargestellt durch
 $\theta_d - \theta$, steuert den Lenkwinkel so, dass er parallel zum zu
-verfolgenden Kurs bleibt. Zusammen bewirken diese beiden Komponenten (?), dass
+verfolgenden Kurs bleibt. Zusammen bewirken diese beiden Komponenten, dass
 das Fahrzeug auf den gewünschten Kurs gelenkt wird.
 
 
@@ -165,12 +165,12 @@ Folglich ist das Verhalten des Stanley-Reglers für kleine Eingangssignale
 \subsection{Gro{\ss}signalverhalten}
 
 Bei großen Signalen wird der Stanley-Regler durch das Verhalten der
-\(arctan(...)\)-Funktion sowie durch die zyklische Natur der Ausrichtung
-\(\theta\) dominiert. Die Funktion \(arctan(...)\) ist auf einen Wert zwischen
+\(arctan\)-Funktion sowie durch die zyklische Natur der Ausrichtung
+\(\theta\) dominiert. Die Funktion \(arctan\) ist auf einen Wert zwischen
 -90 und 90 Grad begrenzt und ist glatt. Die Ausrichtung ist ebenfalls auf den
-vorderen Halbkreis bzw. -90 und 90 Grad begrenzt, da davon ausgegangen wird,
-dass sich das Fahrzeug in eine Richtung bewegt. (?) Zusammen begrenzen diese
-Komponenten den Lenkwinkel (?) des Fahrzeugs.
+vorderen Halbkreis des Fahrzeugsichtfelds bzw. -90 und 90 Grad begrenzt, da davon ausgegangen wird,
+dass sich das Fahrzeug in eine Richtung bewegt. Zusammen begrenzen diese
+Komponenten den Lenkwinkel des Fahrzeugs.
 
 
 %Beim Umgang mit großen Signalen wird das Verhalten des Stanley-Reglers
@@ -187,27 +187,27 @@ Komponenten den Lenkwinkel (?) des Fahrzeugs.
 
 
 Um ein besseres Verständnis für das Verhalten des Stanley-Reglers in einem
-ferngesteuerten Fahrzeug zu gewinnen, haben wir eine Simulation des
+Modellfahrzeug zu gewinnen, habe ich eine Simulation des
 Regelkreises durchgeführt. Die Simulation umfasst drei Hauptkomponenten: den
 Kurs, dem das Fahrzeug folgen muss, den Stanley-Regler und das Fahrzeugmodell.
 Zur Untersuchung der Zeitreihendaten des zweiachsigen Fahrzeugs in der
 Simulation wurde ein Differentialgleichungslöser eingesetzt.
 
 Der Kurs, dem das Fahrzeug folgen muss, ist eine virtuelle Darstellung der
-realen Strecke (?), die das Fahrzeug durchfahren wird. (?) Eine visuelle
+realen Strecke, die das Fahrzeug durchfahren wird. Eine visuelle
 Darstellung der Fahrbahn findet sich in Abb. \ref{fahrbahn}. In der Simulation wird der
 Kurs durch die folgende kontinuierliche statische Funktion definiert:
 \begin{equation} 
   (x, y, h) = f(t, t_f), 
 \end{equation} 
-wobei $t$ und $t_f$ die Eingangsparameter Zeit bzw. Simulationsendzeit (?)sind
+wobei $t$ und $t_f$ die Eingangsparameter Zeit bzw. Simulationsdauer sind
 und $(x, y, h)$ die kartesischen Koordinaten des Pfadpunkts und die
 entsprechende Ausrichtung an diesem Punkt darstellt. Diese Funktion wird für
-eine beliebige Anzahl von $t$-Werten diskretisiert, um ein Array von $(x, y,
+eine beliebige Anzahl von $t$-Werten diskretisiert, um eine Liste von $(x, y,
 theta)$-Werten zu erzeugen. Der Differentialgleichungslöser bezieht den
 Stanley-Controller und das Fahrzeugmodell ein, um die Zeitreihen des
-zweiachsigen Fahrzeugs unter Verwendung dieses Arrays als Eingabe zu
-analysieren. (?)
+zweiachsigen Fahrzeugs unter Verwendung dieser Liste als Eingabe zu
+analysieren.
 
 \begin{figure}[h]
     \centering
@@ -234,7 +234,8 @@ Lenkwinkel des Fahrzeugs. Die Eingangsgrößen des Modells sind $v$ und
 $\varphi$, wobei $v$ die Geschwindigkeit des Fahrzeugs und $\varphi$ der
 Lenkwinkel ist. Der Lenkwinkel $\varphi$ ist selbst ein dynamisches System, das
 durch eine lineare Differentialgleichung erster Ordnung mit der
-konfigurierbaren Zeitkonstante $T$ dargestellt wird. Das Verhalten des
+konfigurierbaren Zeitkonstante $T$ dargestellt wird. $l$ ist der Abstand
+zwischen dem Hinterradachse und dem Vorderradachse.  Das Verhalten des
 Stanley-Reglers bei dynamischen Einflüssen auf den Lenkwinkel ist von großer
 Bedeutung, da die globale asymptotische Stabilität des Reglers nur für das
 kinematische Zweiachsmodell nachgewiesen wurde.
@@ -262,12 +263,14 @@ Funktion berechnet:
   \end{bmatrix}
   \label{eq:Transformation from Rear Axle to Front Axle}
 \end{equation}
-wobei $x_V$ und $y_V$ die kartesischen Koordinaten dieses Mittelpunkts sind. 
+wobei $x_V$ und $y_V$ die kartesischen Koordinaten dieses Vorderradachsemittelpunkts sind.
+$\underline{p}_V$ und $\underline{p}_H$ sind die Positionsvektoren des
+Hinterrad- und Vorderradachsemittelpunkts.
 
-Wie bereits erwähnt,(?) besteht der Stanley-Regler aus mehreren Teilen, die
-getrennt voneinander berechnet werden müssen. Die Ausrichtung $\theta$ ist eine
+Wie bereits erwähnt, besteht der Stanley-Regler aus mehreren Teilen, die
+getrennt voneinander berechnet werden k"onnen. Die Ausrichtung $\theta$ ist eine
 Zustandsvariable, daher ist sie immer verfügbar. Um die Querabweichung und die
-Kursrichtung (?) zu berechnen, muss der richtige Bahnpunkt gewählt werden. Der
+Kursrichtung zu berechnen, muss der richtige Bahnpunkt gewählt werden. Der
 Stanley-Regler verwendet den nächstliegenden Bahnpunkt vom
 Vorderachsmittelpunkt des Fahrzeugs, um die Ausrichtung des Kurses $\theta_d$
 und die aktuelle Querabweichung $e_{fa}$ zu bestimmen. Für die Simulation wird
@@ -301,17 +304,18 @@ und der Ausgang des Reglers wird in das Fahrzeugmodell eingespeist. Ein
 For Paul: this figure will take a bit more time to make.
 
 Der Stanley-Regler arbeitet mit zeitkontinuierlichen Signalen, die sich von den
-vom Fahrzeug verwendeten zeitdiskreten Signalen unterscheiden. Das Fahrzeug
-nimmt Bilder mit einer festen Abtastfrequenz auf, die von der Pipeline
-verarbeitet werden, bevor sie in den Regler eingespeist werden. Um dieses
-Verhalten zu simulieren, wird ein Cache in den Simulator eingebaut, um die
-Ausrichtung und die Querabweichung zu speichern. Der Stanley-Regler verwendet
-dann diese zwischengespeicherten Werte für eine bestimmte Dauer. Dieser
-Cache-Ansatz ahmt das Verhalten eines Halteglieds nullter Ordnung nach, und die
-Ausgabe wird anschließend in den Stanley-Regler eingespeist. Dieser
-Simulationsansatz ermöglicht die Untersuchung des Fahrzeugverhaltens für
-verschiedene Abtastfrequenzen und erlaubt die Festlegung einer Toleranz für die
-Rechengeschwindigkeit (?) der Pipeline. Der Vergleich der Simulationsergebnisse bei
+vom \glqq echten\grqq Fahrzeug verwendeten zeitdiskreten Signalen
+unterscheiden. Das Fahrzeug nimmt Bilder mit einer festen Abtastfrequenz auf,
+die von der Pipeline verarbeitet werden, bevor sie in den Regler eingespeist
+werden. Um dieses Verhalten zu simulieren, wird ein Speicher in den Simulator
+eingebaut, um die Ausrichtung und die Querabweichung zu speichern. Der
+Stanley-Regler verwendet dann diese zwischengespeicherten Werte für eine
+bestimmte Dauer. Dieser Speicher-Ansatz ahmt das Verhalten eines Halteglieds
+nullter Ordnung nach, und die Ausgabe dieses Haltegliedes wird anschließend in
+den Stanley-Regler eingespeist. Dieser Simulationsansatz ermöglicht die
+Untersuchung des Fahrzeugverhaltens für verschiedene Abtastfrequenzen. Von
+besonderer Bedeutung ist die Stablit"at des Regelkreises mit verschiedenen
+Abtastfrequenzen. Der Vergleich der Simulationsergebnisse bei
 verschiedenen Abtastfrequenzen ist in Abb. \ref{sampling} dargestellt.
 
 \begin{figure}[h]
@@ -328,9 +332,9 @@ Wie in Abb. \ref{sampling} dargestellt, wird der Stanley-Regler durch die Abtast
 beeinflusst, wobei bei niedrigeren Frequenzen ein deutlicher Effekt zu
 beobachten ist. Oberhalb eines bestimmten Schwellenwerts von 15 Hz scheint das
 Verhalten des Fahrzeugs jedoch nicht wesentlich durch die Abtastfrequenz
-beeinflusst zu werden. (?)
+beeinflusst zu werden. 
 
-Die Simulation wird dann für eine ausgewählte Zeitspanne durchgeführt. 
+Die Simulation wurde dann für eine ausgewählte Zeitspanne durchgeführt. 
 
 
 
@@ -341,7 +345,7 @@ Am Anfang der Bildverarbeitungspipeline steht die Kamerakalibrierung. Für die
 CoRoLa Car Platform wurde eine Fischaugenkamera im Gegensatz zu einer
 geradlinigen Kamera gewählt. Der Vorteil einer Fischaugenkamera ergibt sich aus
 ihrem größeren Blickwinkel im Vergleich zu einer geradlinigen Kamera. Eine
-Fischaugenkamera hat jedoch von Natur (?) aus eine tonnenförmige Verzeichnung,
+Fischaugenkamera hat eine tonnenförmige Verzeichnung,
 wodurch gerade Linien gekrümmt werden. Die Krümmung dieser Linien hängt von
 ihrem radialen Abstand vom Bildmittelpunkt ab. Ein Beispiel ist in Abb.
 \ref{barrel} zu sehen. Diese Verzeichnung kann mit Hilfe der Software durch die
@@ -355,7 +359,7 @@ sogenannte Kamerakalibrierung kompensiert werden. \\
 \end{figure}
 
 Die Kamerakalibrierung wird verwendet, um die extrinsischen und intrinsischen
-Parameter einer Kamera anzunähern. Eine kalibrierte Kamera ermöglicht es,
+Parameter einer Kamera n"ahrungsweise zu bestimmen. Eine kalibrierte Kamera ermöglicht es,
 3-D-Informationen aus einem 2-D-Bild zu gewinnen. Die intrinsischen Parameter
 einer Kamera werden häufig durch die folgende 3x3-Matrix dargestellt:
 \begin{equation} 
@@ -366,15 +370,15 @@ einer Kamera werden häufig durch die folgende 3x3-Matrix dargestellt:
         0 & 0 & 1
     \end{bmatrix}, 
 \end{equation} 
-wobei $f_x$ und $f_y$ die Brennweiten der Kamera in Form von Pixeln (?) in den
-Richtungen $x$ und $y$ und $c_x$ und $c_y$ die Koordinaten des Hauptpunkts
+wobei $f_x$ und $f_y$ die Brennweiten der Kamera in Pixeln in den
+Richtungen $x$ und $y$ und $c_x$ und $c_y$ die Koordinaten des Bildmittelpunkts
 sind. Die extrinsischen Parameter werden häufig durch die folgende Matrix
 dargestellt: 
 \begin{equation}
     \begin{bmatrix} R & T \end{bmatrix}. 
 \end{equation} 
-Dabei ist $R$ die Rotationsmatrix der Kamera in Bezug auf das Laborsystem und $T$
-der Positionsspaltenvektor des Ursprungs des Laborsystems, ausgedrückt (?) in den
+Dabei ist $R$ die Rotationsmatrix der Kamera in Bezug auf das Laborsystem (?) und $T$
+der Positionsspaltenvektor des Ursprungs des Laborsystems, ausgedrückt in den
 Koordinaten des Kamerabildes. Die Kameramatrix $M$ ist die Abbildung von
 den Weltkoordinaten auf Pixelkoordinaten, die durch die
 Matrix-Matrix-Multiplikation dargestellt wird, 
@@ -385,7 +389,7 @@ Matrix-Matrix-Multiplikation dargestellt wird,
     \end{bmatrix}. 
 \end{equation} 
 Durch Rekonstruieren der $M$-Matrix mit Hilfe von Software kann das verzerrte
-Bild wieder in das Weltbild eingefügt werden, wodurch gekrümmte Linien gerade
+Bild wieder in das Weltbild "uberf"uhrt werden, wodurch gekrümmte Linien gerade
 werden. \\
 
 \begin{figure}[h]
@@ -399,7 +403,7 @@ werden. \\
 Eine Kamera wird anhand einer Sammlung von Fotos mit bekannten geraden Linien
 kalibriert. In der Regel wird eine Reihe von Schachbrettbildern mit bekannten
 Dimensionen verwendet. Danach werden Fotos des Schachbretts in verschiedenen
-Winkeln und an verschiedenen Stellen der Szene aufgenommen. Diese Bilderserie
+Winkeln und in verschiedenen Positionen relativ zu Kamera aufgenommen. Diese Bilderserie
 wird dann in den Algorithmus zur Kamerakalibrierung eingespeist, der zunächst
 die Positionen der Schachbrettfelder und der sie verbindenden Linien bestimmt.
 Anschließend gleicht der Algorithmus anhand des Modells einer Fischaugenkamera
@@ -410,17 +414,17 @@ jeweiligen Kamera ab, eine große Sammlung von Fotos führt jedoch zu einer
 genaueren Annäherung an die Parameter. (Zitat OPENCV) Die Verwendung von
 Bildern mit einer höheren Auflösung führt ebenfalls zu genaueren Parametern.
 (Zitat OPENCV/BLOG) Die angenäherten Parameter sind jedoch nur für die
-Kalibrierung von Bildern genau, die mit der gleichen Auflösung aufgenommen
+Kalibrierung von Bildern sind g"ultig, die mit der gleichen Auflösung aufgenommen
 wurden wie die für die Kalibrierung verwendeten Bilder. Um die Kameramatrix für
 Bilder mit einer niedrigeren Auflösung zu verwenden, muss die intrinsische
 Kameramatrix $K$ mit der folgenden Formel skaliert werden: 
 \begin{equation} 
     K_n = k K, 
 \end{equation} 
-wobei $k$ ein skalarer Wert ist, der den Verkleinerungsfaktor darstellt. Da es
+wobei $k$ ein skalarer Wert ist, der den Skalierungsfaktor darstellt. Da es
 sich bei der intrinsischen Kameramatrix um eine affine Abbildung handelt, muss
 der Wert bei $K_{n3, 3}$ auf 1 gesetzt werden. Die resultierende intrinsische
-Kameramatrix funktioniert bei kleineren Auflösungen, die dem Aspektverhältnis
+Kameramatrix funktioniert bei kleineren Auflösungen, die dem Seitenverhältnis
 der für die Kalibrierung verwendeten Bilder gleich sind. 
 
 
@@ -435,11 +439,11 @@ gerade, während es im mittleren Bild gekrümmt bleibt.
 
 Ein Nachteil der Kamerakalibrierung ist, dass jedes kalibrierte Bild eine
 geringere Auflösung hat als das Originalbild. Dies ist eine Folge des
-Kalibrierungsprozesses, da dieser eine Teilmenge des Bildes verzerrt,
+Kalibrierungsprozesses, da dieser einen Teil des Bildes verzerrt,
 insbesondere die Pixel in den Ecken des Bildes. Daher werden diese Pixel beim
 Kalibrierungsprozess aus dem resultierenden Bild entfernt. Um das Bild in
-seiner ursprünglichen Auflösung zu rekonstruieren, wird ein Interpolator
-verwendet. Der Interpolator liefert jedoch ein unschärferes Bild als das
+seiner ursprünglichen Auflösung zu rekonstruieren, wird eine Interpolation
+verwendet. Die Interpolation liefert jedoch ein unschärferes Bild als das
 Original. Um dies zu kompensieren, empfiehlt es sich, eine Kamera mit
 hochauflösenden Bildern zu kalibrieren und dann Bilder mit dieser Auflösung
 aufzunehmen. Anstatt den Interpolator zu verwenden, verkleinern Sie die Bilder
@@ -449,7 +453,7 @@ rechenintensiv, und es wurde beschlossen, nur die Bilder aus dem Interpolator
 zu verwenden, um die Rechenleistung der Pipeline zu erhöhen.
 
 Ein weiterer Nachteil der Kamerakalibrierung ist, dass sich der Mittelpunkt der
-Kamera verschiebt. Ein Beispiel dafür ist in Abb. \ref{shifted} zu sehen. Durch
+Kamera verschieben kann. Ein Beispiel dafür ist in Abb. \ref{shifted} zu sehen. Durch
 manuelles Ändern von $c_x$ kann der Bildmittelpunkt wieder an seine
 ursprüngliche Position verschoben werden. 
 
@@ -463,12 +467,13 @@ ursprüngliche Position verschoben werden.
 
 \section{\glqq Color Thresholding\grqq}
 
-Als Nächstes folgt die Stufe des sogenannten "Color Thresholding". In dieser
-Stufe werden alle Pixel aus dem Bild entfernt, die nicht hellgelb sind.
+Als Nächstes folgt der Schritt des sogenannten "Color Thresholding". In dieser
+Stufe werden alle Pixel aus dem Bild entfernt, die nicht zur Bahnlinie geh"oren.
+In dieser Implementierung sind Farbe ausser Gelb ungew"unscht.
 
 Zunächst wird das Bild von allen Pixeln ohne hohen Rotanteil gefiltert, da
 Hellgelb im Rot-Grün-Blau-Farbraum (RGB) einen hohen Rotanteil hat.
-Anschließend wird das Bild in den HSV-Farbraum (Farbwert, Sättigung und
+Anschließend wird das Bild in den HSV-Farbraum (Hue, Saturation, Value engl. f"ur Farbwert, Sättigung und
 Hellwert) umgewandelt. 
 
 Im RGB-Farbraum ist reines Gelb so definiert, dass sowohl der rote als auch der
@@ -479,7 +484,7 @@ weniger in der Lage ist, Störungen zu berücksichtigen. Unterschiedliche
 Lichtverhältnisse oder reflektierende Oberflächen sind Beispiele für solche
 Störungen.
 
-Im HSV-Farbraum wählt der Farbwertkanal die Farbe aus, der Sättigungskanal die
+Im HSV-Farbraum bestimmt der Farbwertkanal die Farbe, der Sättigungskanal die
 Reinheit des Farbtons und der Wertekanal die Helligkeit des Farbtons. (MS ANNO)
 Nach der Auswahl des Farbwerts, in diesem Fall Gelb, werden der Helligkeits-
 und der Sättigungskanal verwendet, um den spezifischen Gelbton auszuwählen. Die
@@ -493,7 +498,8 @@ bleibt. Die in der Pipeline verwendeten Werte für Gelb werden durch den
 folgenden Bereich, TABLE, dargestellt.
 
 Das Ergebnis dieser Stufe der Pipeline ist beispielsweise in Abb. \ref{color-thresholding}
-dargestellt. \\
+dargestellt. Als Eingabe bekommt der Pipeline ein kalibriertes Bild und er gibt nur Pixel aus, die 
+zur Bahnlinie geh"oren. \\
 
 \begin{figure}[h]
     \centering
@@ -506,15 +512,16 @@ dargestellt. \\
 \section{Perspektivtransformation}
 
 Der dritte Teil der Bildverarbeitungspipeline ist die Perspektivtransformation. 
+Das Kamera steht nicht senkrecht zur Bahn, sondern steht es winkelig zur Bahn
 
 Wenn ein Bild mit einer am Fahrzeug montierten Kamera aufgenommen wird, ist die
-Fahrspurlinie nicht rechteckig, sondern trapezförmig. Diese Perspektive
-erfordert, dass alle Berechnungen bezüglich der Fahrspurlinie deren abnehmende
+Fahrbahn nicht rechteckig, sondern trapezförmig. Diese Perspektive
+erfordert, dass alle Berechnungen bezüglich der Fahrspurlinie deren scheinbar abnehmende
 Breite kompensieren müssen. Um dies zu vermeiden, wird eine
 Perspektivtransformation durchgeführt. 
 
 Bei der Perspektivtransformation wird eine Teilmenge eines Bildes beschnitten
-(?) und so angepasst, dass sie das gesamte Bild umfasst. Ein Beispiel ist in
+und so angepasst, dass sie das gesamte Bild umfasst. Ein Beispiel ist in
 Abb. \ref{roi-pt} dargestellt. Bei diesem Projekt ist die Form der Teilmenge des Bildes
 ein Trapez. Mithilfe dieser Perspektivtransformation wird die trapezförmige
 Form der Fahrbahnlinie in eine gerade Form korrigiert, wie in Abb. \ref{roi-pt}
@@ -533,14 +540,14 @@ Eine Folge dieser neuen Perspektive ist, dass das resultierende Bild einer
 weitere Bildverarbeitung, da alle Objekte außerhalb des Trapezes abgeschnitten
 werden und nur die Spur übrig bleibt. Wie in Abb. \ref{roi-pt} zu sehen ist, führt die
 Perspektivtransformation jedoch zu zusätzlichem Rauschen im Bild. Die durch die
-Perspektivtransformation verursachte Scherung (?) führt dazu, dass die Pixel des
+Perspektivtransformation verursachte Scherung führt dazu, dass die Pixel des
 Originalbildes gestreckt werden, wodurch das Bild mit Rauschen verunreinigt
 wird. Daher ist es erforderlich, dass diese Stufe nach der
 \glqq Color-Thresholding\grqq-Stufe erfolgt.
 
 \section{Histogramm}
 
-Nach der Perspektivtransformation wird ein Histogramm der Pixelanzahl erstellt,
+Nach der Perspektivtransformation wird ein Histogramm der schwarzen Pixel erstellt,
 um den Startpunkt für die Gleitfenstermethode zu bestimmen. Die Anzahl der
 weißen Pixel wird für jede Spalte des Bildes gezählt, und diese Zahlen werden
 in einer Liste gespeichert. Es wird davon ausgegangen, dass die Spalten mit den
@@ -560,7 +567,7 @@ Eine visuelle Darstellung des Histogramms ist in Abb. \ref{hist} zu sehen. \\
 
 \section{Gleitfenstermethode}
 
-In der fünften Stufe der Pipeline werden die Richtung und der Versatz (?) der
+In der fünften Stufe der Pipeline wird es erstmal die Form der Spur bestimmt werden die Richtung und der Versatz (?) der
 Fahrspur mit Hilfe der Gleitfenstermethode berechnet.
 
 Zunächst wird eine ausgewählte Anzahl von Rechtecken (Fenstern) erstellt. Die
@@ -581,12 +588,7 @@ berechnet. (?) Die x-Koordinate des nächsten Fensters wird auf diesen
 berechneten Mittelwert gesetzt und über das erste Fenster gelegt. Dieser
 Vorgang wird dann für alle verbleibenden Fenster wiederholt. Wenn in einem
 Fenster keine Pixel enthalten sind, wird das Fenster ignoriert und das folgende
-Fenster darüber gelegt. Im Bildkoordinatensystem liegt die linke obere Ecke des
-Bildes bei $(0, 0)$, wobei die positive x-Achse nach rechts und die positive
-y-Achse nach unten im Bild ansteigt. Die untere Kante des Bildes wäre also jede
-Koordinate, deren y-Komponente gleich der Höhe des Bildes ist. Aus der Sicht
-des Ingenieurs wären die Fenster von unten nach oben gestapelt, im
-Bildkoordinatenraum ist es jedoch umgekehrt. 
+Fenster darüber gelegt.  
 
 Die Pixel, die nicht innerhalb der einzelnen Fenster liegen, werden dann aus
 dem Bild herausgefiltert. Das Bild vor und nach dem Filterungsprozess ist in
@@ -603,17 +605,17 @@ Polynom durch die verbleibenden Pixel approximiert.
 
 \section{Berechnung von Ausrichtung und Abstand}
 
-In der letzten Stufe der Pipeline werden die Ausrichtung und die Abweichung von
+In dem letzten Schritt der Pipeline werden die Ausrichtung des Fahrzeugs und die Abweichung von
 der Fahrspurlinie berechnet. 
 
-Aus dem in der vorangegangenen Stufe berechneten angepassten Polynom wird eine
+Aus dem in der vorangegangenen Stufe berechneten Polynom wird eine
 analytische Ausrichtung an einem ausgewählten Punkt entlang der Bahn mit der
 folgenden Gleichung ermittelt, 
 \begin{equation} 
     \theta = \arctan(f^\prime(y)).
 \end{equation} 
-Der inverse Tangens der Ableitung des Polynoms liefert die
-Ausrichtung an einem bestimmten Punkt. Für den Stanley-Regler wird nur die
+Der arcus Tangens der Ableitung des Polynoms liefert die
+Ausrichtung der Spur an einem bestimmten Punkt. Für den Stanley-Regler wird nur die
 Differenz zwischen der Bahnausrichtung und der Ausrichtung des Fahrzeugs
 benötigt, da es kein globales Koordinatensystem für das Fahrzeug gibt; die
 Ausrichtung des Fahrzeugs wird so gewählt, dass sie zu jeder Zeit null Grad
@@ -648,7 +650,7 @@ folgender Funktion berechnet:
 \begin{equation}
     e_{fa} = (\frac{w}{2} - f(h))\cdot x_{mpp}.
 \end{equation}
-Dabei ist $w$ die Breite des Bildes, $f(h)$ die Ausgabe des angepassten
+Dabei ist $w$ die Breite des Bildes, $f(h)$ die Ausgabe des berechneten
 Polynoms am unteren Rand des Bildes, $x_{mpp}$ eine Skalierungskonstante zur
 Umrechnung von Pixeln in Meter und $e_{fa}$ der Abstand des Fahrzeugs zur
 Fahrspur. Zusammenfassend wird die Differenz aus der x-Komponente des
@@ -660,7 +662,7 @@ Meter umgerechnet.
 Die in Algorithmen zur Fahrspurerkennung verwendete Gleitfenstermethode kann zu
 einem Phänomen führen, das als \glqq Ausreißer\grqq bekannt ist. Diese treten auf, wenn
 der Algorithmus die Fahrspurlinie in einem bestimmten Bild falsch bestimmt.
-Abb. \ref{ausrei} zeigt eine Sequenz von drei Einzelbildern, wobei das ganz linke
+Abb. \ref{ausrei} zeigt eine Sequenz von drei Einzelbildern, wobei das erste linke
 Einzelbild den Ausgangspunkt bildet. Im ersten Bild wird die Fahrspurlinie
 richtig erkannt, aber im zweiten Bild tritt ein Ausreißer auf, bei dem die
 Fahrspurlinie falsch bestimmt wird. Im letzten Bild wird die Fahrspurlinie
@@ -675,7 +677,7 @@ wieder korrekt erkannt.
     \label{ausrei}
 \end{figure}
 
-Eine der Hauptursachen für Ausreißer ist die falsche Auswahl der HSV-Werte.
+Eine der Hauptursachen für Ausreißer ist die falsche Auswahl der HSV-Werte im Color-Thresholding-Schritt.
 Wenn die im Algorithmus verwendeten HSV-Werte nicht restriktiv genug sind,
 werden Farben außer Gelb möglicherweise nicht herausgefiltert, was zu einer
 ungenauen Bestimmung der Fahrspurlinie führt.
@@ -684,14 +686,14 @@ ungenauen Bestimmung der Fahrspurlinie führt.
 \section{Pipeline-Optimierungen}
 
 Bei der Entwicklung der Bildverarbeitungspipeline wurde festgestellt, dass die
-Laufzeit der Pipeline zu langsam war. Um die Rechenzeit der Pipeline auf ein
+Laufzeit der Pipeline zu gro{\ss} war. Um die Rechenzeit der Pipeline auf ein
 akzeptables Niveau zu verbessern, wurde eine Optimierung eingeführt. Weitere
 Optimierungen sind zwar möglich, würden aber den Rahmen der Arbeit sprengen und
 werden daher hier nicht behandelt.
 
 Das Python-Programm cProfiler wurde verwendet, um die Funktionsaufrufe der
-Pipeline mit ihren jeweiligen Laufzeiten zu tabellieren. Da es sich bei der
-Pipeline um ein deterministisches Programm handelt, (?) verbessert die
+Pipeline mit ihren jeweiligen Laufzeiten zu untersuchen. Da es sich bei der
+Pipeline um ein deterministisches Programm handelt, verbessert die
 Zwischenspeicherung der Ausgabe der teuren Funktionsaufrufe im Speicher die
 Laufzeit der Pipeline. Daher wird bei allen nachfolgenden Pipeline-Ausführungen
 das zwischengespeicherte Ergebnis zurückgegeben, anstatt die Berechnung erneut
@@ -721,14 +723,10 @@ pipeline processing speed improved by VALUE%.
 \section{Hardware}
 
 Die CoRoLa-Car-Platform besteht aus einem Raspberry Pi, einer Fisheye-Kamera,
-einem Gleichstrommotor und einem Motorregler zur Steuerung der
-Fahrzeuggeschwindigkeit und einem Servomotor um den Lenkeinschlag des Fahrzeugs
-zu steuern. Der Raspberry Pi sendet PWM Signale an den Motorregler und den
-Servoregler, um das Fahrzeug zu steuern. das Fahrzeug zu steuern. Mit dem Robot
-Operating System 2 (ros2) wird der Raspberry Pi über das Netzwerk mit einem
-zentralen Computer verbunden. Der Stanley-Controller läuft auf dem
-Zentralrechner, der die Daten von der Kamera verarbeitet und die Ausgabe des
-Stanley-Reglers an das Fahrzeug sendet.
+einem b"urstenlosen Gleichstrommotor und einem Motorregler zur Steuerung der
+Fahrzeuggeschwindigkeit und einem Servomotor um den Radeinschlag des Fahrzeugs
+zu steuern. Der Raspberry Pi sendet PWM (Power-Werte) Signale an den Motorregler und den
+Servoregler, um das Fahrzeug zu steuern. 
 
 \section{Experimentkriterien}
 
@@ -751,8 +749,7 @@ wiederzufinden. Um dies zu messen, wird das Fahrzeug bei deaktiviertem
 Motorregler kollinear mit der Fahrspurlinie platziert. Dann wird das Fahrzeug
 im Uhrzeigersinn gedreht, wobei der Ausgang des jeweiligen Reglers in Echtzeit
 angezeigt wird. Das Fahrzeug wird so lange gedreht, bis der Ausgang des Reglers
-entweder chaotisch wird oder konstant Null ist. Das Experiment wird dann für
-den Stanley-Regler und den PID-Regler durchgeführt. Das Auftreten eines
+entweder chaotisch wird oder konstant Null ist. Das Auftreten eines
 chaotischen Ausgangs ist nicht deterministisch, empirisch gesehen ist dies
 jedoch der Fall, wenn das Fahrzeug die Fahrspurlinie nicht zuverlässig erkennen
 kann. Ein Ausgang von Null bedeutet auch, dass das Fahrzeug die Fahrspurlinie
