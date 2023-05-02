@@ -100,6 +100,17 @@ to follow.}
 
 \chapter{Einführung}
 
+At the Connected Robotics Lab (CoRoLa) research group at the Barkhausen
+Institut, a demonstration using remote controlled two axle vehicles was
+developed. The demonstration is currently in use in order to model
+communications between vehicles similar to an Internet of Things (IoT) network.
+
+Due to issues regarding low forward velocity and robustness of the current
+vehicle controller, it was proposed to implement a new 
+
+In order to achieve the goals stated above, creation of an image processing
+pipeline and implementation of the Stanley controller are proposed.
+
 \chapter{Regelalgorithmus}
 
 \section{Stanley-Regler}
@@ -119,18 +130,18 @@ gewählt werden kann.
 
 Der Stanley-Regler wird mathematisch durch die folgende Gleichung beschrieben:
 \begin{equation} 
-  u = \theta - \theta_d + \arctan\left(\frac{ke_{fa}}{v}\right).
+  u = \theta - \theta_d + \arctan\left(\frac{ke_{V}}{v}\right).
   \label{eq:Stanley-Regler} 
 \end{equation}
 Dabei ist $u$ den Reglerausgang, $\theta$ die aktuelle Ausrichtung des Fahrzeugs,
 $\theta_d$ die Kursausrichtung, $k$ ein Skalierungsfaktor, $v$ die
-Geschwindigkeit des Fahrzeugs und $e_{fa}$ die Querabweichung vom Mittelpunkt
+Geschwindigkeit des Fahrzeugs und $e_{V}$ die Querabweichung vom Mittelpunkt
 der Vorderachse des Fahrzeugs zum Kurs.
 
 Der Stanley-Regler besteht aus zwei Komponenten: einer Komponente, die die
 Querabweichung des Fahrzeugs vom Kurs behandelt, und einer Komponente, die die
 Differenz zwischen der Ausrichtung des Fahrzeugs und der des Kurses behandelt.
-Die erste Komponente wird durch $\arctan(\frac{ke_{fa}}{v})$ dargestellt und
+Die erste Komponente wird durch $\arctan(\frac{ke_{V}}{v})$ dargestellt und
 steuert den Lenkwinkel so, dass er sich auf den Kurs zubewegt, wenn sich das
 Fahrzeug weiter von ihm entfernt. Die zweite Komponente, dargestellt durch
 $\theta_d - \theta$, steuert den Lenkwinkel so, dass er parallel zum zu
@@ -144,22 +155,21 @@ das Fahrzeug auf den gewünschten Kurs gelenkt wird.
 Um das Verhalten des Stanley-Reglers besser zu verstehen, wird der Regler um
 den Punkt $\left(x_V, \theta_d\right) = \left(0, 0\right)$
 linearisiert, was zu folgender Gleichung führt: 
-\begin{equation} \bar{u}
-    \approx \bar{\theta} + \frac{k}{v}e_{fa}. 
+\begin{equation} \bar{u} \approx \bar{\theta} + \frac{k}{v}e_{V}. 
     \label{eq:linearer Stanley-Regler}
 \end{equation}
 
 Die sich daraus ergebende Gleichung \eqref{eq:linearer Stanley-Regler} hat die
 Form eines PID-Reglers (Proportional-, Integral- und Derivativ-Regler), der nur
-P- und D-Komponenten hat. Die P-Komponente wird durch \(\frac{ke_{fa}}{v}\)
+P- und D-Komponenten hat. Die P-Komponente wird durch \(\frac{k}{v}e_{V}\)
 dargestellt. Da die Vorwärtsgeschwindigkeit des Fahrzeugs als konstant
 angenommen wird, besteht eine Proportionalität zwischen den Ableitungen von
-\(e_{fa}\) nach Zeit und Raum. Die Ableitung von \(e_{fa}\) nach dem Raum ist
+\(e_{V}\) nach Zeit und Raum. Die Ableitung von \(e_{V}\) nach dem Raum ist
 \(\theta\). Daher ist \(\theta\) die D-Komponente des linearisierten
 Stanley-Reglers.
 
 Folglich ist das Verhalten des Stanley-Reglers für kleine Eingangssignale
-ähnlich wie das eines PD-Reglers mit dem Fehlerterm \(e_{fa}\). 
+ähnlich wie das eines PD-Reglers mit dem Fehlerterm \(e_{V}\). 
 
 
 \subsection{Gro{\ss}signalverhalten}
@@ -211,7 +221,7 @@ analysieren.
 
 \begin{figure}[h]
     \centering
-    \fbox{\includegraphics[scale=0.5]{Fahrbahn}}
+    \includegraphics[scale=0.5]{Fahrbahn}
     \caption{Fahrbahn}
     \label{fahrbahn}
 \end{figure}
@@ -273,17 +283,22 @@ Zustandsvariable, daher ist sie immer verfügbar. Um die Querabweichung und die
 Kursrichtung zu berechnen, muss der richtige Bahnpunkt gewählt werden. Der
 Stanley-Regler verwendet den nächstliegenden Bahnpunkt vom
 Vorderachsmittelpunkt des Fahrzeugs, um die Ausrichtung des Kurses $\theta_d$
-und die aktuelle Querabweichung $e_{fa}$ zu bestimmen. Für die Simulation wird
+und die aktuelle Querabweichung $e_{V}$ zu bestimmen. Für die Simulation wird
 dies bestimmt, indem der Punkt mit dem geringsten Abstand zum
 Vorderachsmittelpunkt $\delta\underline{x}$ gefunden wird. An diesem Punkt wird
 dann die Ausrichtung des Kurses ermittelt. Das Skalarprodukt zwischen dem
 Vektor senkrecht zur Fahrzeugausrichtung $\underline{x}_{\perp}$ und dem Vektor
 vom Pfadpunkt zur Fahrzeugvorderachse $\delta\underline{x}$ ist die
-Querabweichung $e_{fa}$. Zur Verdeutlichung ist in ABBILDUNG eine visuelle
+Querabweichung $e_{V}$. Zur Verdeutlichung ist in ABBILDUNG eine visuelle
 Darstellung dieser beiden Vektoren und ihres Skalarprodukts abgebildet. Dieser
 Algorithmus wird in folgende Algorithmus dargestellt. \\
 
-For Paul: this figure will take a bit more time to make.
+\begin{figure}[h]
+    \centering
+    \includegraphics{dot_product}
+    \caption{Berechnung von Querabweichung}
+    \label{algorithm}
+\end{figure}
 
 \begin{algorithm}
   \caption{Berechnung von Querabweichung}
@@ -293,7 +308,7 @@ For Paul: this figure will take a bit more time to make.
     \State $\Delta\underline{x} \gets \underline{p}_V - \underline{p}_P$
     \State $\delta\underline{x} \gets \min \left{ || \Delta\underline{x} ||_2 \right}$
     \State $\theta_d \gets \arctan\left(\frac{\frac{d}{dy}\delta\underline{x}}{\frac{d}{dx}\delta\underline{x}}\right)$
-    \State $e_{fa} \gets \delta\underline{x} \cdot \underline{v}_{\perp}$
+    \State $e_{V} \gets \delta\underline{x} \cdot \underline{v}_{\perp}$
   \end{algorithmic}
 \end{algorithm}
 
@@ -301,7 +316,12 @@ Der Kurs und die Querabweichung werden dann in den Stanley-Regler eingegeben,
 und der Ausgang des Reglers wird in das Fahrzeugmodell eingespeist. Ein
 Übersichtsdiagramm des Regelkreises ist in ABBILDUNG dargestellt.
 
-For Paul: this figure will take a bit more time to make.
+\begin{figure}[h]
+    \centering
+    \includegraphics{control_loop}
+    \caption{Regelkreis}
+    \label{control_loop}
+\end{figure}
 
 Der Stanley-Regler arbeitet mit zeitkontinuierlichen Signalen, die sich von den
 vom \glqq echten\grqq Fahrzeug verwendeten zeitdiskreten Signalen
@@ -316,14 +336,14 @@ den Stanley-Regler eingespeist. Dieser Simulationsansatz ermöglicht die
 Untersuchung des Fahrzeugverhaltens für verschiedene Abtastfrequenzen. Von
 besonderer Bedeutung ist die Stablit"at des Regelkreises mit verschiedenen
 Abtastfrequenzen. Der Vergleich der Simulationsergebnisse bei
-verschiedenen Abtastfrequenzen ist in Abb. \ref{sampling} dargestellt.
+verschiedenen Abtastfrequenzen ist in Abb. \ref{sampling} dargestellt. 
 
 \begin{figure}[h]
     \centering
-    \fbox{\includegraphics[scale=0.45]{50Hz}}
-    \fbox{\includegraphics[scale=0.45]{25Hz}}
-    \fbox{\includegraphics[scale=0.45]{15Hz}}
-    \fbox{\includegraphics[scale=0.45]{10Hz}}
+    \includegraphics[scale=0.47]{50Hz}
+    \includegraphics[scale=0.47]{25Hz}
+    \includegraphics[scale=0.47]{15Hz}
+    \includegraphics[scale=0.47]{10Hz}
     \caption{Abtastfrequenzen}
     \label{sampling}
 \end{figure}
@@ -559,8 +579,8 @@ Eine visuelle Darstellung des Histogramms ist in Abb. \ref{hist} zu sehen. \\
 
 \begin{figure}[h]
     \centering
-    \fbox{\includegraphics[scale=0.45]{hist1}}
-    \fbox{\includegraphics[scale=0.45]{hist2}}
+    \includegraphics[scale=0.47]{hist1}
+    \includegraphics[scale=0.47]{hist2}
     \caption{Histogramm}
     \label{hist}
 \end{figure}
@@ -597,8 +617,8 @@ Polynom durch die verbleibenden Pixel approximiert.
 
 \begin{figure}[h]
     \centering
-    \fbox{\includegraphics[scale=0.45]{before_filter}}
-    \fbox{\includegraphics[scale=0.45]{after_filter}}
+    \includegraphics[scale=0.47]{before_filter}
+    \includegraphics[scale=0.47]{after_filter}
     \caption{Vor und Nach dem Filterungsprozess}
     \label{gleit}
 \end{figure}
@@ -624,13 +644,10 @@ dargestellt.
 
 \begin{figure}[h]
     \centering
-    \fbox{\includegraphics[scale=0.25]{heading}}
-    \caption{For Paul: I know this looks strange, do you have any recommendations for programs where I can draw vectors?}
+    \includegraphics{fov}
+    \caption{FOV}
     \label{ausrichtung}
 \end{figure}
-
-For Paul: I removed the paragraph here as I realized it was no longer necessary, 
-the results of looking ahead into the future i can talk about in the results chapter
 
 \iffalse
 Der klassische Stanley-Regler, wie in Kapitel 2 beschrieben, verwendet die vom
@@ -648,11 +665,11 @@ Kapitel 4 erörtert.
 Die Abweichung von der Fahrspurlinie wird aus dem angepassten Polynom mit
 folgender Funktion berechnet: 
 \begin{equation}
-    e_{fa} = (\frac{w}{2} - f(h))\cdot x_{mpp}.
+    e_{V} = (\frac{w}{2} - f(h))\cdot x_{mpp}.
 \end{equation}
 Dabei ist $w$ die Breite des Bildes, $f(h)$ die Ausgabe des berechneten
 Polynoms am unteren Rand des Bildes, $x_{mpp}$ eine Skalierungskonstante zur
-Umrechnung von Pixeln in Meter und $e_{fa}$ der Abstand des Fahrzeugs zur
+Umrechnung von Pixeln in Meter und $e_{V}$ der Abstand des Fahrzeugs zur
 Fahrspur. Zusammenfassend wird die Differenz aus der x-Komponente des
 Mittelpunkts und der x-Komponente des Polynompunkts am unteren Bildrand in
 Meter umgerechnet.
@@ -779,7 +796,228 @@ Ausreißern.
 \section{Ergebnisse}
 
 
+\subsection{H"ochstgeschwindigkeit}
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+    PID & Stanley \\
+\hline
+\hline
+    1,5 m/s & 2,3 m/s \\
+\hline
+\end{tabular}
+\end{center}
+When running the PID controller on the vehicle, velocities above 1,5
+$m/s$lead to issues with the robustness of the vehicle. In comparison
+to then Stanley controller, whenever an outlier appears, the PID controller
+causes the vehicle to oscillate and requires a longer time than the Stanley
+controller to return to the lane. The oscillations scale with the forward
+velocity of the vehicle. With velocities greater than or equal to 2,0
+$m/s$, the PID controller will drive the vehicle into the wall of the
+track. Even velocities between 1,5 and 1,75 $m/s$ require supervision
+in order to make sure that the vehicle won't drive into the wall.
+
+In comparsion, the Stanley controller requires no supervision, until the
+forward velocity of the vehicle is above 2,3 $m/s$ However, at higher
+velocities, the vehicle will drift farther from the path, until the vehicle
+acts as a "guide", as opposed to something that needs to be followed. 
+
+\subsection{Maximal m"oglicher Fehlerwinkel}
+
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+
+\hline
+    & PID (\textdegree) & Stanley (\textdegree)\\
+\hline
+\hline
+    Uhrzeigersinn & 75 \pm 1& 50 \pm 1 \\
+\hline
+    Gegenuhrzeigersinn & 54 \pm 1 & 44 \pm 1 \\
+\hline
+\end{tabular}
+\end{center}
+The Stanley controller can not be offset from the lane as much as the PID
+controller. Due to both the calibration stage of the pipeline and requiring an
+approximated polynomial, the requirements for the Stanley controller to detect
+the lane are higher than the PID controller. The PID controller requires only
+that a grouping of yellow pixels exists in the image. The Stanley controller
+requires at least some geometry to the grouping of yellow pixels, typically in
+the form of a line or section of a curve.
+
+\subsection{Abstand von der Linie}
+
+As can be seen in FIGURE, the PID controller follows the path closer than the
+Stanley controller. Even accounting for the offset at the start of the curve,
+the Stanley controller does not drive the vehicle onto the lane until the end
+of the curve. In comparison, the PID controller forces the vehicle to stay on
+the path, while still drifting lightly to the left. This drift scales with the
+forward velocity of the vehicle.
+
+When comparing the results of the simulation of the Stanley controller in
+FIGURE with $v = 1,75 m/s$ and $fs = 50$ Hz and its behaviour on the
+track, the behaviour of the Stanley controller in reality matches with the
+simulation. However, as can be seen in FIGURE, the Stanley controller will
+drift away from the straight section of the track before the curve. 
+
+Compensation for this drift was attempted, but outside of setting the reference
+point for the cross-track-error to another value, the drift stayed. By changing
+the reference point manually, the vehicle requires different parameters when
+driving clockwise or counterclockwise around the track. To avoid this, it was
+decided to keep the drift included for now. In chapter 5, adjustments to the
+Stanley controller are discussed, that could lead to an improvement in the
+future.
+
+\begin{figure}[h]
+    \centering
+    \fbox{\includegraphics[scale=0.8]{done1.0}}
+    \caption{1.0}
+    \label{ausrei}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \fbox{\includegraphics[scale=0.8]{done1.25}}
+    \caption{1.25}
+    \label{ausrei}
+\end{figure}
+\begin{figure}[h]
+    \centering
+    \fbox{\includegraphics[scale=0.8]{done1.5}}
+    \caption{1.5}
+    \label{ausrei}
+\end{figure}
+\begin{figure}[h]
+    \centering
+    \fbox{\includegraphics[scale=0.8]{done1.75}}
+    \caption{1.75}
+    \label{ausrei}
+\end{figure}
+\begin{figure}[h]
+    \centering
+    \fbox{\includegraphics[scale=0.8]{done2.0}}
+    \caption{2.0}
+    \label{ausrei}
+\end{figure}
+\subsection{Reglerausgang}
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+    Geschwindigkeit (m/s) & PID (\textdegree) & Stanley (\textdegree)\\
+\hline
+\hline
+    1,0 & 5,33 & 4,79 \\ 
+\hline
+    1,25 & 11,97 & 11,82 \\
+\hline
+    1,5 & 9,61 & 13,19 \\
+\hline
+    1,75 & 12,35 & 13,30 \\
+\hline
+    2,0 & 13,84 & 13,51 \\
+\hline
+\end{tabular}
+\end{center}
+
+The controller output of both controllers are similar, regardless of the
+velocity, except for the PID controller at velocity 1,5 $m/s$. As the
+forward velocity of the vehicle increases, the controller output scales
+appropiately. The difference between the two controllers comes in the form of
+both signals. Between forward velocities 1,0 and 1,5 $m/s$, the signal
+output of the two controllers are similar, however at 1,75 and 2,0
+$m/s$ the sinusoidal nature of the PID controller degrades, while the
+sinusoidal nature of the Stanley controller increases. 
+
+At 1,75 $m/s$ the PID controller can still control the vehicle onto
+the lane, however as can be seen in FIGURE, outliers lead to high oscillations
+in controller output. When the PID controller incorrectly identifies the lane,
+the controller has difficulty returning the vehicle to the lane and can instead
+drive the vehicle into the wall, which can be seen at the right end of the
+graph. In comparison, the Stanley controller has no issue following the path at
+the same velocity. 
+
+At 2,0 $m/s$ the PID controller is unable to control the vehicle and
+drives the vehicle into the wall. As can be seen in FIGURE, the output varies
+between -30 and 30 degrees and there is no periodicity. In comparision, the
+Stanley controller has a stable oscillation between -30 and 0 degrees and is
+periodic.
+
+Outliers do not lead to high oscillations when the vehicle is being controlled
+by the Stanley controller. It has been observed that the vehicle will reorient
+itself onto the path much quicker than the PID controller.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.47]{pid1.0}
+    \includegraphics[scale=0.47]{Stan1.0}
+    \caption{1.0}
+    \label{ausrei}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.47]{pid1.25}
+    \includegraphics[scale=0.47]{Stan1.25}
+    \caption{1.25}
+    \label{ausrei}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.47]{pid1.5}
+    \includegraphics[scale=0.47]{Stan1.5}
+    \caption{1.5}
+    \label{ausrei}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.47]{pid1.75}
+    \includegraphics[scale=0.47]{Stan1.75}
+    \caption{1.75}
+    \label{ausrei}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.47]{pid2.0}
+    \includegraphics[scale=0.47]{Stan2.0}
+    \caption{2.0}
+    \label{ausrei}
+\end{figure}
+
+
+
 
 \chapter{Conclusion}
+
+
+When comparing only the path following behaviour of both controllers, the PID
+controller is still the best choice. However, when factoring in the other
+aspects of the problem statement, the Stanley controller is a better fit for
+the application. As the vehicle needs to be able to drive autonomously without
+supervision at a higher velocity than it can originally, the Stanley controller
+fulfills these requirements. 
+
+\subsection{Future Work}
+
+By the conclusion of this paper, the vehicle still drifts away from the
+lane before each curve. In the future, it is proposed to adjust the Stanley
+controller to include an integrator in order to compensate for this drift.
+The adjusted Stanley controller has the form of the following equation:
+
+\begin{equation} 
+    u = \theta - \theta_d + \arctan\left(\frac{ke_{V}}{v}\right) + k_{i} \int_{0}^{t} e_{V}\,d\tau, 
+    \label{eq:Stanley-Regler-adjusted} 
+\end{equation}
+
+In linear control theory, an integrator is used in order to remove residual
+error from an application. As the small signal version of the Stanley
+controller is a PD controller, it is hypothesized that an integrator will 
+correct this observed drift. As can be seen in FIGURE, the drift is apparent in
+the input to the controller. By integrating the offset it is proposed that
+over time the drift will be componsated for and the vehicle stay on the lane. 
 
 \end{document}
