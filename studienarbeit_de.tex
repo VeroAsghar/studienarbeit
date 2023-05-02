@@ -208,13 +208,13 @@ realen Strecke, die das Fahrzeug durchfahren wird. Eine visuelle
 Darstellung der Fahrbahn findet sich in Abb. \ref{fahrbahn}. In der Simulation wird der
 Kurs durch die folgende kontinuierliche statische Funktion definiert:
 \begin{equation} 
-  (x, y, h) = f(t, t_f), 
+  (x, y, \theta) = f(t, t_f), 
 \end{equation} 
 wobei $t$ und $t_f$ die Eingangsparameter Zeit bzw. Simulationsdauer sind
 und $(x, y, h)$ die kartesischen Koordinaten des Pfadpunkts und die
 entsprechende Ausrichtung an diesem Punkt darstellt. Diese Funktion wird für
 eine beliebige Anzahl von $t$-Werten diskretisiert, um eine Liste von $(x, y,
-theta)$-Werten zu erzeugen. Der Differentialgleichungslöser bezieht den
+\theta)$-Werten zu erzeugen. Der Differentialgleichungslöser bezieht den
 Stanley-Controller und das Fahrzeugmodell ein, um die Zeitreihen des
 zweiachsigen Fahrzeugs unter Verwendung dieser Liste als Eingabe zu
 analysieren.
@@ -222,7 +222,7 @@ analysieren.
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.5]{Fahrbahn}
-    \caption{Fahrbahn}
+    \caption{Graphische Darstellung der Fahrbahn.}
     \label{fahrbahn}
 \end{figure}
 
@@ -289,37 +289,36 @@ Vorderachsmittelpunkt $\delta\underline{x}$ gefunden wird. An diesem Punkt wird
 dann die Ausrichtung des Kurses ermittelt. Das Skalarprodukt zwischen dem
 Vektor senkrecht zur Fahrzeugausrichtung $\underline{x}_{\perp}$ und dem Vektor
 vom Pfadpunkt zur Fahrzeugvorderachse $\delta\underline{x}$ ist die
-Querabweichung $e_{V}$. Zur Verdeutlichung ist in ABBILDUNG eine visuelle
-Darstellung dieser beiden Vektoren und ihres Skalarprodukts abgebildet. Dieser
-Algorithmus wird in folgende Algorithmus dargestellt. \\
+Querabweichung $e_{V}$. Zur Verdeutlichung ist in Abb. \ref{algorithm} eine visuelle
+Darstellung dieser beiden Vektoren und ihres Skalarprodukts abgebildet. Die Berechnung
+der wichtigen Parameter sind in folgende Gleichungen dargestellt: \\
 
 \begin{figure}[h]
     \centering
     \includegraphics{dot_product}
-    \caption{Berechnung von Querabweichung}
+    \caption{Graphische Darstellung der Beziehungen zwischen der ben"otigen
+    Parameter. $\underline{p}_P$ ist hier der Pfadpositionsvektor mit dem
+    kleinsten Abstand zum Vorderradachsemittelpunkt.}
     \label{algorithm}
 \end{figure}
 
-\begin{algorithm}
-  \caption{Berechnung von Querabweichung}
-  \label{alg:quer}
-  \begin{algorithmic}
-    \State $\underline{v}_{\perp} \gets \left[-\cos(\theta + \pi/2),  -\sin(\theta + \pi/2)\right]^T$
-    \State $\Delta\underline{x} \gets \underline{p}_V - \underline{p}_P$
-    \State $\delta\underline{x} \gets \min \left{ || \Delta\underline{x} ||_2 \right}$
-    \State $\theta_d \gets \arctan\left(\frac{\frac{d}{dy}\delta\underline{x}}{\frac{d}{dx}\delta\underline{x}}\right)$
-    \State $e_{V} \gets \delta\underline{x} \cdot \underline{v}_{\perp}$
-  \end{algorithmic}
-\end{algorithm}
+\begin{gather}
+ \underline{v}_{\perp} := \left[-\cos(\theta + \pi/2),  -\sin(\theta + \pi/2)\right]^T, \\
+ \Delta\underline{x} := \underline{p}_V - \underline{p}_P, \\
+ \delta\underline{x} := \min \left{ || \Delta\underline{x} ||_2 \right}, \\
+ \theta_d := \arctan\left(\frac{\frac{d}{dy}\delta\underline{x}}{\frac{d}{dx}\delta\underline{x}}\right), \\
+ e_{V} := \delta\underline{x} \cdot \underline{v}_{\perp}. \\
+ \label{alg:quer}
+\end{gather}
 
 Der Kurs und die Querabweichung werden dann in den Stanley-Regler eingegeben,
 und der Ausgang des Reglers wird in das Fahrzeugmodell eingespeist. Ein
-Übersichtsdiagramm des Regelkreises ist in ABBILDUNG dargestellt.
+Übersichtsdiagramm des Regelkreises ist in Abb. \ref{control_loop} dargestellt.
 
 \begin{figure}[h]
     \centering
     \includegraphics{control_loop}
-    \caption{Regelkreis}
+    \caption{Darstellung des Regelkreises.}
     \label{control_loop}
 \end{figure}
 
@@ -344,7 +343,8 @@ verschiedenen Abtastfrequenzen ist in Abb. \ref{sampling} dargestellt.
     \includegraphics[scale=0.47]{25Hz}
     \includegraphics[scale=0.47]{15Hz}
     \includegraphics[scale=0.47]{10Hz}
-    \caption{Abtastfrequenzen}
+    \caption{Verhalten des Stanley-Reglers mit verschiedenen Abtastfrequenzen.
+    Das Verhalten bleibt "ahnlich bis unter 10 Hz.}
     \label{sampling}
 \end{figure}
 
@@ -374,7 +374,7 @@ sogenannte Kamerakalibrierung kompensiert werden. \\
 \begin{figure}[h]
     \centering
     \fbox{\includegraphics[scale=0.175]{Barrel_distortion}}
-    \caption{Verzeichnung}
+    \caption{Ein Beispiel einer tonnenf"ormigen Verzeichnung.}
     \label{barrel}
 \end{figure}
 
@@ -416,7 +416,8 @@ werden. \\
     \centering
     \fbox{\includegraphics[scale=0.75]{before_calibration_checkerboard}}
     \fbox{\includegraphics[scale=0.75]{after_calibration_checkerboard}}
-    \caption{Calibrated Images.}
+    \caption{Die Kalibrierung des linken Bilds liefert das rechte Bild. Die gekr"ummte Linie 
+    des Schachbretts sind gerade nach der Kalibrierung.} 
     \label{checkerboards}
 \end{figure}
 
@@ -481,7 +482,8 @@ ursprüngliche Position verschoben werden.
     \centering
     \fbox{\includegraphics[scale=0.5]{orig_not_shifted}}
     \fbox{\includegraphics[scale=0.5]{cal_shifted}}
-    \caption{Shifted Images.}
+    \caption{Ein Beispiel von dem Kalibrierungsschritt. Die Mittellinie des
+    rechten Bilds ist leicht nach rechts im linken Bild verschoben.}
     \label{shifted}
 \end{figure}
 
@@ -525,7 +527,7 @@ zur Bahnlinie geh"oren. \\
     \centering
     \fbox{\includegraphics[scale=0.5]{calibrated}}
     \fbox{\includegraphics[scale=0.5]{thresholded}}
-    \caption{Thresholded image.}
+    \caption{Ein Beispiel von der Ausgabe des Color-Thresholdings.}
     \label{color-thresholding}
 \end{figure}
 
@@ -541,17 +543,21 @@ Breite kompensieren müssen. Um dies zu vermeiden, wird eine
 Perspektivtransformation durchgeführt. 
 
 Bei der Perspektivtransformation wird eine Teilmenge eines Bildes beschnitten
-und so angepasst, dass sie das gesamte Bild umfasst. Ein Beispiel ist in
-Abb. \ref{roi-pt} dargestellt. Bei diesem Projekt ist die Form der Teilmenge des Bildes
-ein Trapez. Mithilfe dieser Perspektivtransformation wird die trapezförmige
-Form der Fahrbahnlinie in eine gerade Form korrigiert, wie in Abb. \ref{roi-pt}
-dargestellt. \\
+und so angepasst, dass sie das gesamte Bild umfasst. Im allgemeinen Fall muss
+diese Scherung nicht das gesamte Bild umfassen, sondern sie kann in einen
+anderen Bildausschnitt "ubertragen werden. Ein Beispiel ist in Abb.
+\ref{roi-pt} dargestellt. Bei diesem Projekt ist die Form der Teilmenge des
+Bildes ein Trapez. Mithilfe dieser Perspektivtransformation wird die
+trapezförmige Form der Fahrbahnlinie in eine gerade Form korrigiert, wie in
+Abb. \ref{roi-pt} dargestellt. \\
 
 \begin{figure}[h]
     \centering
     \fbox{\includegraphics[scale=0.5]{roi.png}}
     \fbox{\includegraphics[scale=0.5]{perp_trans.png}}
-    \caption{ROI, Inverted Perspective Trans.}
+    \caption{Ein Beispiel von der perspektivischen Transformation. Im rechten Bild ist das Trapez
+    die Teilmenge, die von dem Bild beschnitten wird. (?) Im linken Bild ist die Ausgabe der
+    Transformation, aber die Farbe sind invertiert.}
     \label{roi-pt}
 \end{figure}
 
@@ -581,33 +587,32 @@ Eine visuelle Darstellung des Histogramms ist in Abb. \ref{hist} zu sehen. \\
     \centering
     \includegraphics[scale=0.47]{hist1}
     \includegraphics[scale=0.47]{hist2}
-    \caption{Histogramm}
+    \caption{Histogramm der schwarzen Pixel. Die Spitze des Histogramms liegt bei dem
+    x-Schnittpunkts.}
     \label{hist}
 \end{figure}
 
 \section{Gleitfenstermethode}
 
-In der fünften Stufe der Pipeline wird es erstmal die Form der Spur bestimmt werden die Richtung und der Versatz (?) der
-Fahrspur mit Hilfe der Gleitfenstermethode berechnet.
+In der fünften Stufe der Pipeline wird es erstmal die Form der Fahrspur bestimmt.
 
-Zunächst wird eine ausgewählte Anzahl von Rechtecken (Fenstern) erstellt. Die
-Fenster werden in einer Spalte ausgerichtet und sind gleich groß. Ihre Höhe
-wird so gewählt, dass die Spalte die gesamte Höhe des Bildes überspannt,
+Zunächst wird eine ausgewählte Anzahl von Rechtecken (Fenstern) erstellt.  Die Höhe
+wird so gewählt, dass die Summe der H"ohe aller Rechteck gleich der Bildh"ohe ist,
 während ihre Breite um einen Faktor der Bildbreite gewählt wird. Die Anzahl der
-Fenster wird so gewählt, dass die Spalte die schwarzen Pixel umfasst, die die
-Fahrspur darstellen, (?) wie in Abb. \ref{gleit} zu sehen ist. Wenn die Anzahl der
-Fenster zu groß ist, besteht die Gefahr, dass die Methode weiße Pixel, die tief
+Fenster wird so gewählt, dass die Spalte die schwarzen Pixel umfasst, (?) die die
+Fahrspur darstellen, wie in Abb. \ref{gleit} zu sehen ist. Wenn die Anzahl der
+Fenster zu groß ist, besteht die Gefahr, dass die Methode weiße Pixel, die oben 
 im Bild liegen, fälschlicherweise als Teil der Fahrspur erkennt. 
 
 Zweitens wird die x-Koordinate des Mittelpunkts des ersten Fensters auf den
 Spitzenwert des Histogramms aus der vorherigen Stufe gesetzt. Dann wird die
 Anzahl der weißen Pixel innerhalb des Fensters gezählt. Wenn die Anzahl über
 einem gewählten Schwellenwert liegt, werden die Pixel zu einem Array
-hinzugefügt und der Mittelwert der x-Koordinaten der enthaltenen Pixel
-berechnet. (?) Die x-Koordinate des nächsten Fensters wird auf diesen
-berechneten Mittelwert gesetzt und über das erste Fenster gelegt. Dieser
+hinzugefügt und der Mittelwert der x-Koordinaten dieser Pixel
+berechnet. Die x-Koordinate des nächsten Fensters wird auf diesen
+berechneten Mittelwert gesetzt und um die Breite der Fenster in y-Richtung verschoben. Dieser
 Vorgang wird dann für alle verbleibenden Fenster wiederholt. Wenn in einem
-Fenster keine Pixel enthalten sind, wird das Fenster ignoriert und das folgende
+Fenster nicht gen"ugend schwarze Pixel enthalten sind, wird das Fenster ignoriert und das folgende
 Fenster darüber gelegt.  
 
 Die Pixel, die nicht innerhalb der einzelnen Fenster liegen, werden dann aus
@@ -619,7 +624,8 @@ Polynom durch die verbleibenden Pixel approximiert.
     \centering
     \includegraphics[scale=0.47]{before_filter}
     \includegraphics[scale=0.47]{after_filter}
-    \caption{Vor und Nach dem Filterungsprozess}
+    \caption{Das rechte Bild ist ein Beispiel von der Gleitfenstermethode. Das linke Bild
+    zeigt das Polynom, das von den verbleibenden Pixel approximiert wurde.}
     \label{gleit}
 \end{figure}
 
@@ -645,7 +651,7 @@ dargestellt.
 \begin{figure}[h]
     \centering
     \includegraphics{fov}
-    \caption{FOV}
+    \caption{Graphische Darstellung des Modellfahrzeugsichtfelds.}
     \label{ausrichtung}
 \end{figure}
 
@@ -690,7 +696,9 @@ wieder korrekt erkannt.
     \fbox{\includegraphics[scale=0.8]{before_outlier}}
     \fbox{\includegraphics[scale=0.8]{outlier}}
     \fbox{\includegraphics[scale=0.8]{after_outlier}}
-    \caption{Ausrei{\ss}er}
+    \caption{Ein Beispiel von einem Ausrei{\ss}er. Die drei Bilder sind
+    nacheinander aufgenommen. Im rechten und linken Bilder sind die Fahrspur
+    richtig erkannt. Im mittleren Bild ist die Fahrspur falsch erkannt.}
     \label{ausrei}
 \end{figure}
 
@@ -716,24 +724,20 @@ Laufzeit der Pipeline. Daher wird bei allen nachfolgenden Pipeline-Ausführungen
 das zwischengespeicherte Ergebnis zurückgegeben, anstatt die Berechnung erneut
 auszuführen. Beispielsweise ist die Berechnung der perspektivischen
 Transformationsmatrizen kostspielig, was bei der Zwischenspeicherung zu einer
-Leistungssteigerung der Pipeline führt.
+Leistungssteigerung der Pipeline führt. Diese Zwischenspeicherung hat die Laufzeit 
+des Pipelines vom X ms zu Y ms verringert.
 
-FOR PAUL: 
-This next paragraph exists in the english version, but I removed it here as it
-no longer accurate due to our use of the corola brain.
-Do you think I should still have it?
-
-
-In order to prove the performance improvement of the pipeline, an experiment
-was implemented. First, the pipeline is executed once and the runtime ignored
-as the performance improvement is only relevant to subsequent executions of the
-pipeline. Therefore, on the second execution of the pipeline, the runtime is
-measured for both pipeline variants, with and without caching the expensive
-function calls from the first execution. The experiment is then run 100 times
-and the result tabulated. The arithmetic mean of the runtimes for both variants
-are then compared to one another to measure the speed improvement. The values
-are in TABLE, showing that by caching the expensive function calls, the
-pipeline processing speed improved by VALUE%.
+Um die Leistungsverbesserung der Pipeline zu beweisen, wurde ein Experiment
+durchgeführt. Zunächst wird die Pipeline einmal ausgeführt und die Laufzeit
+ignoriert, da die Leistungsverbesserung nur für nachfolgende Ausführungen der
+Pipeline relevant ist. Daher wird bei der zweiten Ausführung der Pipeline die
+Laufzeit für beide Pipeline-Varianten gemessen, mit und ohne
+Zwischenspeicherung der teuren Funktionsaufrufe aus der ersten Ausführung. Das
+Experiment wird dann 100 Mal durchgeführt und das Ergebnis tabellarisch
+erfasst. Das arithmetische Mittel der Laufzeiten für beide Varianten wird dann
+miteinander verglichen, um die Laufzeitverbesserung zu messen. Das Experiment
+zeigte, dass das Zwischenspeichern dieser Funktionsaufrufe die Laufzeit von X
+ms auf Y ms senkte. (Ich muss die Werte nochmal finden.)
 
 
 \chapter{Experiment}
@@ -742,8 +746,8 @@ pipeline processing speed improved by VALUE%.
 Die CoRoLa-Car-Platform besteht aus einem Raspberry Pi, einer Fisheye-Kamera,
 einem b"urstenlosen Gleichstrommotor und einem Motorregler zur Steuerung der
 Fahrzeuggeschwindigkeit und einem Servomotor um den Radeinschlag des Fahrzeugs
-zu steuern. Der Raspberry Pi sendet PWM (Power-Werte) Signale an den Motorregler und den
-Servoregler, um das Fahrzeug zu steuern. 
+zu steuern. Der Raspberry Pi sendet PWM (Power-Werte) Signale an den
+Motorregler und den Servoregler, um das Fahrzeug zu steuern. 
 
 \section{Experimentkriterien}
 
@@ -846,14 +850,15 @@ Kurvenabschnitts, während der PID-Controller keine solchen Voraussetzungen hat.
 
 \subsection{Bahnfolgeverhalten}
 
-Abb. \ref{ab:1.5}, \ref{ab:1.75} und \ref{ab:2.0} zeigen, dass der PID-Regler die Bahn genauer verfolgt als der
-Stanley-Regler. Selbst unter Berücksichtigung des anfänglichen Versatzes bringt
-der Stanley-Regler das Fahrzeug erst am Ende der Kurve auf die Fahrspur,
-während der PID-Regler das Fahrzeug mit einer leichten nach links driftenden
-Bewegung, die mit der Vorwärtsgeschwindigkeit skaliert, auf der Bahn hält.
+Abb. \ref{ab:1.5}, \ref{ab:1.75} und \ref{ab:2.0} zeigen, dass der PID-Regler
+die Bahn genauer verfolgt als der Stanley-Regler. Selbst unter Berücksichtigung
+des anfänglichen Versatzes bringt der Stanley-Regler das Fahrzeug erst am Ende
+der Kurve auf die Fahrspur, während der PID-Regler das Fahrzeug mit einer
+leichten nach links driftenden Bewegung, die mit der Vorwärtsgeschwindigkeit
+skaliert, auf der Bahn hält.
 
-Die Ergebnisse der Simulation des Stanley-Reglers in Abb. \ref{sampling} mit einer
-Vorwärtsgeschwindigkeit von 1,75 $m/s$ und einer Abtastfrequenz von 50 Hz
+Die Ergebnisse der Simulation des Stanley-Reglers in Abb. \ref{sampling} mit
+einer Vorwärtsgeschwindigkeit von 1,75 $m/s$ und einer Abtastfrequenz von 50 Hz
 stimmen mit dem Verhalten des Stanley-Reglers auf der tatsächlichen Strecke
 überein. Allerdings driftet der Stanley-Regler, wie in der Abbildung gezeigt,
 vor der Kurve vom geraden Streckenabschnitt weg.
@@ -869,32 +874,35 @@ Stanley-Reglers erörtert, die seine Leistung in Zukunft verbessern könnten.
 \begin{figure}[h]
     \centering
     \fbox{\includegraphics[scale=0.8]{done1.0}}
-    \caption{1.0}
+    \caption{PID- und Stanley-Regler haben ungef"ahr das gleiche Verhalten.}
     \label{ab:1.0}
 \end{figure}
 
 \begin{figure}[h]
     \centering
     \fbox{\includegraphics[scale=0.8]{done1.25}}
-    \caption{1.25}
+    \caption{PID- und Stanley-Regler haben ungef"ahr das gleiche Verhalten.}
     \label{ab:1.25}
 \end{figure}
 \begin{figure}[h]
     \centering
     \fbox{\includegraphics[scale=0.8]{done1.5}}
-    \caption{1.5}
+    \caption{Dar Modellfahrzeug mit dem Stanley-Regler hat eine kleine Abweichung am Anfang der Kurve, aber 
+    am Ende der Kurve ist es nochmal auf die Fahrspur.}
     \label{ab:1.5}
 \end{figure}
 \begin{figure}[h]
     \centering
     \fbox{\includegraphics[scale=0.8]{done1.75}}
-    \caption{1.75}
+    \caption{Die Abweichung mit dem Stanley-Regler ist gro{\ss}er. PID-Regler verh"alt sich
+    gleich.}
     \label{ab:1.75}
 \end{figure}
 \begin{figure}[h]
     \centering
     \fbox{\includegraphics[scale=0.8]{done2.0}}
-    \caption{2.0}
+    \caption{Die Abweichung mit dem Stanley-Regler ist am gro{\ss}ten. PID-Regler driftet nach links
+    am Ende der Kurve.}
     \label{ab:2.0}
 \end{figure}
 \FloatBarrier
@@ -952,7 +960,7 @@ schneller als der PID-Regler auf der Bahn neu orientiert.
     \centering
     \includegraphics[scale=0.47]{pid1.0}
     \includegraphics[scale=0.47]{Stan1.0}
-    \caption{1.0}
+    \caption{Ausgang der Regler mit $v = 1.0$ $m/s$.}
     \label{reg:1.0}
 \end{figure}
 
@@ -960,7 +968,7 @@ schneller als der PID-Regler auf der Bahn neu orientiert.
     \centering
     \includegraphics[scale=0.47]{pid1.25}
     \includegraphics[scale=0.47]{Stan1.25}
-    \caption{1.25}
+    \caption{Ausgang der Regler mit $v = 1.25$ $m/s$.}
     \label{reg:1.25}
 \end{figure}
 
@@ -968,7 +976,7 @@ schneller als der PID-Regler auf der Bahn neu orientiert.
     \centering
     \includegraphics[scale=0.47]{pid1.5}
     \includegraphics[scale=0.47]{Stan1.5}
-    \caption{1.5}
+    \caption{Ausgang der Regler mit $v = 1.5$ $m/s$.}
     \label{reg:1.5}
 \end{figure}
 
@@ -976,7 +984,7 @@ schneller als der PID-Regler auf der Bahn neu orientiert.
     \centering
     \includegraphics[scale=0.47]{pid1.75}
     \includegraphics[scale=0.47]{Stan1.75}
-    \caption{1.75}
+    \caption{Ausgang der Regler mit $v = 1.75$ $m/s$.}
     \label{reg:1.75}
 \end{figure}
 
@@ -984,14 +992,15 @@ schneller als der PID-Regler auf der Bahn neu orientiert.
     \centering
     \includegraphics[scale=0.47]{pid2.0}
     \includegraphics[scale=0.47]{Stan2.0}
-    \caption{2.0}
+    \caption{Ausgang der Regler mit $v = 2.0$ $m/s$. PID-Regler-Signal hat keine Periodizit"at
+    und schwankt von -40 zu 30 Grad. }
     \label{reg:2.0}
 \end{figure}
 
 
 
 
-\chapter{Conclusion}
+\chapter{Fazit}
 
 Das Bahnfolgeverhalten beider Regler wurde bewertet, und während der PID-Regler
 in diesem Aspekt besser abschneidet, müssen andere Faktoren der Problemstellung
@@ -1005,7 +1014,7 @@ Anwendung.
 
 
 
-\subsection{Future Work}
+\subsection{K"unfigte Arbeit}
 
 Am Ende dieser Arbeit wurde festgestellt, dass das Fahrzeug vor jeder Kurve
 immer noch von der Fahrbahn abdriftet. Um dieses Problem zu lösen, wird
@@ -1031,7 +1040,9 @@ Wirksamkeit der vorgeschlagenen Anpassung zu überprüfen.
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.7]{querabweichung}
-    \caption{Querabweichung}
+    \caption{Das gemessene Querabweichungsignal mit $v = 1.75$ $m/s$. Der Mittelwert
+    des Signals liegt bei -5.89 cm. Deswegen gibt es ein bleibende Abweichung, die 
+    mit dem urspr"unglichen Stanley-Regler nicht kompensiert wird.}
     \label{quer}
 \end{figure}
 

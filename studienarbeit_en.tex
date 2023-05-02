@@ -797,8 +797,6 @@ calculation again. As an example, calculation of the the perspective
 transformation matrices are expensive, which when cached leads to a performance
 improvement of the pipeline.
 
-\iffalse
-
 In order to prove the performance improvement of the pipeline, an experiment
 was implemented. First, the pipeline is executed once and the runtime ignored
 as the performance improvement is only relevant to subsequent executions of the
@@ -806,11 +804,9 @@ pipeline. Therefore, on the second execution of the pipeline, the runtime is
 measured for both pipeline variants, with and without caching the expensive
 function calls from the first execution. The experiment is then run 100 times
 and the result tabulated. The arithmetic mean of the runtimes for both variants
-are then compared to one another to measure the speed improvement. The values
-are in TABLE, showing that by caching the expensive function calls, the
-pipeline processing speed improved by VALUE%.
-
-\fi
+are then compared to one another to measure the runtime improvement. The
+experiment showed that the caching of these function calls lowered the runtime
+from X ms to Y ms.
 
 \chapter{Experiment}
 \section{Hardware}
