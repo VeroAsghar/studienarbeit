@@ -100,16 +100,16 @@ to follow.}
 
 \chapter{Einführung}
 
-At the Connected Robotics Lab (CoRoLa) research group at the Barkhausen
-Institut, a demonstration using remote controlled two axle vehicles was
-developed. The demonstration is currently in use in order to model
-communications between vehicles similar to an Internet of Things (IoT) network.
+Die Forschungsgruppe Connected Robotics Lab (CoRoLa) am Barkhausen Institut hat
+eine Demonstration entwickelt, die ferngesteuerte zweiachsige Fahrzeuge
+verwendet, um die Kommunikation zwischen ferngesteuerten Fahrzeugen in einem
+Internet of Things (IoT)-Netzwerk zu modellieren.
 
-Due to issues regarding low forward velocity and robustness of the current
-vehicle controller, it was proposed to implement a new 
-
-In order to achieve the goals stated above, creation of an image processing
-pipeline and implementation of the Stanley controller are proposed.
+Aufgrund der Einschränkungen der aktuellen Fahrzeugsteuerung, wie z. B. der
+geringen Vorwärtsgeschwindigkeit und der mangelnden Robustheit, wurde
+vorgeschlagen, eine neue Steuerung zu implementieren. Um dieses Ziel zu
+erreichen, umfasst die vorgeschlagene Lösung die Erstellung einer
+Bildverarbeitungspipeline und die Implementierung des Stanley-Reglers.
 
 \chapter{Regelalgorithmus}
 
@@ -772,7 +772,7 @@ jedoch der Fall, wenn das Fahrzeug die Fahrspurlinie nicht zuverlässig erkennen
 kann. Ein Ausgang von Null bedeutet auch, dass das Fahrzeug die Fahrspurlinie
 überhaupt nicht erkennen kann.
 
-\subsection{Abstand von der Linie}
+\subsection{Bahnfolgeverhalten}
 
 Die Messung des Fahrzeugversatzes erfolgt durch die folgenden zwei Versuche.
 Zunächst fährt das Fahrzeug mit einer bestimmten Vorwärtsgeschwindigkeit auf
@@ -789,12 +789,9 @@ durchgeführt.
 Um den Reglerausgang der beiden Regler zu messen, wird das Fahrzeug angewiesen
 (?), mindestens dreimal um die Strecke zu fahren. Während der Fahrt wird der
 Ausgang des Reglers aufgenommen. Nach der Fahrt werden die Daten im Zeitverlauf
-grafisch dargestellt und eine Teilmenge der Daten ausgewählt. Die Teilmenge der
-Daten wird nach den folgenden Kriterien ausgewählt: Periodizität und Fehlen von
-Ausreißern.
+grafisch dargestellt und der Mittelwert der Daten aufgezeichnet. 
 
 \section{Ergebnisse}
-
 
 \subsection{H"ochstgeschwindigkeit}
 \begin{center}
@@ -807,27 +804,25 @@ Ausreißern.
 \hline
 \end{tabular}
 \end{center}
-When running the PID controller on the vehicle, velocities above 1,5
-$m/s$lead to issues with the robustness of the vehicle. In comparison
-to then Stanley controller, whenever an outlier appears, the PID controller
-causes the vehicle to oscillate and requires a longer time than the Stanley
-controller to return to the lane. The oscillations scale with the forward
-velocity of the vehicle. With velocities greater than or equal to 2,0
-$m/s$, the PID controller will drive the vehicle into the wall of the
-track. Even velocities between 1,5 and 1,75 $m/s$ require supervision
-in order to make sure that the vehicle won't drive into the wall.
 
-In comparsion, the Stanley controller requires no supervision, until the
-forward velocity of the vehicle is above 2,3 $m/s$ However, at higher
-velocities, the vehicle will drift farther from the path, until the vehicle
-acts as a "guide", as opposed to something that needs to be followed. 
+Wenn der PID-Regler für das Modellfahrzeug verwendet wird, führen
+Geschwindigkeiten von mehr als 1,5 $m/s$ zu einer geringeren Robustheit. Im
+Gegensatz zum Stanley-Regler bringt der PID-Regler das Fahrzeug zum Schwingen,
+wenn ein Ausreißer auftritt, und benötigt mehr Zeit, um in die Spur
+zurückzukehren. Das Schwingungsverhalten nimmt mit der Vorwärtsgeschwindigkeit
+des Fahrzeugs zu. Wenn die Geschwindigkeit 2,0 $m/s$ übersteigt, steuert der
+PID-Regler das Fahrzeug in die Spurwand. Selbst Geschwindigkeiten zwischen 1,5
+und 1,75 $m/s$ erfordern eine Überwachung, um Kollisionen zu vermeiden.
+
+Im Vergleich dazu benötigt der Stanley-Regler keine Überwachung, bis die
+Vorwärtsgeschwindigkeit des Fahrzeugs 2,3 $m/s$ erreicht. Bei höheren
+Geschwindigkeiten weicht das Fahrzeug jedoch immer weiter von der gewünschten
+Bahn ab, bis es sich eher wie ein Begleiter verhält als etwas, dem man folgen
+muss. (?)
 
 \subsection{Maximal m"oglicher Fehlerwinkel}
-
-
 \begin{center}
 \begin{tabular}{|c|c|c|}
-
 \hline
     & PID (\textdegree) & Stanley (\textdegree)\\
 \hline
@@ -838,68 +833,72 @@ acts as a "guide", as opposed to something that needs to be followed.
 \hline
 \end{tabular}
 \end{center}
-The Stanley controller can not be offset from the lane as much as the PID
-controller. Due to both the calibration stage of the pipeline and requiring an
-approximated polynomial, the requirements for the Stanley controller to detect
-the lane are higher than the PID controller. The PID controller requires only
-that a grouping of yellow pixels exists in the image. The Stanley controller
-requires at least some geometry to the grouping of yellow pixels, typically in
-the form of a line or section of a curve.
 
-\subsection{Abstand von der Linie}
+Der Stanley-Regler ist im Vergleich zum PID-Regler weniger tolerant gegenüber
+einer Abweichung von der Fahrspur. Dies liegt an der Kalibrierungsstufe der
+Pipeline und der Anforderung eines approximierten Polynoms, was es für den
+Stanley-Regler schwieriger macht, die Fahrspur zu erkennen. Im Gegensatz dazu
+benötigt der PID-Regler nur eine Gruppe von gelben Pixeln im Bild.
 
-As can be seen in FIGURE, the PID controller follows the path closer than the
-Stanley controller. Even accounting for the offset at the start of the curve,
-the Stanley controller does not drive the vehicle onto the lane until the end
-of the curve. In comparison, the PID controller forces the vehicle to stay on
-the path, while still drifting lightly to the left. This drift scales with the
-forward velocity of the vehicle.
+Der Stanley-Controller benötigt für die Gruppierung der gelben Pixel eine
+gewisse Geometrie, typischerweise in Form einer Linie oder eines
+Kurvenabschnitts, während der PID-Controller keine solchen Voraussetzungen hat.
 
-When comparing the results of the simulation of the Stanley controller in
-FIGURE with $v = 1,75 m/s$ and $fs = 50$ Hz and its behaviour on the
-track, the behaviour of the Stanley controller in reality matches with the
-simulation. However, as can be seen in FIGURE, the Stanley controller will
-drift away from the straight section of the track before the curve. 
+\subsection{Bahnfolgeverhalten}
 
-Compensation for this drift was attempted, but outside of setting the reference
-point for the cross-track-error to another value, the drift stayed. By changing
-the reference point manually, the vehicle requires different parameters when
-driving clockwise or counterclockwise around the track. To avoid this, it was
-decided to keep the drift included for now. In chapter 5, adjustments to the
-Stanley controller are discussed, that could lead to an improvement in the
-future.
+Abb. \ref{ab:1.5}, \ref{ab:1.75} und \ref{ab:2.0} zeigen, dass der PID-Regler die Bahn genauer verfolgt als der
+Stanley-Regler. Selbst unter Berücksichtigung des anfänglichen Versatzes bringt
+der Stanley-Regler das Fahrzeug erst am Ende der Kurve auf die Fahrspur,
+während der PID-Regler das Fahrzeug mit einer leichten nach links driftenden
+Bewegung, die mit der Vorwärtsgeschwindigkeit skaliert, auf der Bahn hält.
+
+Die Ergebnisse der Simulation des Stanley-Reglers in Abb. \ref{sampling} mit einer
+Vorwärtsgeschwindigkeit von 1,75 $m/s$ und einer Abtastfrequenz von 50 Hz
+stimmen mit dem Verhalten des Stanley-Reglers auf der tatsächlichen Strecke
+überein. Allerdings driftet der Stanley-Regler, wie in der Abbildung gezeigt,
+vor der Kurve vom geraden Streckenabschnitt weg.
+
+Es wurde versucht, diese Drift zu kompensieren, aber abgesehen von der
+Anpassung des Bezugspunkts für die Querabweichung blieb die Drift bestehen.
+Eine manuelle Änderung des Referenzpunktes führte dazu, dass das Fahrzeug bei
+der Fahrt im oder gegen den Uhrzeigersinn um die Strecke unterschiedliche
+Parameter benötigte, was nicht praktikabel war. Daher wurde die Drift vorerst
+so belassen, wie sie ist. In Kapitel 5 werden mögliche Anpassungen des
+Stanley-Reglers erörtert, die seine Leistung in Zukunft verbessern könnten.
 
 \begin{figure}[h]
     \centering
     \fbox{\includegraphics[scale=0.8]{done1.0}}
     \caption{1.0}
-    \label{ausrei}
+    \label{ab:1.0}
 \end{figure}
 
 \begin{figure}[h]
     \centering
     \fbox{\includegraphics[scale=0.8]{done1.25}}
     \caption{1.25}
-    \label{ausrei}
+    \label{ab:1.25}
 \end{figure}
 \begin{figure}[h]
     \centering
     \fbox{\includegraphics[scale=0.8]{done1.5}}
     \caption{1.5}
-    \label{ausrei}
+    \label{ab:1.5}
 \end{figure}
 \begin{figure}[h]
     \centering
     \fbox{\includegraphics[scale=0.8]{done1.75}}
     \caption{1.75}
-    \label{ausrei}
+    \label{ab:1.75}
 \end{figure}
 \begin{figure}[h]
     \centering
     \fbox{\includegraphics[scale=0.8]{done2.0}}
     \caption{2.0}
-    \label{ausrei}
+    \label{ab:2.0}
 \end{figure}
+\FloatBarrier
+
 \subsection{Reglerausgang}
 
 \begin{center}
@@ -921,39 +920,40 @@ future.
 \end{tabular}
 \end{center}
 
-The controller output of both controllers are similar, regardless of the
-velocity, except for the PID controller at velocity 1,5 $m/s$. As the
-forward velocity of the vehicle increases, the controller output scales
-appropiately. The difference between the two controllers comes in the form of
-both signals. Between forward velocities 1,0 and 1,5 $m/s$, the signal
-output of the two controllers are similar, however at 1,75 and 2,0
-$m/s$ the sinusoidal nature of the PID controller degrades, while the
-sinusoidal nature of the Stanley controller increases. 
+Die durchschnittliche Reglerausgabe beider Regler ist ähnlich, unabhängig von
+der Geschwindigkeit, außer für den PID-Regler bei einer Geschwindigkeit von 1,5
+m/s. Mit zunehmender Vorwärtsgeschwindigkeit des Fahrzeugs steigt der
+durchschnittliche Reglerausgang entsprechend an. Der Unterschied zwischen den
+beiden Reglern liegt jedoch in der Form der beiden Signale. Bei
+Vorwärtsgeschwindigkeiten zwischen 1,0 und 1,5 $m/s$ ist der Signalverlauf der
+beiden Regler ähnlich. Bei 1,75 und 2,0 $m/s$ verschlechtert sich jedoch der
+sinusförmige Verlauf des PID-Reglers, während der sinusförmige Verlauf des
+Stanley-Reglers zunimmt.
 
-At 1,75 $m/s$ the PID controller can still control the vehicle onto
-the lane, however as can be seen in FIGURE, outliers lead to high oscillations
-in controller output. When the PID controller incorrectly identifies the lane,
-the controller has difficulty returning the vehicle to the lane and can instead
-drive the vehicle into the wall, which can be seen at the right end of the
-graph. In comparison, the Stanley controller has no issue following the path at
-the same velocity. 
+Bei 1,75 $m/s$ kann der PID-Regler das Fahrzeug immer noch auf die Fahrspur
+lenken. Wie in Abb. \ref{reg:1.75} gezeigt, führen Ausreißer allerdings zu starken
+Schwingungen im Reglerausgang. Wenn der PID-Regler die Fahrspur nicht richtig
+erkennt, hat er Schwierigkeiten, das Fahrzeug auf die Fahrspur zurückzubringen.
+Stattdessen kann er das Fahrzeug gegen die Wand fahren, wie am rechten Ende des
+Diagramms zu sehen ist. Im Vergleich dazu hat der Stanley-Regler keine
+Probleme, dem Weg mit der gleichen Geschwindigkeit zu folgen.
 
-At 2,0 $m/s$ the PID controller is unable to control the vehicle and
-drives the vehicle into the wall. As can be seen in FIGURE, the output varies
-between -30 and 30 degrees and there is no periodicity. In comparision, the
-Stanley controller has a stable oscillation between -30 and 0 degrees and is
-periodic.
+Bei 2,0 $m/s$ ist der PID-Regler nicht in der Lage, das Fahrzeug zu steuern, und
+fährt es in die Wand. Wie in Abb. \ref{reg:2.0} dargestellt, schwankt der Ausgang
+zwischen -30 und 30 Grad, und es gibt keine Periodizität. Im Vergleich dazu
+weist der Stanley-Regler eine stabile Schwingung zwischen -30 und 0 Grad auf
+und ist periodisch.
 
-Outliers do not lead to high oscillations when the vehicle is being controlled
-by the Stanley controller. It has been observed that the vehicle will reorient
-itself onto the path much quicker than the PID controller.
+Ausreißer führen nicht zu starken Schwingungen, wenn das Fahrzeug mit dem
+Stanley-Regler gesteuert wird. Es wurde beobachtet, dass sich das Fahrzeug viel
+schneller als der PID-Regler auf der Bahn neu orientiert.
 
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.47]{pid1.0}
     \includegraphics[scale=0.47]{Stan1.0}
     \caption{1.0}
-    \label{ausrei}
+    \label{reg:1.0}
 \end{figure}
 
 \begin{figure}[h]
@@ -961,7 +961,7 @@ itself onto the path much quicker than the PID controller.
     \includegraphics[scale=0.47]{pid1.25}
     \includegraphics[scale=0.47]{Stan1.25}
     \caption{1.25}
-    \label{ausrei}
+    \label{reg:1.25}
 \end{figure}
 
 \begin{figure}[h]
@@ -969,7 +969,7 @@ itself onto the path much quicker than the PID controller.
     \includegraphics[scale=0.47]{pid1.5}
     \includegraphics[scale=0.47]{Stan1.5}
     \caption{1.5}
-    \label{ausrei}
+    \label{reg:1.5}
 \end{figure}
 
 \begin{figure}[h]
@@ -977,7 +977,7 @@ itself onto the path much quicker than the PID controller.
     \includegraphics[scale=0.47]{pid1.75}
     \includegraphics[scale=0.47]{Stan1.75}
     \caption{1.75}
-    \label{ausrei}
+    \label{reg:1.75}
 \end{figure}
 
 \begin{figure}[h]
@@ -985,7 +985,7 @@ itself onto the path much quicker than the PID controller.
     \includegraphics[scale=0.47]{pid2.0}
     \includegraphics[scale=0.47]{Stan2.0}
     \caption{2.0}
-    \label{ausrei}
+    \label{reg:2.0}
 \end{figure}
 
 
@@ -993,31 +993,46 @@ itself onto the path much quicker than the PID controller.
 
 \chapter{Conclusion}
 
+Das Bahnfolgeverhalten beider Regler wurde bewertet, und während der PID-Regler
+in diesem Aspekt besser abschneidet, müssen andere Faktoren der Problemstellung
+berücksichtigt werden, um die bessere Lösung für die Anwendung zu finden. In
+diesem Fall erweist sich der Stanley-Regler als geeigneter für die Anwendung
+des autonomen Fahrens, da er in der Lage ist, höhere Geschwindigkeiten ohne
+Überwachung zu bewältigen. Unter Berücksichtigung aller Aspekte der
+Problemstellung ist der Stanley-Regler daher die bessere Wahl für diese
+Anwendung.
 
-When comparing only the path following behaviour of both controllers, the PID
-controller is still the best choice. However, when factoring in the other
-aspects of the problem statement, the Stanley controller is a better fit for
-the application. As the vehicle needs to be able to drive autonomously without
-supervision at a higher velocity than it can originally, the Stanley controller
-fulfills these requirements. 
+
+
 
 \subsection{Future Work}
 
-By the conclusion of this paper, the vehicle still drifts away from the
-lane before each curve. In the future, it is proposed to adjust the Stanley
-controller to include an integrator in order to compensate for this drift.
-The adjusted Stanley controller has the form of the following equation:
+Am Ende dieser Arbeit wurde festgestellt, dass das Fahrzeug vor jeder Kurve
+immer noch von der Fahrbahn abdriftet. Um dieses Problem zu lösen, wird
+vorgeschlagen, den Stanley-Regler durch Hinzufügen eines Integrators zu
+verändern, um diese Abweichung zu kompensieren. Der adaptierte Stanley-Regler
+wird durch die folgende Gleichung beschrieben:
 
-\begin{equation} 
-    u = \theta - \theta_d + \arctan\left(\frac{ke_{V}}{v}\right) + k_{i} \int_{0}^{t} e_{V}\,d\tau, 
-    \label{eq:Stanley-Regler-adjusted} 
+\begin{equation}
+u = \theta - \theta_d + \arctan\left(\frac{ke_{V}}{v}\right) + k_{i} \int_{0}^{t} e_{V},d\tau,
+\label{eq:Stanley-Regler-adjusted}
 \end{equation}
 
-In linear control theory, an integrator is used in order to remove residual
-error from an application. As the small signal version of the Stanley
-controller is a PD controller, it is hypothesized that an integrator will 
-correct this observed drift. As can be seen in FIGURE, the drift is apparent in
-the input to the controller. By integrating the offset it is proposed that
-over time the drift will be componsated for and the vehicle stay on the lane. 
+In der linearen Regelungstheorie wird ein Integrator verwendet, um bleibende
+Regelabweichungen aus einer Anwendung zu entfernen. Da es sich bei der
+Kleinsignalversion des Stanley-Reglers um einen PD-Regler handelt, wird
+vermutet, dass das Hinzufügen eines Integrators die beobachtete Drift
+korrigieren wird. Wie in der Abb. \ref{quer} zu sehen ist, ist die Drift im Eingang
+des Reglers sichtbar. Durch die Integration der Querabweichung soll die Drift
+mit der Zeit kompensiert werden und das Fahrzeug auf der Fahrspur bleiben.
+Weitere Untersuchungen sind erforderlich, um diese Hypothese zu testen und die
+Wirksamkeit der vorgeschlagenen Anpassung zu überprüfen.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.7]{querabweichung}
+    \caption{Querabweichung}
+    \label{quer}
+\end{figure}
 
 \end{document}

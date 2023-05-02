@@ -96,6 +96,17 @@ to follow.}
 
 \chapter{Einführung}
 
+The Connected Robotics Lab (CoRoLa) research group at the Barkhausen Institut
+has developed a demonstration that uses remote-controlled two-axle vehicles to
+model communications between remote-controlled vehicles in an Internet of Things (IoT) network.
+
+However, due to limitations in the current vehicle controller, such as low
+forward velocity and lack of robustness, it has been proposed to implement a
+new controller. To achieve this objective, the proposed solution includes the
+creation of an image processing pipeline and implementation of the Stanley
+controller.
+
+\iffalse
 At the Connected Robotics Lab (CoRoLa) research group at the Barkhausen
 Institut, a demonstration using remote controlled two axle vehicles was
 developed. The demonstration is currently in use in order to model
@@ -106,6 +117,7 @@ vehicle controller, it was proposed to implement a new
 
 In order to achieve the goals stated above, creation of an image processing
 pipeline and implementation of the Stanley controller are proposed.
+\fi
 
 
 \chapter{Regelalgorithmus}
@@ -864,7 +876,19 @@ under the following criteria: periodicity and absence of outliers.
 The results of the experiments are listed in TABLE. 
 
 \subsection{H"ochstgeschwindigkeit}
+When the PID controller is used on the vehicle, velocities exceeding 1.5 $m/s$
+result in reduced robustness. In contrast to the Stanley controller, the PID
+controller causes the vehicle to oscillate when an outlier occurs and requires
+more time to return to the lane. The magnitude of the oscillations increases
+with the forward velocity of the vehicle. If the velocity exceeds 2.0 $m/s$,
+the PID controller will steer the vehicle into the track wall. Even velocities
+between 1.5 and 1.75 $m/s$ require supervision to avoid collisions.
 
+In comparison, the Stanley controller requires no supervision until the forward
+velocity of the vehicle reaches 2.3 $m/s$. However, at higher velocities, the
+vehicle deviates further from the desired path until it acts as a guide rather
+than something that needs to be followed.
+\iffalse
 When running the PID controller on the vehicle, velocities above $1.5 \frac{m}{s}$
 lead to issues with the robustness of the vehicle. In comparison to then Stanley 
 controller, whenever an outlier appears, the PID controller causes the vehicle to oscillate and
@@ -878,6 +902,7 @@ In comparsion, the Stanley controller requires no supervision, until the
 forward velocity of the vehicle is above 2.3 $\frac{m}{s}$. However, at higher
 velocities, the vehicle will drift farther from the path, until the vehicle
 acts as a "guide", as opposed to something that needs to be followed. 
+\fi
 
 \subsection{Maximal m"oglicher Fehlerwinkel}
 
@@ -946,15 +971,47 @@ itself onto the path much quicker than the PID controller.
 
 \chapter{Conclusion}
 
+\iffalse
 When comparing only the path following behaviour of both controllers, the PID
 controller is still the best choice. However, when factoring in the other
 aspects of the problem statement, the Stanley controller is a better fit for
 the application. As the vehicle needs to be able to drive autonomously without
 supervision at a higher velocity than it can originally, the Stanley controller
 fulfills these requirements. 
+\fi
+
+The path following behavior of both controllers has been evaluated, and while
+the PID controller may perform better in this aspect, other factors of the
+problem statement need to be considered to determine the better fit for the
+application. In this case, the Stanley controller proves to be more suitable
+for the autonomous driving application, as it is capable of handling higher
+velocities without supervision. Therefore, when taking into account all aspects
+of the problem statement, the Stanley controller is the better choice for this
+application.
 
 \subsection{Future Work}
 
+By the conclusion of this paper, it was observed that the vehicle still drifts
+away from the lane before each curve. In order to address this issue, it is
+proposed to adjust the Stanley controller by adding an integrator to compensate
+for this drift. The adjusted Stanley controller is given by the following
+equation:
+
+\begin{equation}
+u = \theta - \theta_d + \arctan\left(\frac{ke_{V}}{v}\right) + k_{i} \int_{0}^{t} e_{V},d\tau,
+\label{eq:Stanley-Regler-adjusted}
+\end{equation}
+
+In linear control theory, an integrator is used to remove residual error from
+an application. As the small signal version of the Stanley controller is a PD
+controller, it is hypothesized that adding an integrator will correct the
+observed drift. As shown in the figure, the drift is apparent in the input to
+the controller. By integrating the offset, it is proposed that over time the
+drift will be compensated for and the vehicle will stay on the lane. Further
+research is needed to test this hypothesis and verify the effectiveness of the
+proposed adjustment.
+
+\iffalse
 By the conclusion of this paper, the vehicle still drifts away from the
 lane before each curve. In the future, it is proposed to adjust the Stanley
 controller to include an integrator in order to compensate for this drift.
@@ -971,6 +1028,7 @@ controller is a PD controller, it is hypothesized that an integrator will
 correct this observed drift. As can be seen in FIGURE, the drift is apparent in
 the input to the controller. By integrating the offset it is proposed that
 over time the drift will be componsated for and the vehicle stay on the lane. 
+\fi
 
 
 \end{document}
