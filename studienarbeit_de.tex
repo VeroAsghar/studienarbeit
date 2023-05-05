@@ -32,6 +32,7 @@
 
 \graphicspath{{./photos}}
 
+\addbibresource{refs.bib}
 \begin{document}
 
 % Titelseite
@@ -119,14 +120,14 @@ Der Stanley-Regler ist ein nichtlinearer Regelungsalgorithmus, der 2005 von
 der Stanford University entwickelt wurde, um ein zweiachsiges Fahrzeug nur
 anhand der Ausrichtung des Fahrzeugs relativ zur Bahn und der Querabweichung der zu verfolgenden Bahn zu
 steuern. Der Algorithmus hat sich für das kinematische Modell eines
-zweiachsigen Fahrzeugs als asymptotisch global stabil erwiesen.
+zweiachsigen Fahrzeugs als asymptotisch global stabil erwiesen. \cite{stanley}
 
 Der Stanley-Regler ist ein Bahnfolgeregler anstelle eines
 Trajektorienfolgereglers. Als Querregler soll er das Fahrzeug auf der Bahn
 halten, hat aber keinen Einfluss auf die Vorw"artsgeschwindigkeit. Dieser
 Ansatz ermöglicht eine flexible Wahl der Fahrzeuggeschwindigkeit, die unter
 Berücksichtigung dynamischer Effekte nach Bedarf für eine bestimmte Anwendung
-gewählt werden kann. 
+gewählt werden kann. \cite{stanley}
 
 Der Stanley-Regler wird mathematisch durch die folgende Gleichung beschrieben:
 \begin{equation} 
@@ -146,7 +147,7 @@ steuert den Lenkwinkel so, dass er sich auf den Kurs zubewegt, wenn sich das
 Fahrzeug weiter von ihm entfernt. Die zweite Komponente, dargestellt durch
 $\theta_d - \theta$, steuert den Lenkwinkel so, dass er parallel zum zu
 verfolgenden Kurs bleibt. Zusammen bewirken diese beiden Komponenten, dass
-das Fahrzeug auf den gewünschten Kurs gelenkt wird.
+das Fahrzeug auf den gewünschten Kurs gelenkt wird. \cite{steering-methods}
 
 
 \subsection{Kleinsignalverhalten}
@@ -423,7 +424,7 @@ werden. \\
 
 Eine Kamera wird anhand einer Sammlung von Fotos mit bekannten geraden Linien
 kalibriert. In der Regel wird eine Reihe von Schachbrettbildern mit bekannten
-Dimensionen verwendet. Danach werden Fotos des Schachbretts in verschiedenen
+Dimensionen verwendet. \cite{addison} Danach werden Fotos des Schachbretts in verschiedenen
 Winkeln und in verschiedenen Positionen relativ zu Kamera aufgenommen. Diese Bilderserie
 wird dann in den Algorithmus zur Kamerakalibrierung eingespeist, der zunächst
 die Positionen der Schachbrettfelder und der sie verbindenden Linien bestimmt.
@@ -432,9 +433,9 @@ die Verzeichnung aus. Wie in Abb. \ref{checkerboards} zu sehen, werden
 beispielsweise die gekrümmten Linien des Schachbretts nach der Kalibrierung
 wieder gerade gemacht. Die Anzahl der benötigten Bilder hängt von der
 jeweiligen Kamera ab, eine große Sammlung von Fotos führt jedoch zu einer
-genaueren Annäherung an die Parameter. (Zitat OPENCV) Die Verwendung von
+genaueren Annäherung an die Parameter.  Die Verwendung von
 Bildern mit einer höheren Auflösung führt ebenfalls zu genaueren Parametern.
-(Zitat OPENCV/BLOG) Die angenäherten Parameter sind jedoch nur für die
+\cite{addison} Die angenäherten Parameter sind jedoch nur für die
 Kalibrierung von Bildern sind g"ultig, die mit der gleichen Auflösung aufgenommen
 wurden wie die für die Kalibrierung verwendeten Bilder. Um die Kameramatrix für
 Bilder mit einer niedrigeren Auflösung zu verwenden, muss die intrinsische
@@ -507,7 +508,7 @@ Lichtverhältnisse oder reflektierende Oberflächen sind Beispiele für solche
 Störungen.
 
 Im HSV-Farbraum bestimmt der Farbwertkanal die Farbe, der Sättigungskanal die
-Reinheit des Farbtons und der Wertekanal die Helligkeit des Farbtons. (MS ANNO)
+Reinheit des Farbtons und der Wertekanal die Helligkeit des Farbtons. \cite{hsv}
 Nach der Auswahl des Farbwerts, in diesem Fall Gelb, werden der Helligkeits-
 und der Sättigungskanal verwendet, um den spezifischen Gelbton auszuwählen. Die
 Verwendung dieser beiden Kanäle ermöglicht eine zuverlässigere Erkennung der
@@ -1023,8 +1024,8 @@ verändern, um diese Abweichung zu kompensieren. Der adaptierte Stanley-Regler
 wird durch die folgende Gleichung beschrieben:
 
 \begin{equation}
-u = \theta - \theta_d + \arctan\left(\frac{ke_{V}}{v}\right) + k_{i} \int_{0}^{t} e_{V},d\tau,
-\label{eq:Stanley-Regler-adjusted}
+    u = \theta - \theta_d + \arctan\left(\frac{ke_{V}}{v}\right) + k_{i} \int_{0}^{t} e_{V}d\tau,
+    \label{eq:Stanley-Regler-adjusted}
 \end{equation}
 
 In der linearen Regelungstheorie wird ein Integrator verwendet, um bleibende
@@ -1045,5 +1046,7 @@ Wirksamkeit der vorgeschlagenen Anpassung zu überprüfen.
     mit dem urspr"unglichen Stanley-Regler nicht kompensiert wird.}
     \label{quer}
 \end{figure}
+
+\printbibliography
 
 \end{document}
