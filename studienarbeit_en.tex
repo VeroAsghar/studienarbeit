@@ -683,17 +683,22 @@ pixels is calculated. The x-coordinate of the next window is set to this
 calculated mean while being placed on top of the first window. This process is
 then repeated for all remaining windows. When no pixels are contained in a
 window, the window is ignored and the following window is placed on top of it.
+\iffalse
 In the image coordinate system, the top left corner of the image is $(0, 0)$,
 with the positive x-axis increasing to the right, while the positive y-axis
 increases moving down the image. Therefore, the bottom edge of the image would
 be any coordinate with a y component equal to the height of the image. Seen
 from the engineer's perspective, the windows would be stacked from lowest to
 highest, however in the image coordinate space it is inverted. 
+\fi
 
 The pixels not located within each window are then filtered out of the image.
 The image before and after the filtering process can be seen in FIGURE. Using
-the the least squares method, a polynomial is approximated through remaining
-pixels.
+the least squares method, a second order polynomial is approximated through the
+remaining pixels.
+In order to determine the polynomial representing the lane from the $n$ remaining pixels, the following calculation is used: \begin{gather} \underline{x} := \begin{bmatrix} x_1 & x_2 & ... & x_n \end{bmatrix}^T \\ \bold{Y} := \begin{bmatrix} 1 & y_1 & y_1^2 \\ 1 & y_2 & y_2^2 \\ \vdots & \vdots & \vdots \\ 1 & y_n & y_n^2 \end{bmatrix} \\ \underline{\hat{\beta}} := \begin{bmatrix} \hat{\beta_0} & \hat{\beta_1} & \hat{\beta_2} \end{bmatrix}^T \\ \underline{\hat{\beta}} = \left(\bold{Y}^T\bold{Y}\right)^{-1}\bold{Y}^T\underline{x}, \end{gather} where $\underline{x}$ and $\underline{y}$ are the vectors containing the x and y coordinates of the remaining pixels. $\hat{\beta_0}$, $\hat{\beta_1}$ and $\hat{\beta_2}$ are the coefficients of the approximated polynomial. 
+
+Using the approximated coefficients, the following equation is obtained: \begin{equation} \hat{x} = \hat{\beta_0} + \hat{\beta_1}y + \hat{\beta_2}y^2, \end{equation} where $y$ is the y coordinate and $\hat{x}$ is the approximated x coordinate of the lane. The equation provides an analytical representation of the lane. 
 
 \section{Berechnung von Ausrichtung und Abstand}
 In the final stage of the pipeline, the heading and offset from the lane line

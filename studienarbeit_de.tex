@@ -308,7 +308,7 @@ der wichtigen Parameter sind in folgende Gleichungen dargestellt: \\
  \Delta\underline{x} := \underline{p}_V - \underline{p}_P, \\
  \delta\underline{x} := \min \left{ || \Delta\underline{x} ||_2 \right}, \\
  \theta_d := \arctan\left(\frac{\frac{d}{dy}\delta\underline{x}}{\frac{d}{dx}\delta\underline{x}}\right), \\
- e_{V} := \delta\underline{x} \cdot \underline{v}_{\perp}. \\
+ e_{V} := \delta\underline{x} \cdot \underline{v}_{\perp}.
  \label{alg:quer}
 \end{gather}
 
@@ -619,7 +619,26 @@ Fenster darüber gelegt.
 Die Pixel, die nicht innerhalb der einzelnen Fenster liegen, werden dann aus
 dem Bild herausgefiltert. Das Bild vor und nach dem Filterungsprozess ist in
 Abb. \ref{gleit} zu sehen. Mit Hilfe der Methode der kleinsten Quadrate wird ein
-Polynom durch die verbleibenden Pixel approximiert.
+2. Ordnung Polynom durch die verbleibenden Pixel approximiert.
+
+Um das Polynom, das die Fahrspur repräsentiert, aus den $n$ verbleibenden
+Pixeln zu bestimmen, wird die folgende Berechnung verwendet:
+\begin{gather}
+    \underline{x} := \begin{bmatrix} x_1 & x_2 & ... & x_n \end{bmatrix}^T \\
+    \bold{Y} := \begin{bmatrix} 1 & y_1 & y_1^2 \\ 1 & y_2 & y_2^2 \\ \vdots & \vdots & \vdots \\ 1 & y_n & y_n^2 \end{bmatrix} \\
+    \underline{\hat{\beta}} := \begin{bmatrix} \hat{\beta_0} & \hat{\beta_1} & \hat{\beta_2} \end{bmatrix}^T \\
+    \underline{\hat{\beta}} = \left(\bold{Y}^T\bold{Y}\right)^{-1}\bold{Y}^T\underline{x},
+\end{gather}
+wobei $\underline{x}$ und $\underline{y}$ die Vektoren sind, die die x- und
+y-Koordinaten der übrigen Pixel enthalten. $\hat{\beta_0}$, $\hat{\beta_1}$ und
+$\hat{\beta_2}$ sind die Koeffizienten des approximierten Polynoms. 
+
+Unter Verwendung der approximierten Koeffizienten erhält man die folgende Gleichung:
+\begin{equation}
+    \hat{x} = \hat{\beta_0} + \hat{\beta_1}y + \hat{\beta_2}y^2,
+\end{equation}
+wobei $y$ die y-Koordinate und $\hat{x}$ die angenäherte x-Koordinate der
+Fahrspur ist. Die Gleichung liefert eine analytische Darstellung der Fahrspur. 
 
 \begin{figure}[h]
     \centering
