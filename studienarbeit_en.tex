@@ -94,17 +94,29 @@ to follow.}
 % ==================
 \tableofcontents
 
-\chapter{Einführung}
+\chapter{Einleitung}
 
 The Connected Robotics Lab (CoRoLa) research group at the Barkhausen Institut
 has developed a demonstration that uses remote-controlled two-axle vehicles to
-model communications between remote-controlled vehicles in an Internet of Things (IoT) network.
+model communications between remote-controlled vehicles in an Internet of
+Things (IoT) network.
+
+The autonomous control of each remote-controlled vehicle on the track is
+accomplished through a centralized computer. The track, as depicted in FIGURE,
+comprises a black floor and a yellow lane line. The vehicle utilizes a fisheye
+camera for detecting the lane line, which is then steered using a PID
+controller. An image processing pipeline on the computer is utilized for
+processing each new image from the vehicle's camera, at a frequency of 50 Hz.
+The pipeline extracts all yellow pixels from the image and considers the
+densest grouping to be the lane line. The distance between the $x$-coordinate
+of this grouping and the centerline of the image is provided as the input to
+the PID controller, which guides the vehicle onto the lane.
 
 However, due to limitations in the current vehicle controller, such as low
 forward velocity and lack of robustness, it has been proposed to implement a
 new controller. To achieve this objective, the proposed solution includes the
-creation of an image processing pipeline and implementation of the Stanley
-controller.
+expansion of the image processing pipeline and replacing the PID controller
+with the Stanley controller. 
 
 \iffalse
 At the Connected Robotics Lab (CoRoLa) research group at the Barkhausen
@@ -119,6 +131,19 @@ In order to achieve the goals stated above, creation of an image processing
 pipeline and implementation of the Stanley controller are proposed.
 \fi
 
+\iffalse
+Each remote-controlled vehicle is autonomously controlled, using a central
+computer, to travel around a track. The track, seen in FIGURE, is composed of a
+black floor and a yellow lane line. 
+
+A vehicle is equipped with a fisheye camera to detect the lane line and
+steered using a PID controller. The computer has an image processing pipeline,
+which processes a new image from the vehicle's camera at a rate of 50 Hz. The
+computer extracts all yellow pixels from the image and considers the densest
+grouping to be the lane line. The input to the PID controller is then the
+distance from the $x$-coordinate of this grouping to the centerline of the
+image. These components work together to steer the vehicle onto lane.
+\fi
 
 \chapter{Regelalgorithmus}
 
@@ -480,7 +505,11 @@ The simulation is then executed for a chosen amount of time.
 
 \chapter{Bildverarbeitung} 
 
-In comparison to the PID controller used on the model vehicle, the Stanley controller requires extra information, namely the heading of the path. An image processing pipeline was developed in order extract this necessary information. As can be seen in FIGURE, the pipeline is composed of multiple stages in order to calculate the heading and cross-track-error. 
+In comparison to the PID controller used on the model vehicle, the Stanley
+controller requires extra information, namely the heading of the path. An image
+processing pipeline was developed in order extract this necessary information.
+As can be seen in FIGURE, the pipeline is composed of multiple stages in order
+to calculate the heading and cross-track-error. 
 
 
 \section{Kamera-Kalibrierung} 
@@ -765,13 +794,13 @@ FIGURE.
 
 \fi
 
-The sliding window method used in the lane detection algorithm may result in a
-phenomenon known as "outliers". These occur when the algorithm incorrectly
-determines the lane line in a given frame. FIGURE shows a sequence of three
-frames, with the leftmost frame being the starting point. The first frame
-accurately detects the lane line, but in the second frame, an outlier occurs
-where the lane line is incorrectly determined. In the final frame, the lane
-line is once again correctly identified.
+Lane detection algorithms may cause a phenomenon known as a "outlier". These
+occur when a algorithm incorrectly determines the lane line in a given frame.
+As an example, FIGURE shows a sequence of three frames being processed by the
+sliding window method, with the leftmost frame being the starting point. The
+first frame accurately detects the lane line, but in the second frame, an
+outlier occurs where the lane line is incorrectly determined. In the final
+frame, the lane line is once again correctly identified.
 
 One of the primary causes of outliers is the incorrect selection of HSV values.
 When the HSV values used in the algorithm are not restrictive enough, colors
@@ -787,6 +816,9 @@ position in the histogram. However, along curves, the lane line is distributed
 across the x-axis, leading to a weaker peak in the histogram. This can be seen
 visually in FIGURE. The outlier observed in FIGURE is a result of both these
 factors combined.
+
+The image processing used for the PID controller and Stanley controller are 
+victims to this phenomenon.
 
 \section{Pipeline-Optimierungen}
 
