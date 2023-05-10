@@ -211,7 +211,7 @@ analysieren.
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.5]{Fahrbahn}
-    \caption{Graphische Darstellung der Fahrbahn.}
+    \caption{Grafische Darstellung der Fahrbahn.}
     \label{fahrbahn}
 \end{figure}
 
@@ -350,17 +350,32 @@ Die Simulation wurde dann für eine ausgewählte Zeitspanne durchgeführt.
 
 
 \chapter{Bildverarbeitung}
+
+Im Vergleich zu dem am Modellfahrzeug verwendeten PID-Regler benötigt der
+Stanley-Regler zusätzliche Informationen, nämlich die Ausrichtung des Pfades.
+Es wurde eine Bildverarbeitungspipeline entwickelt, um diese notwendigen
+Informationen zu extrahieren. Wie in Abb. \ref{pipeline} zu sehen ist, besteht die
+Pipeline aus mehreren Schritten zur Berechnung der Ausrichtung und der
+Querabweichung. \\
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.72]{pipeline}
+    \caption{Grafische Darstellung des Bildverarbeitungspipelines.}
+    \label{pipeline}
+\end{figure}
+
+
 \section{Kamera-Kalibrierung}
 
 Am Anfang der Bildverarbeitungspipeline steht die Kamerakalibrierung. Für die
-CoRoLa Car Platform wurde eine Fischaugenkamera im Gegensatz zu einer
-geradlinigen Kamera gewählt. Der Vorteil einer Fischaugenkamera ergibt sich aus
-ihrem größeren Blickwinkel im Vergleich zu einer geradlinigen Kamera. Eine
-Fischaugenkamera hat eine tonnenförmige Verzeichnung,
-wodurch gerade Linien gekrümmt werden. Die Krümmung dieser Linien hängt von
-ihrem radialen Abstand vom Bildmittelpunkt ab. Ein Beispiel ist in Abb.
-\ref{barrel} zu sehen. Diese Verzeichnung kann mit Hilfe der Software durch die
-sogenannte Kamerakalibrierung kompensiert werden. \\
+CoRoLa Car Platform wurde eine Fischaugenkamera gewählt. Der Vorteil einer
+Fischaugenkamera ergibt sich aus ihrem größeren Blickwinkel im Vergleich zu
+einer geradlinigen Kamera. Eine Fischaugenkamera hat eine tonnenförmige
+Verzeichnung, wodurch gerade Linien gekrümmt werden. Die Krümmung dieser Linien
+hängt von ihrem radialen Abstand vom Bildmittelpunkt ab. Ein Beispiel ist in
+Abb. \ref{barrel} zu sehen. Diese Verzeichnung kann mit Hilfe der Software
+durch die sogenannte Kamerakalibrierung kompensiert werden. \\
 
 \begin{figure}[h]
     \centering
@@ -382,14 +397,15 @@ einer Kamera werden häufig durch die folgende 3x3-Matrix dargestellt:
     \end{bmatrix}, 
 \end{equation} 
 wobei $f_x$ und $f_y$ die Brennweiten der Kamera in Pixeln in den
-Richtungen $x$ und $y$ und $c_x$ und $c_y$ die Koordinaten des Bildmittelpunkts
-sind. Die extrinsischen Parameter werden häufig durch die folgende Matrix
+Richtungen $x$ und $y$ sind und $c_x$ und $c_y$ die Koordinaten des Bildmittelpunkts
+bezeichnen. Die extrinsischen Parameter werden häufig durch die folgende Matrix
 dargestellt: 
 \begin{equation}
     \begin{bmatrix} R & T \end{bmatrix}. 
 \end{equation} 
-Dabei ist $R$ die Rotationsmatrix der Kamera in Bezug auf das Laborsystem (?) und $T$
-der Positionsspaltenvektor des Ursprungs des Laborsystems, ausgedrückt in den
+Dabei ist $R$ die Rotationsmatrix der Kamera in Bezug auf das dem Experiment zugrunde 
+liegenden Bezugskoordinatensystem und $T$
+der Positionsspaltenvektor des Ursprungs des Bezugssystem, ausgedrückt in den
 Koordinaten des Kamerabildes. Die Kameramatrix $M$ ist die Abbildung von
 den Weltkoordinaten auf Pixelkoordinaten, die durch die
 Matrix-Matrix-Multiplikation dargestellt wird, 
@@ -412,53 +428,44 @@ werden. \\
     \label{checkerboards}
 \end{figure}
 
-Eine Kamera wird anhand einer Sammlung von Fotos mit bekannten geraden Linien
-kalibriert. In der Regel wird eine Reihe von Schachbrettbildern mit bekannten
-Dimensionen verwendet. \cite{addison} Danach werden Fotos des Schachbretts in verschiedenen
-Winkeln und in verschiedenen Positionen relativ zu Kamera aufgenommen. Diese Bilderserie
-wird dann in den Algorithmus zur Kamerakalibrierung eingespeist, der zunächst
-die Positionen der Schachbrettfelder und der sie verbindenden Linien bestimmt.
-Anschließend gleicht der Algorithmus anhand des Modells einer Fischaugenkamera
-die Verzeichnung aus. Wie in Abb. \ref{checkerboards} zu sehen, werden
-beispielsweise die gekrümmten Linien des Schachbretts nach der Kalibrierung
-wieder gerade gemacht. Die Anzahl der benötigten Bilder hängt von der
-jeweiligen Kamera ab, eine große Sammlung von Fotos führt jedoch zu einer
-genaueren Annäherung an die Parameter.  Die Verwendung von
-Bildern mit einer höheren Auflösung führt ebenfalls zu genaueren Parametern.
-\cite{addison} Die angenäherten Parameter sind jedoch nur für die
-Kalibrierung von Bildern sind g"ultig, die mit der gleichen Auflösung aufgenommen
-wurden wie die für die Kalibrierung verwendeten Bilder. Um die Kameramatrix für
-Bilder mit einer niedrigeren Auflösung zu verwenden, muss die intrinsische
-Kameramatrix $K$ mit der folgenden Formel skaliert werden: 
+Im Einzelnen l"auft der Prozess folgenderma{\ss}en ab: eine Kamera wird anhand
+einer Sammlung von Fotos mit bekannten geraden Linien kalibriert. In der Regel
+wird eine Reihe von Schachbrettbildern mit bekannten Dimensionen verwendet.
+\cite{addison} Danach werden Fotos des Schachbretts in verschiedenen Winkeln
+und in verschiedenen Positionen relativ zur Kamera aufgenommen. Diese
+Bilderserie wird dann in den Algorithmus zur Kamerakalibrierung eingespeist,
+der zunächst die Positionen der Schachbrettfelder und der sie verbindenden
+Linien bestimmt. Anschließend gleicht der Algorithmus anhand des Modells einer
+Fischaugenkamera die Verzeichnung aus. Wie in Abb. \ref{checkerboards} zu
+sehen, werden beispielsweise die gekrümmt abgebildeten Linien des Schachbretts nach der
+Kalibrierung wieder begradigt. Die Anzahl der benötigten Bilder hängt von
+der jeweiligen Kamera ab, eine große Sammlung von Fotos führt jedoch zu einer
+genaueren Annäherung an die Parameter.  Die Verwendung von Bildern mit einer
+höheren Auflösung führt ebenfalls zu genaueren Parametern. \cite{addison} Die
+angenäherten Parameter sind jedoch nur g"ultig für die Kalibrierung von Bildern,
+die mit der gleichen Auflösung aufgenommen wurden wie die für die
+Kalibrierung verwendeten Bilder. Um die Kameramatrix für Bilder mit einer
+niedrigeren Auflösung zu verwenden, muss die intrinsische Kameramatrix $K$ mit
+der folgenden Formel skaliert werden: 
 \begin{equation} 
     K_n = k K, 
 \end{equation} 
-wobei $k$ ein skalarer Wert ist, der den Skalierungsfaktor darstellt. Da es
+wobei $k$ ein positiver skalarer Wert ist, der den Skalierungsfaktor darstellt. Da es
 sich bei der intrinsischen Kameramatrix um eine affine Abbildung handelt, muss
-der Wert bei $K_{n3, 3}$ auf 1 gesetzt werden. Die resultierende intrinsische
+der Wert bei $K_{\matthrm{n},3, 3}$ auf 1 gesetzt werden. Die resultierende intrinsische
 Kameramatrix funktioniert bei kleineren Auflösungen, die dem Seitenverhältnis
 der für die Kalibrierung verwendeten Bilder gleich sind. 
-
-
-\iffalse
-Allerdings wurde
-beobachtet, dass bei einem zu großen Auflösungsunterschied Verzeichnungen
-wieder in das Bild eingefügt werden. In ABBILDUNG ist links das Originalbild zu
-sehen, das mittlere Bild wurde mit Bildern von 900p kalibriert und das rechte
-Bild mit Bildern von 240p. Wie man sieht, wird das Lineal im rechten Bild
-gerade, während es im mittleren Bild gekrümmt bleibt.
-\fi
 
 Ein Nachteil der Kamerakalibrierung ist, dass jedes kalibrierte Bild eine
 geringere Auflösung hat als das Originalbild. Dies ist eine Folge des
 Kalibrierungsprozesses, da dieser einen Teil des Bildes verzerrt,
-insbesondere die Pixel in den Ecken des Bildes. Daher werden diese Pixel beim
+insbesondere die Pixel nahe den Ecken des Bildes. Daher werden diese Pixel beim
 Kalibrierungsprozess aus dem resultierenden Bild entfernt. Um das Bild in
 seiner ursprünglichen Auflösung zu rekonstruieren, wird eine Interpolation
 verwendet. Die Interpolation liefert jedoch ein unschärferes Bild als das
-Original. Um dies zu kompensieren, empfiehlt es sich, eine Kamera mit
+Original. Um dies zu kompensieren, empfiehlt es sich grunds"atzlich, eine Kamera mit
 hochauflösenden Bildern zu kalibrieren und dann Bilder mit dieser Auflösung
-aufzunehmen. Anstatt den Interpolator zu verwenden, verkleinern Sie die Bilder
+aufzunehmen. Anstatt den Interpolator zu verwenden, verkleinert man die Bilder
 dann auf eine Auflösung, die für die jeweilige Anwendung erforderlich ist.  Das
 Ergebnis ist ein genaueres Bild ohne Unschärfe. Leider ist dieser Prozess sehr
 rechenintensiv, und es wurde beschlossen, nur die Bilder aus dem Interpolator
@@ -478,9 +485,9 @@ ursprüngliche Position verschoben werden.
     \label{shifted}
 \end{figure}
 
-\section{\glqq Color Thresholding\grqq}
+\section{\glqq Color-Thresholding\grqq}
 
-Als Nächstes folgt der Schritt des sogenannten "Color Thresholding". In dieser
+Als Nächstes folgt der Schritt des sogenannten \glqq Color-Thresholding\grqq. In dieser
 Stufe werden alle Pixel aus dem Bild entfernt, die nicht zur Bahnlinie geh"oren.
 In dieser Implementierung sind Farbe ausser Gelb ungew"unscht.
 
@@ -661,7 +668,7 @@ dargestellt.
 \begin{figure}[h]
     \centering
     \includegraphics{fov}
-    \caption{Graphische Darstellung des Modellfahrzeugsichtfelds.}
+    \caption{Grafische Darstellung des Modellfahrzeugsichtfelds.}
     \label{ausrichtung}
 \end{figure}
 
