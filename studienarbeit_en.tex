@@ -480,6 +480,9 @@ The simulation is then executed for a chosen amount of time.
 
 \chapter{Bildverarbeitung} 
 
+In comparison to the PID controller used on the model vehicle, the Stanley controller requires extra information, namely the heading of the path. An image processing pipeline was developed in order extract this necessary information. As can be seen in FIGURE, the pipeline is composed of multiple stages in order to calculate the heading and cross-track-error. 
+
+
 \section{Kamera-Kalibrierung} 
 
 The start of the image processing pipeline is the camera calibration. For the
@@ -606,7 +609,7 @@ following range, TABLE.
 
 An example of the output from this stage of the pipeline is FIGURE.
 
-\section{Perspectivtransformation}
+\section{Perspektivtransformation}
 
 The third part of the image processing pipeline is the perspective 
 transformation. 
