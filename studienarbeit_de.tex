@@ -80,19 +80,32 @@
 
 % Kurzfassung / Abstract
 % ======================
-\kurzfassung{An dieser Stelle fügen Sie bitte eine deutsche Kurzfassung ein.}
+\kurzfassung{ In der Forschungsgruppe Connected Robotics Lab (CoRoLa) am
+Barkhausen Institut wurde eine Demonstration mit ferngesteuerten zweiachsigen
+Fahrzeugen entwickelt. Die Demonstration ist derzeit im Einsatz, um die
+Kommunikation zwischen Fahrzeugen ähnlich einem Internet of Things (IoT)
+Netzwerk zu modellieren. 
+
+In dieser Arbeit wird ein nichtlinearer Regelalgorithmus eingeführt, um die
+Komplexität eines realen Systems besser zu modellieren. Der sogenannte
+Stanley-Regler \cite{stanley} ist ein nichtlinearer Regler, der für den Einsatz bei der
+Querregelung von zweiachsigen Fahrzeugen entwickelt wurde. Eine Fisheye-Kamera
+wird verwendet, um Bilder der Strecke zu erstellen. Diese Bilder werden dann
+digital verarbeitet, um eine gelbe Fahrspur zu finden, der die Fahrzeuge folgen
+sollen. Sobald diese gefunden ist, werden die Querabweichung zwischen dem
+Fahrzeug und der Fahrspur sowie die Ausrichtung der Fahrspur berechnet. }
 {At the Connected Robotics Lab (CoRoLa) research group at the Barkhausen
-Institut, a demonstration using remote controlled 2 axis vehicles was
+Institut, a demonstration using remote controlled two axle vehicles was
 developed. The demonstration is currently in use in order to model
 communications between vehicles similar to an Internet of Things (IoT) network.
 
-In order to better model the complexities of a real world system a nonlinear
-control algorithm was introduced to the system in order to more accurately
-control the vehicles. The Stanley Controller is a nonlinear controller
-developed for use with the lateral control of 2 axis vehicles in mind. As input
-to the controller, a fisheye camera was used to create images of road. These
-images were then digitally processed to find the yellow line for the vehicles
-to follow.}
+In this thesis, a nonlinear control algorithm is introduced in order to better
+model the complexities of a real world system. The so called Stanley controller
+\cite{stanley} is a nonlinear controller developed for use with the lateral control of two
+axle vehicles. A fisheye camera is used to create images of the track. These
+images are then digitally processed to find a yellow lane for the vehicles to
+follow. Once found, the cross-track-error between the vehicle and the lane as
+well as the lane's heading are calculated.}
 
 
 % Inhaltsverzeichnis
@@ -112,6 +125,10 @@ Die bisherige autonome Regelung jedes ferngesteuerten Modellfahrzeugs auf der
 Strecke erfolgt über einen zentralen Computer. Die Strecke besteht, wie in Abb.
 \ref{track_and_car} dargestellt, aus einem schwarzen Untergrund und einer
 gelben Fahrbahnlinie. 
+Das Fahrzeug nutzt eine Fischaugenkamera zur Erkennung der Fahrspur. Eine
+Bildverarbeitungspipeline auf dem Computer verarbeitet mit einer Frequenz von
+50 Hz jedes neue Bild der Fahrzeugkamera. Die Vorw"artsgeschwindigkeit des
+Fahrzeugs ist dabei konstant. 
 
 \begin{figure}[h]
     \centering
@@ -120,19 +137,16 @@ gelben Fahrbahnlinie.
     \label{track_and_car}
 \end{figure}
 
-Das Fahrzeug nutzt eine Fischaugenkamera zur Erkennung der Fahrspur. Eine
-Bildverarbeitungspipeline auf dem Computer verarbeitet mit einer Frequenz von
-50 Hz jedes neuen Bildes der Fahrzeugkamera. Die Pipeline extrahiert alle
-gelben Pixel aus dem Bild und betrachtet deren dichteste Gruppierung als die
+Die bisherige Pipeline extrahierte alle gelben
+Pixel aus dem Bild und betrachtete deren dichteste Gruppierung als die
 Fahrspurlinie. Der Abstand zwischen der $x$-Koordinate dieser Gruppierung und
-der Mittellinie des Bildes dient als Eingabe für einen PID-Regler, der das
-Fahrzeug auf die Fahrspur lenkt. Die Vorw"artsgeschwindigkeit des Fahrzeugs ist
-dabei konstant.
+der Mittellinie des Bildes diente als Eingabe für einen PID-Regler, der das
+Fahrzeug auf die Fahrspur lenkte. 
 
 Aufgrund der Einschränkungen der bisherigen Fahrzeugregelung, wie z. B. der
 geringen maximal m"oglichen Vorwärtsgeschwindigkeit und der mangelnden
 Robustheit, bestand im Vorfeld der Arbeit der Wunsch, eine neue Regelstrategie
-zu implementieren. Um dieses Ziel zu erreichen, umfasst die hiervorgeschlagene
+zu implementieren. Um dieses Ziel zu erreichen, umfasst die hiererarbeitete
 Lösung die Entwicklung einer neuen Bildverarbeitungspipeline und die Ersetzung des
 PID-Reglers durch einen Stanley-Regler.
 
@@ -142,12 +156,12 @@ PID-Reglers durch einen Stanley-Regler.
 
 In \cite{stanley} wurde im Jahr 2005 ein Regelungsalgorithmus vorgeschlagen,
 der Stanley-Regler. Von den Autoren wird dieser Regler (unter Bezugnahme auf
-d"ie Stanford University Rennteams Auto \glqq Stanley\grqq) als
+das Auto des Rennteams Stanford University \glqq Stanley\grqq) als
 \glqq Stanley-Regler\grqq bezeichnet.
 
 Der Stanley-Regler ist ein nichtlinearer Regelungsalgorithmus, um ein
 zweiachsiges Fahrzeug nur anhand der Ausrichtung des Fahrzeugs relativ zur Bahn
-und der Querabweichung der zu verfolgenden Bahn zu steuern. Der Algorithmus hat
+und der Querabweichung zu der zu verfolgenden Bahn zu steuern. Der Algorithmus hat
 sich für das kinematische Modell eines zweiachsigen Fahrzeugs als asymptotisch
 global stabil erwiesen. \cite{stanley}
 
@@ -166,12 +180,12 @@ Der Stanley-Regler wird mathematisch durch die folgende Gleichung beschrieben:
   u = \theta - \theta_d + \arctan\left(\frac{ke_{V}}{v}\right).
   \label{eq:Stanley-Regler} 
 \end{equation}
-Dabei ist $u$ der Reglerausgang, welcher im Wesentlichen die "Anderung des Lenkwinkels
+Dabei ist $u$ der Reglerausgang, welcher im Wesentlichen die "Anderung des Lenkwinkels $\varphi$
 bestimmt, siehe \eqref{eq:model}, $\theta$ die aktuelle Ausrichtung des Fahrzeugs,
 $\theta_d$ die Pfadausrichtung, $k$ ein Skalierungsfaktor, $v$ die
 Geschwindigkeit des Fahrzeugs und $e_{V}$ die Querabweichung vom Mittelpunkt
-der Vorderachse des Fahrzeugs zum Pfad. Die geometrische Beziehungen zwischen
-den Gr"o{\ss}en ist in Abb. \ref{stanley} zu sehen.
+der Vorderachse des Fahrzeugs zum Pfad. Die geometrischen Beziehungen zwischen
+den Gr"o{\ss}en sind in Abb. \ref{stanley} zu sehen.
 
 \begin{figure}[h]
     \centering
@@ -232,14 +246,14 @@ Der Pfad, dem das Fahrzeug folgen muss, ist eine virtuelle Darstellung der
 realen Strecke, die das Fahrzeug durchfahren wird. Eine visuelle
 Darstellung der Fahrbahn findet sich in Abb. \ref{fahrbahn}. In der Simulation wird der
 Pfad durch die folgende kontinuierliche statische Funktion definiert:
-\begin{equation} 
-  (x, y, \theta_d) = f(s), 
-\end{equation} 
+\begin{equation}
+        \underline{p}_P(s) = (x_p, y_p, \theta_d),
+\end{equation}
 wobei $s$ der Eingangsparameter Kurvenl"ange ist
-und $(x, y, h)$ die kartesischen Koordinaten des Pfadpunkts und die
-entsprechende Ausrichtung an diesem Punkt darstellt. Diese Funktion wird für
-eine beliebige Anzahl von $s$-Werten diskretisiert, um eine Liste von $(x, y,
-\theta)$-Werten zu erzeugen. Der Differentialgleichungslöser bezieht den
+und $\underline{p}_P$ bzw. $(x_p, y_p, \theta_d)$ die kartesischen Koordinaten des Pfadpunkts und die
+entsprechende Ausrichtung an diesem Punkt darstellen. Diese Funktion wird für
+eine beliebige Anzahl von $s$-Werten diskretisiert, um eine Liste von $(x_p, y_p,
+\theta_d)$-Werten zu erzeugen. Der Differentialgleichungslöser bezieht den
 Stanley-Controller und das Fahrzeugmodell ein, um die Zeitreihen des
 zweiachsigen Fahrzeugs unter Verwendung dieser Liste als Eingabe zu
 analysieren.
@@ -252,9 +266,9 @@ analysieren.
 \end{figure}
 
 
-Das verwendete Fahrzeugmodell ist das Modell eines zweiachsiges Fahrzeug mit
-gelenkter Vorderachse \cite{car-model}. Dieses Modell wird durch die folgende
-nichtlineare Zustandsraumdarstellung dargestellt: 
+Das verwendete Fahrzeugmodell ist das Modell eines zweiachsigen Fahrzeugs mit
+gelenkter Vorderachse \cite{car-model}. Dieses Modell wird mithilfe der folgenden
+nichtlinearen Zustandsraumdarstellung formuliert: 
 \begin{subequations} \label{eq:model}
     \begin{align}
         \dot{x} &= v \cos(\theta) \\ 
@@ -268,14 +282,15 @@ sind und $\theta$ die Ausrichtung des Fahrzeugs ist. $\varphi$ ist der
 Lenkwinkel des Fahrzeugs. Die Eingangsgrößen des Modells sind $v$ und
 $\varphi$, wobei $v$ die Geschwindigkeit des Fahrzeugs und $\varphi$ der
 Lenkwinkel ist. Der Parameter $l$ bezeichnet den Abstand
-zwischen dem Hinterradachse und dem Vorderradachse.
+zwischen der Hinterradachse und der Vorderradachse.
 
-Der Lenkwinkel $\varphi$ ist selbst ein dynamisches System, das experimentell
-gezeigt wird, ein PT1-Glied zu verhalten.
-Der PT1-Glied wird durch die folgende Gleichung modelliert:\begin{equation}
+Der Lenkwinkel $\varphi$ ist selbst ein dynamisches System. Experimentell zeigt sich,
+dass der Lenkwinkel $\varphi$ sich wie ein PT1-Glied verh"alt.
+Das PT1-Glied wird durch die folgende Gleichung modelliert \cite{pt1glied}:
+\begin{equation}
         \dot{\varphi} = \frac{\left(u-\varphi\right)}{T},
 \end{equation}
-womit der Zeitkonstante $T$ konfiguierbar ist. Das Verhalten des Stanley-Reglers bei dynamischen Einflüssen auf den Lenkwinkel
+wobei die Zeitkonstante $T$ konfiguierbar ist. Das Verhalten des Stanley-Reglers bei dynamischen Einflüssen auf den Lenkwinkel
 ist von großer Bedeutung, da die globale asymptotische Stabilität des Reglers
 nur für das kinematische Zweiachsmodell nachgewiesen wurde. \cite{stanley}
 
@@ -301,7 +316,7 @@ Funktion \cite{car-model} berechnet:
 \end{align}
 \end{subequations}
 wobei $x_V$ und $y_V$ die kartesischen Koordinaten dieses Vorderradachsemittelpunkts sind.
-Der Parameter $\underline{p}_H$ bezeichnet die Positionsvektor des Hinterradachsemittelpunkts.
+Der Parameter $\underline{p}_H$ bezeichnet den Positionsvektor des Hinterradachsemittelpunkts.
 
 Wie bereits erwähnt, besteht der Stanley-Regler aus mehreren Teilen, die
 getrennt voneinander berechnet werden k"onnen. Die Ausrichtung $\theta$ ist eine
@@ -311,19 +326,19 @@ Stanley-Regler verwendet den nächstliegenden Bahnpunkt vom
 Vorderachsmittelpunkt des Fahrzeugs, um die Ausrichtung des Pfades $\theta_d$
 und die aktuelle Querabweichung $e_{V}$ zu bestimmen. Für die Simulation wird
 dieser bestimmt, indem der Punkt mit dem geringsten Abstand $\underline{\lambda}$ zum
-Vorderachsmittelpunkt gefunden wird. An diesem Punkt wird
+Vorderachsmittelpunkt gefunden wird (entspricht Kurvenparameter $s^*$. An diesem Punkt wird
 dann die Ausrichtung des Pfades ermittelt. Das Skalarprodukt zwischen dem
 Vektor senkrecht zur Fahrzeugausrichtung $\underline{\nu}_{\perp}$ und dem Vektor
 vom Pfadpunkt zur Fahrzeugvorderachse $\underline{\lambda}$ ist die
 Querabweichung $e_{V}$. Zur Verdeutlichung ist in Abb. \ref{algorithm} eine visuelle
-Darstellung dieser beiden Vektoren und ihres Skalarprodukts abgebildet. Die Berechnung
-der wichtigen Parameter sind in folgende Gleichungen dargestellt: \\
+Darstellung dieser beiden Vektoren und ihres Skalarprodukts gezeigt. Die Berechnung
+der wichtigen Parameter ist in folgenden Gleichungen dargestellt: \\
 
 \begin{figure}[h]
     \centering
     \includegraphics{dot_product}
-    \caption{Grafische Darstellung der Beziehungen zwischen der ben"otigen
-    Parameter. $\underline{p}_P(s^*)$ ist hier der Pfadpositionsvektor mit dem
+    \caption{Grafische Darstellung der Beziehungen zwischen den ben"otigten
+    Parametern. Der Vektor $\underline{p}_P(s^*)$ ist hier der Pfadpositionsvektor mit dem
     kleinsten Abstand zum Vorderradachsemittelpunkt.}
     \label{algorithm}
 \end{figure}
@@ -339,7 +354,7 @@ der wichtigen Parameter sind in folgende Gleichungen dargestellt: \\
 \end{align}
 \end{subequations}
 
-Die Pfadausrichtung und die Querabweichung werden dann an den Stanley-Regler eingegeben,
+Die Pfadausrichtung und die Querabweichung werden dann an den Stanley-Regler "ubergeben,
 und der Ausgang des Reglers wird in das Fahrzeugmodell eingespeist. Ein
 Übersichtsdiagramm des Regelkreises ist in Abb. \ref{control_loop} dargestellt.
 
@@ -374,8 +389,8 @@ verschiedenen Abtastfrequenzen ist in Abb. \ref{sampling} dargestellt.
     \includegraphics[scale=0.47]{0.15ms25Hz}
     \includegraphics[scale=0.47]{0.15ms15Hz}
     \includegraphics[scale=0.47]{0.15ms10Hz}
-    \caption{Verhalten des Stanley-Reglers mit verschiedenen Abtastfrequenzen und Zeitkonstanten.
-    Das Verhalten bleibt "ahnlich bis unter 15 Hz. Der Stanley-Regler folgt den Pfad besser
+    \caption{Verhalten des Stanley-Reglers bei verschiedenen Abtastfrequenzen und Zeitkonstanten.
+    Das Verhalten bleibt "ahnlich bei Frequenzen unter 15 Hz. Der Stanley-Regler folgt den Pfad besser
     wenn die Zeitkonstante des PT1-Glieds niedrig ist, aber die Lenkwinkelstrecke im Auto hat eine 
     Zeitkonstante zwischen 100 und 200 ms.}
     \label{sampling}
@@ -387,16 +402,13 @@ beobachten ist. Oberhalb eines Schwellenwerts von 15 Hz scheint das
 Verhalten des Fahrzeugs jedoch nicht wesentlich durch die Abtastfrequenz
 beeinflusst zu werden. 
 
-Die Simulation wurde dann für eine ausgewählte Zeitspanne durchgeführt. 
-
-
 
 \chapter{Bildverarbeitung}
 
 Im Vergleich zu dem vorher verwendeten PID-Regler benötigt der
 Stanley-Regler zusätzliche Informationen, nämlich die Ausrichtung des Pfades.
 Die neue Bildverarbeitungspipeline ist darauf ausgelegt, diese notwendigen
-Informationen zu extrahieren. Wie in Abb. \ref{pipeline} zu sehen, besteht die
+Informationen zu extrahieren. Der beschriebene Prozess basiert auf \cite{addison-pipeline}. Wie in Abb. \ref{pipeline} zu sehen, besteht die
 Pipeline aus mehreren Schritten zur Berechnung der Ausrichtung und der
 Querabweichung. Im Folgenden werden die einzelnen Schritte der Bildverarbeitung
 genauer beschrieben. \\
@@ -409,19 +421,15 @@ genauer beschrieben. \\
 \end{figure}
 
 
-\section{Kamera-Kalibrierung}
-
-Am Anfang der Bildverarbeitungspipeline steht die Kamerakalibrierung. Diese
-ist notwendig, um die extrinsischen und intrinsischen
-Parameter der Kamera n"ahrungsweise zu bestimmen. Eine kalibrierte Kamera
-ermöglicht es, 3-D-Informationen aus einem 2-D-Bild zu gewinnen. Für die CoRoLa
+\section{Verzeichnungskorrektur}
+Für die CoRoLa
 Car Platform wurde eine Fischaugenkamera gewählt. Der Vorteil einer
 Fischaugenkamera ergibt sich aus ihrem größeren Blickwinkel im Vergleich zu
 einer normalen Kamera. Eine Fischaugenkamera hat eine sog. \glqq
 tonnenförmige Verzeichnung\grqq \cite{wiki-verzei}, wodurch gerade Linien
 gekrümmt werden. Die Krümmung dieser Linien hängt von ihrem radialen Abstand
 vom Bildmittelpunkt ab. Ein Beispiel ist in Abb. \ref{barrel} zu sehen. Diese
-Verzeichnung kann mit Hilfe der Software durch die sogenannte
+Verzeichnung kann mit Hilfe der Software \cite{opencv} auf Grundlage einer 
 Kamerakalibrierung kompensiert werden.
 
 \begin{figure}[h]
@@ -430,6 +438,11 @@ Kamerakalibrierung kompensiert werden.
     \caption{Ein Beispiel einer tonnenf"ormigen Verzeichnung.}
     \label{barrel}
 \end{figure}
+
+Diese ist notwendig, um die extrinsischen und intrinsischen
+Parameter der Kamera n"ahrungsweise zu bestimmen. 
+
+\subsection{Kalibrierung}
 
 Die intrinsischen Parameter
 einer Kamera werden häufig durch die 3x3-Matrix 
@@ -460,18 +473,9 @@ Matrix-Matrix-Multiplikation dargestellt wird,
         R & T
     \end{bmatrix}. 
 \end{equation} 
-Durch Rekonstruieren der $M$-Matrix mit Hilfe von Software \cite{opencv} kann das verzerrte
-Bild wieder in das Weltbild "uberf"uhrt werden, wodurch gekrümmte Linien gerade
-werden. \\
-
-\begin{figure}[h]
-    \centering
-    \fbox{\includegraphics[scale=0.75]{before_calibration_checkerboard}}
-    \fbox{\includegraphics[scale=0.75]{after_calibration_checkerboard}}
-    \caption{Die Kalibrierung des linken Bilds liefert das rechte Bild. Die gekr"ummte Linie 
-    des Schachbretts sind gerade nach dem Verzeichnungkorrektur.} 
-    \label{checkerboards}
-\end{figure}
+Durch das Rekonstruieren der $M$-Matrix mit Hilfe von Software \cite{opencv} kann das verzerrte
+Bild wieder in das Bezugssystem des Experiments "uberf"uhrt werden, wodurch gekrümmte Linien gerade
+werden.
 
 Im Einzelnen l"auft der Prozess folgenderma{\ss}en ab: eine Kamera wird anhand
 einer Sammlung von Fotos mit bekannten geraden Linien kalibriert. In der Regel
@@ -480,14 +484,11 @@ wird eine Reihe von Schachbrettbildern mit bekannten Dimensionen verwendet.
 und in verschiedenen Positionen relativ zur Kamera aufgenommen. Diese
 Bilderserie wird dann in den Algorithmus zur Kamerakalibrierung eingespeist,
 der zunächst die Positionen der Schachbrettfelder und der sie verbindenden
-Linien bestimmt. Anschließend gleicht der Algorithmus anhand des Modells einer
-Fischaugenkamera die Verzeichnung aus. Wie in Abb. \ref{checkerboards} zu
-sehen, werden beispielsweise die gekrümmt abgebildeten Linien des Schachbretts nach der
-Kalibrierung wieder begradigt. Die Anzahl der benötigten Bilder hängt von
+Linien bestimmt.  Die Anzahl der benötigten Bilder hängt von
 der jeweiligen Kamera ab, eine große Sammlung von Fotos führt jedoch zu einer
-genaueren Annäherung an die Parameter.  Die Verwendung von Bildern mit einer
+genaueren Annäherung an die wirklichen Parameter.  Die Verwendung von Bildern mit einer
 höheren Auflösung führt ebenfalls zu genaueren Parametern. \cite{addison} Die
-angenäherten Parameter sind jedoch nur g"ultig für die Kalibrierung von Bildern,
+angenäherten Parameter sind jedoch nur g"ultig für die Verarbeitung von Bildern,
 die mit der gleichen Auflösung aufgenommen wurden wie die für die
 Kalibrierung verwendeten Bilder. Um die Kameramatrix für Bilder mit einer
 niedrigeren Auflösung zu verwenden, muss die intrinsische Kameramatrix $K$ mit
@@ -495,28 +496,46 @@ der folgenden Formel skaliert werden:
 \begin{equation} 
     K_n = k K, 
 \end{equation} 
-wobei $k$ ein positiver skalarer Wert ist, der den Skalierungsfaktor darstellt. Da es
-sich bei der intrinsischen Kameramatrix um eine affine Abbildung handelt, muss
-der Wert bei $K_{\mathrm{n},3, 3}$ auf 1 gesetzt werden. Die resultierende intrinsische
-Kameramatrix funktioniert bei kleineren Auflösungen, die dem Seitenverhältnis
-der für die Kalibrierung verwendeten Bilder gleich sind. 
+wobei $k$ ein positiver skalarer Wert ist, der den Skalierungsfaktor darstellt
+\cite{scalingK} . Da es sich bei der intrinsischen Kameramatrix um eine affine
+Abbildung handelt, muss der Wert bei $K_{\mathrm{n},3, 3}$ auf 1 gesetzt
+werden. Die resultierende intrinsische Kameramatrix funktioniert bei kleineren
+Auflösungen, die dem Seitenverhältnis der für die Kalibrierung verwendeten
+Bilder gleich sind. 
 
-Ein Nachteil der Kamerakalibrierung ist, dass jedes kalibrierte Bild eine
+\subsection{Korrektur}
+
+Nach der erfolgten Kalibrierung gleicht der Algorithmus anhand des Modells der
+Fischaugenkamera die Verzeichnung aus. Wie in Abb. \ref{checkerboards} zu
+sehen, sind beispielsweise die gekrümmt abgebildeten Linien des Schachbretts nach der
+Kalibrierung wieder begradigt.
+
+\begin{figure}[h]
+    \centering
+    \fbox{\includegraphics[scale=0.75]{before_calibration_checkerboard}}
+    \fbox{\includegraphics[scale=0.75]{after_calibration_checkerboard}}
+    \caption{Die Kalibrierung des linken Bilds liefert das rechte Bild. Die gekr"ummte Linie 
+    des Schachbretts sind gerade nach dem Verzeichnungskorrektur. Der Grund f"ur die
+    wellenf"ormigen Verzerrungen ist die nicht perfekte Kalibrierung.} 
+    \label{checkerboards}
+\end{figure}
+
+Ein Nachteil der Verzeichnungskorrektur ist, dass jedes korrigierte Bild eine
 geringere Auflösung hat als das Originalbild. Dies ist eine Folge des
-Kalibrierungsprozesses, da dieser einen Teil des Bildes verzerrt,
+Korrektursprozess  da dieser einen Teil des Bildes verzerrt,
 insbesondere die Pixel nahe den Ecken des Bildes. Daher werden diese Pixel beim
-Kalibrierungsprozess aus dem resultierenden Bild entfernt. Um das Bild in
+Korrektursprozess aus dem resultierenden Bild entfernt. Um das Bild in
 seiner ursprünglichen Auflösung zu rekonstruieren, wird eine Interpolation
 verwendet. Die Interpolation liefert jedoch ein unschärferes Bild als das
 Original. Um dies zu kompensieren, empfiehlt es sich grunds"atzlich, eine Kamera mit
 hochauflösenden Bildern zu kalibrieren und dann Bilder mit dieser Auflösung
 aufzunehmen. Anstatt den Interpolator zu verwenden, verkleinert man die Bilder
-dann auf eine Auflösung, die für die jeweilige Anwendung erforderlich ist.  Das
+dann auf eine Auflösung, die für die jeweilige Anwendung ausreichend ist.  Das
 Ergebnis ist ein genaueres Bild ohne Unschärfe. Leider ist dieser Prozess sehr
 rechenintensiv, und es wurde beschlossen, nur die Bilder aus dem Interpolator
 zu verwenden, um die Rechenleistung der Pipeline zu erhöhen.
 
-Ein weiterer Nachteil der Kamerakalibrierung ist, dass sich der Mittelpunkt der
+Ein weiterer Nachteil der Verzeichnungskorrektur ist, dass sich der Mittelpunkt der
 Kamera verschieben kann. Ein Beispiel dafür ist in Abb. \ref{shifted} zu sehen. Durch
 manuelles Ändern von $c_x$ kann der Bildmittelpunkt wieder an seine
 ursprüngliche Position verschoben werden. 
@@ -525,8 +544,8 @@ ursprüngliche Position verschoben werden.
     \centering
     \fbox{\includegraphics[scale=0.5]{orig_not_shifted}}
     \fbox{\includegraphics[scale=0.5]{cal_shifted}}
-    \caption{Ein Beispiel von dem Kalibrierungsschritt. Die Mittellinie des
-    rechten Bilds ist leicht nach rechts im linken Bild verschoben.}
+    \caption{Ein Beispiel von dem Korrekturschritt. Die Mittellinie im
+    rechten Bilds ist leicht nach rechts verschoben.}
     \label{shifted}
 \end{figure}
 
@@ -583,8 +602,8 @@ bleibt. Die in der Pipeline verwendeten Werte für Gelb werden in Tab.
 Das Ergebnis dieses Schritts der Pipeline ist f"ur ein Beispielbild in Abb.
 \ref{color-thresholding} dargestellt. Um die Darstellung zu vereinfachen,
 werden die gelben Pixel hier und im Folgenden als schwarze Pixel auf wei{\ss}em
-Grund dargestellt. Als Eingabe bekommt der Pipeline ein kalibriertes Bild und er
-gibt nur Pixel aus, die zur Bahnlinie geh"oren. \\
+Grund dargestellt. Als Eingabe bekommt die Pipeline ein kalibriertes Bild und 
+gibt dann nur Pixel aus, die zur Bahnlinie geh"oren. \\
 
 \begin{figure}[h]
     \centering
@@ -592,7 +611,7 @@ gibt nur Pixel aus, die zur Bahnlinie geh"oren. \\
     \fbox{\includegraphics[scale=0.5]{thresholded}}
     \caption{Ein Beispiel von der Ausgabe des Color-Thresholdings. Links: Bild
     nach dem Kalibrierungsschritt, Eingang zum \glqq Color-Thresholding\grqq.
-    Rechts: bin"ares Bild mit nur Pixeln, die Gelb erkannt wurden.}
+    Rechts: bin"ares Bild mit nur Pixeln, die als gelb erkannt wurden.}
     \label{color-thresholding}
 \end{figure}
 
@@ -609,19 +628,20 @@ erfordert, dass alle Berechnungen bezüglich der Fahrspurlinie deren scheinbar a
 Breite kompensieren müssen. Um dies zu vermeiden, wird eine
 Perspektivtransformation durchgeführt. 
 
-Bei der Perspektivtransformation wird eine Teilmenge eines Bildes beschnitten
-und so angepasst, dass sie das gesamte Bild umfasst. Im allgemeinen Fall muss
+Bei der Perspektivtransformation wird eine Teilmenge des Bildes ausgeschnitten
+und so angepasst, dass sie das gesamte Bild f"ullt. Im allgemeinen Fall muss
 diese Scherung nicht das gesamte Bild umfassen, sondern sie kann in einen
 anderen Bildausschnitt "ubertragen werden. Ein Beispiel ist in Abb.
 \ref{roi-pt} dargestellt. Mithilfe dieser Perspektivtransformation wird die
-trapezförmige Form der Fahrbahnlinie in eine rechteckige Form korrigiert. \\
+trapezförmige Form der Fahrbahnlinie zu einer rechteckige Form korrigiert. \\
 
 \begin{figure}[h]
     \centering
     \fbox{\includegraphics[scale=1.0]{roi_inverted.png}}
     \fbox{\includegraphics[scale=0.5]{perp_trans.png}}
     \caption{Perspektivtransformation f"ur ein Beispielbild. Die Trapez im linken
-    Bild wird ausgeschnitten und gestreckt, sodass sich das rechte Bild ergibt.}
+    Bild wird ausgeschnitten und gestreckt, sodass sich das rechte Bild ergibt.
+    Zu diesem Zeitpunkt hat noch kein \glqq Color-Thresholding\grqq stattgefunden.}
     \label{roi-pt}
 \end{figure}
 
@@ -635,15 +655,16 @@ erfolgt.
 
 \section{Histogramm}
 
-Nach der Perspektivtransformation wird ein Histogramm der schwarzen Pixel erstellt,
-um den Startpunkt für die Gleitfenstermethode zu bestimmen. Die Anzahl der
-schwarzen Pixel wird für jede Spalte des Bildes gezählt, und diese Zahlen werden
-in einer Liste gespeichert. Es wird davon ausgegangen, dass die Spalten mit den
-höchsten Zahlen Fahrspurinformationen enthalten, und der Index der Spalte mit
-der höchsten Zahl wird als Startpunkt für die Gleitfenstermethode gewählt.
-Dieser Schritt trägt dazu bei, die Berechnungszeit zu verkürzen, indem Teile
-des Bildes herausgefiltert werden, die keine Fahrspurinformationen enthalten.
-Eine visuelle Darstellung des Histogramms ist in Abb. \ref{hist} zu sehen. \\
+Nach der Perspektivtransformation wird ein Histogramm der schwarzen Pixel
+erstellt, um den Startpunkt für die im n"achsten Schritt folgende
+Gleitfenstermethode zu bestimmen. Die Anzahl der schwarzen Pixel wird für jede
+Spalte des Bildes gezählt, und diese Zahlen werden in einer Liste gespeichert.
+Es wird davon ausgegangen, dass die Spalten mit den höchsten Zahlen
+Fahrspurinformationen enthalten, und der Index der Spalte mit der höchsten Zahl
+wird als Startpunkt für die Gleitfenstermethode gewählt. Dieser Schritt trägt
+dazu bei, die Berechnungszeit zu verkürzen, indem Teile des Bildes
+herausgefiltert werden, die keine Fahrspurinformationen enthalten. Eine
+visuelle Darstellung des Histogramms ist in Abb. \ref{hist} zu sehen. \\
 
 \begin{figure}[h]
     \centering
@@ -668,10 +689,8 @@ ist, während ihre Breite entsprechend proportional zur Bildbreite gewählt wird
 Die Anzahl der Fenster wird so gewählt, dass der aus dem Histogramm bekannte
 Bereich der schwarzen Pixel umfasst wird, wie in Abb. \ref{gleit} zu sehen ist. 
 
-
-
 Als zweiter Schritt wird die $x$-Koordinate des Mittelpunkts des ersten Fensters auf den
-Spitzenwert des Histogramms aus des vorherigen Schritts gesetzt. Dann wird die
+Spitzenwert des Histogramms aus dem vorherigen Schritt gesetzt. Dann wird die
 Anzahl der schwarzen Pixel innerhalb des Fensters gezählt. Wenn die Anzahl über
 einem gewählten Schwellenwert liegt, werden die Pixel zu einem Array
 hinzugefügt und der Mittelwert der $x$-Koordinaten dieser Pixel berechnet. Die
@@ -684,7 +703,7 @@ ignoriert und das folgende Fenster darüber gelegt.
 Die Pixel, die nicht innerhalb der einzelnen Fenster liegen, werden dann aus
 dem Bild herausgefiltert. Das Bild vor und nach dem Filterungsprozess ist in
 Abb. \ref{gleit} zu sehen. Mit Hilfe der Methode der kleinsten Quadrate wird ein
-2. Ordnung Polynom durch die verbleibenden Pixel approximiert.
+Polynom 2. Ordnung durch die verbleibenden Pixel approximiert.
 
 Um das Polynom, das die Fahrspur repräsentiert, aus den $n$ verbleibenden
 Pixeln zu bestimmen, wird die folgende Berechnung \cite{lstsq} verwendet:
@@ -712,7 +731,7 @@ Fahrspur ist. Die Gleichung liefert eine analytische Darstellung der Fahrspur.
     \centering
     \includegraphics[scale=0.47]{before_filter}
     \includegraphics[scale=0.47]{after_filter}
-    \caption{Das rechte Bild ist ein Beispiel von der Gleitfenstermethode. Das linke Bild
+    \caption{Das linke Bild ist ein Beispiel von der Gleitfenstermethode. Das rechte Bild
     zeigt das Polynom, das von den verbleibenden Pixel approximiert wurde.}
     \label{gleit}
 \end{figure}
@@ -724,7 +743,7 @@ der Fahrspurlinie berechnet.
 
 Aus dem in dem vorangegangenen Schritt berechneten Polynom \eqref{poly} wird eine
 analytische Ausrichtung an einem ausgewählten Punkt entlang der Bahn mit der
-folgenden Gleichung ermittelt:
+folgenden Gleichung \cite{tangentangle} ermittelt:
 \begin{subequations} 
     \begin{align}
         \hat{x} &= g(y), \\
@@ -733,7 +752,7 @@ folgenden Gleichung ermittelt:
 \end{subequations} 
 Der Arkustangens der Ableitung des Polynoms liefert die Ausrichtung der Spur
 an einem bestimmten Punkt. Für den Stanley-Regler wird nur die Differenz
-zwischen der Bahnausrichtung und der Ausrichtung des Fahrzeugs benötigt, da
+zwischen der Bahnausrichtung und der Ausrichtung des Fahrzeugs benötigt. Da
 kein globales Koordinatensystem für das Fahrzeug benötigt wird, kann die
 Ausrichtung des Fahrzeugs zu jedem Zeitpunkt als $0^{\circ}$ definiert
 werden. Die aus dem Bild erkannte Ausrichtung $\theta$ der Bahn bildet somit
@@ -744,12 +763,12 @@ folgender Funktion berechnet:
 \begin{equation}
     e_{V} = \left(\frac{w}{2} - f(h)\right)\cdot \sigma_\mathrm{mpp}.
 \end{equation}
-Dabei ist $w$ die Breite des Bildes, $f(h)$ die Ausgabe des berechneten
-Polynoms am unteren Rand des Bildes, d.h. bei $y=h$, $\sigma_\mathrm{mpp}$ eine
-Skalierungskonstante zur Umrechnung von Pixeln in Meter und $e_{V}$ der Abstand
-des Fahrzeugs zur Fahrspur. Zusammenfassend wird die Differenz aus der
+Dabei ist $w$ die Breite des Bildes, $e_{V}$ der Abstand des Fahrzeugs zur
+Fahrspur, $\sigma_\mathrm{mpp}$ eine Skalierungskonstante zur Umrechnung von
+Pixeln in Meter und $g(h)$ die Ausgabe des berechneten Polynoms am unteren Rand
+des Bildes, d.h. bei $y=h$. Zusammenfassend wird die Differenz aus der
 $x$-Komponente des Mittelpunkts und der $x$-Komponente des Polynompunkts am
-unteren Bildrand in Meter umgerechnet.
+unteren Bildrand von Pixel in Meter umgerechnet.
 
 \section{Ausrei{\ss}er}
 
@@ -766,9 +785,9 @@ bestimmt wird. Im letzten Bild wird die Fahrspurlinie wieder korrekt erkannt.
     \fbox{\includegraphics[scale=0.8]{before_outlier}}
     \fbox{\includegraphics[scale=0.8]{outlier}}
     \fbox{\includegraphics[scale=0.8]{after_outlier}}
-    \caption{Ein Beispiel von einem Ausrei{\ss}er. Die drei Bilder sind
-    nacheinander aufgenommen. Im rechten und linken Bilder sind die Fahrspur
-    richtig erkannt. Im mittleren Bild ist die Fahrspur falsch erkannt.}
+    \caption{Ein Beispiel von einem Ausrei{\ss}er. Die drei Bilder wurden
+    nacheinander aufgenommen. Im rechten und linken Bilder wurde die Fahrspur
+    richtig erkannt. Im mittleren Bild wurde die Fahrspur falsch erkannt.}
     \label{ausrei}
 \end{figure}
 
@@ -857,13 +876,13 @@ Motorregler parallel zur Fahrspurlinie platziert. Dann wird das Fahrzeug
 im Uhrzeigersinn gedreht, wobei der Ausgang des jeweiligen Reglers in Echtzeit
 angezeigt wird. Das Fahrzeug wird so lange gedreht, bis der Ausgang des Reglers
 entweder den plausiblen Gültigkeitsbereich verlässt oder konstant Null ist.
-In beiden Fällen ist das Fahrzeug nicht mehr in der Lage die Spur zu erkennen.
+In beiden Fällen ist das Fahrzeug nicht mehr in der Lage die Spur zu wiederzufinden.
 
 \subsection{Bahnfolgeverhalten}
 
 Die Messung des Fahrzeugversatzes erfolgt durch die folgenden zwei Versuche.
 Zunächst fährt das Fahrzeug mit einer bestimmten Vorwärtsgeschwindigkeit auf
-der Strecke. Dann wird mit einer Überwachungskamera ein Video von der
+der Strecke. Dabei wird mit einer Überwachungskamera ein Video von der
 Kurvenfahrt des Fahrzeugs aus der Vogelperspektive aufgenommen. Das Fahrzeug
 wird bei unterschiedlichen Vorwärtsgeschwindigkeiten aufgezeichnet. Bei der
 ersten Aufnahmerunde wird das Fahrzeug mit dem Stanley-Regler gesteuert, bei
@@ -892,7 +911,7 @@ das Fahrzeug zum Schwingen, wenn ein Ausreißer auftritt, und benötigt mehr
 Zeit, um auf die Spur zurückzukehren. Das Schwingungsverhalten nimmt mit der
 Vorwärtsgeschwindigkeit des Fahrzeugs zu. Wenn die Geschwindigkeit 2,0
 $\frac{\mathrm{m}}{\mathrm{s}}$ übersteigt, steuert der PID-Regler das Fahrzeug
-in die Spurwand. Selbst Geschwindigkeiten zwischen 1,5 und 1,75
+gegen die Wand des Streckenaufbaus. Selbst Geschwindigkeiten zwischen 1,5 und 1,75
 $\frac{\mathrm{m}}{\mathrm{s}}$ erfordern eine Überwachung durch einen Menschen,
 um Kollisionen zu vermeiden. Dieser muss das Fahrzeug vor der Spurwand manuell mit 
 einem Notaus stoppen.
@@ -905,7 +924,7 @@ Zeitraum genau auf die Spur zu gelangen.
 
 \subsection{Maximal m"oglicher Fehlerwinkel}
 
-Die Ergebnisse des Experiments ist in Tab. \ref{fehlerwinkel} zu sehen.
+Die Ergebnisse des Experiments sind in Tab. \ref{fehlerwinkel} zu sehen.
 Der Stanley-Regler ist im Vergleich zum PID-Regler weniger tolerant gegenüber
 einer Abweichung von der Fahrspur. Dies liegt an dem Kalibrierungsschritt der
 Pipeline und der Anforderung eines approximierten Polynoms, was es für den
@@ -924,20 +943,20 @@ benötigt der PID-Regler nur eine Gruppe von gelben Pixeln im Bild.
     Gegenuhrzeigersinn & 54 \pm 1 & 44 \pm 1 \\
 \hline
 \end{tabular}
-    \caption{Maximal m"oglicher Fehlerwinkel beider Regler, wenn die im oder gegen den Uhrzeigersinn
+    \caption{Maximal m"oglicher Fehlerwinkel beider Regler, wenn das Fahrzeug im oder gegen den Uhrzeigersinn
     gedreht wird.}
     \label{fehlerwinkel}
 \end{center}
 \end{table}
 
 Der Stanley-Controller benötigt für die Gruppierung der gelben Pixel eine
-gewisse Geometrie, typischerweise in Form einer Linie oder eines
+bekannte Geometrie, typischerweise in Form einer Linie oder eines
 Kurvenabschnitts, während der PID-Controller keine solchen Voraussetzungen hat.
 
 \subsection{Bahnfolgeverhalten}
 
-Abb. \ref{ab:1.0} und \ref{ab:1.25} zeigen, dass bei niedrigeren
-Vorw"artsgeschwindigkeiten verhalten die beide Regler "ahnlich. Aber Abb.
+Abb. \ref{ab:1.0} und \ref{ab:1.25} zeigen, dass die beiden Regler sich bei niedrigeren
+Vorw"artsgeschwindigkeiten "ahnlich verhalten. Aber Abb.
 \ref{ab:1.5}, \ref{ab:1.75} und \ref{ab:2.0} zeigen, dass der PID-Regler bei
 h"oheren Vorw"artsgeschwindigkeiten die Bahn genauer verfolgt als der
 Stanley-Regler. Selbst unter Berücksichtigung des anfänglichen Versatzes bringt
@@ -952,12 +971,12 @@ stimmen mit dem Verhalten des Stanley-Reglers auf der tatsächlichen Strecke wei
 vor der Kurve vom geraden Streckenabschnitt weg. Dieses Ph"anomen wird als \glqq Drift
 \grqq bezeichnet.
 
-Im Rahmen der Arbeit wurde versucht, diese Drift zu kompensieren, aber abgesehen von der
-Anpassung des Bezugspunkts für die Querabweichung blieb die Drift bestehen.
+Im Rahmen der Arbeit wurde versucht, diesen Drift zu kompensieren, aber trotz der
+Anpassung des Bezugspunkts für die Querabweichung blieb der Drift bestehen.
 Eine manuelle Änderung des Referenzpunktes führte dazu, dass das Fahrzeug bei
 der Fahrt im oder gegen den Uhrzeigersinn um die Strecke unterschiedliche
-Parameter benötigte, was nicht praktikabel war. Daher wurde die Drift vorerst
-so belassen, wie sie ist. In Kapitel 5 werden mögliche Anpassungen des
+Parameter benötigte, was nicht praktikabel war. Daher wurde der Drift vorerst
+so belassen, wie er ist. In Kapitel 5 werden mögliche Anpassungen des
 Stanley-Reglers erörtert, die seine Leistung in Zukunft verbessern könnten.
 
 \begin{figure}[h]
@@ -1007,19 +1026,17 @@ Stanley-Reglers erörtert, die seine Leistung in Zukunft verbessern könnten.
 
 \subsection{Reglerausgang}
 
-Die Ergebnisse des Experiments ist in Tab. \ref{reglerausgabe} zu sehen.
+Die Ergebnisse des Experiments sind in Tab. \ref{reglerausgabe} aufgef"uhrt.
 Die durchschnittliche Reglerausgabe beider Regler ist ähnlich, unabhängig von
 der Geschwindigkeit, außer für den PID-Regler bei einer Geschwindigkeit von 1,5
 m/s. Mit zunehmender Vorwärtsgeschwindigkeit des Fahrzeugs steigt der
-durchschnittliche Reglerausgang entsprechend an. Dies ist plausibel, da eine
-größere Vorwärtsgeschwindigkeit eine schnellere Reaktion des Reglers nötig
-macht. Der Unterschied zwischen den beiden Reglern liegt jedoch im zeitlichen
-Verlauf der beiden Signale. Bei Vorwärtsgeschwindigkeiten zwischen 1,0 und 1,5
-$\frac{\mathrm{m}}{\mathrm{s}}$ ist der Signalverlauf der beiden Regler
-ähnlich, wie in Abb. \ref{reg:1.0} und \ref{reg:1.5} zu sehen sind. Bei 1,75
-und 2,0 $\frac{\mathrm{m}}{\mathrm{s}}$ verschlechtert sich jedoch der
-periodische Verlauf des PID-Reglers, während die Periodizität des
-Stanley-Reglers zunimmt.
+durchschnittliche Reglerausgang f"ur beide Regler an. Der Unterschied zwischen den
+beiden Reglern liegt jedoch im zeitlichen Verlauf der beiden Signale. Bei
+Vorwärtsgeschwindigkeiten zwischen 1,0 und 1,5 $\frac{\mathrm{m}}{\mathrm{s}}$
+ist der Signalverlauf der beiden Regler ähnlich, wie in Abb. \ref{reg:1.0} und
+\ref{reg:1.5} zu sehen sind. Bei 1,75 und 2,0 $\frac{\mathrm{m}}{\mathrm{s}}$
+verschlechtert sich jedoch der periodische Verlauf des PID-Reglers, während die
+Periodizität des Stanley-Reglers zunimmt.
 
     \begin{table}[h]
 \begin{center}
@@ -1039,7 +1056,7 @@ Stanley-Reglers zunimmt.
             2,0 & 13,84 & 13,51 \\
             \hline
         \end{tabular}
-        \caption{Zeitlichen Mittelwerte der Reglerausg"ange bei den verschiedenen
+        \caption{Zeitliche Mittelwerte der Reglerausg"ange bei den verschiedenen
         Vorw"artsgeschwindigkeiten.}
         \label{reglerausgabe}
 \end{center}
@@ -1099,8 +1116,9 @@ schneller als der PID-Regler auf der Bahn neu orientiert.
     \centering
     \includegraphics[scale=0.47]{pid2.0}
     \includegraphics[scale=0.47]{Stan2.0}
-    \caption{Ausgang der Regler mit $v = 2.0$ $\frac{\mathrm{m}}{\mathrm{s}}$. Der PID-Regler-Signal hat keine Periodizit"at
-    und schwankt von -40 zu 30 Grad. Er ist bei dieser Geschwindigkeit nicht mehr nutzbar.}
+    \caption{Ausgang der Regler mit $v = 2.0$ $\frac{\mathrm{m}}{\mathrm{s}}$.
+    Das PID-Regler-Signal hat keine Periodizit"at und schwankt von -40 zu 30
+    Grad. Er ist bei dieser Geschwindigkeit nicht mehr nutzbar.}
     \label{reg:2.0}
 \end{figure}
 
@@ -1110,10 +1128,11 @@ schneller als der PID-Regler auf der Bahn neu orientiert.
 \chapter{Fazit}
 
 Das Bahnfolgeverhalten beider Regler wurde bewertet. Während der PID-Regler
-in diesem Aspekt besser abschneidet, ist dies nicht das wichtigste Kriterium bei der Auswahl des Regelungsalgorithmus.
-Größere Bedeutung ist der Robustheit zuzumessen. In diesem Kontext hat sich der Stanley-Regler als überlegen erwiesen.
-Deshalb ist der Stanley-Regler geeigneter für die Anwendung
-des autonomen Fahrens, da er in der Lage ist, höhere Geschwindigkeiten ohne
+unter diesem Aspekt besser abschneidet, ist dies nicht das wichtigste Kriterium
+bei der Auswahl des Regelungsalgorithmus. Größere Bedeutung ist der Robustheit
+zuzumessen. In diesem Kontext hat sich der Stanley-Regler als überlegen
+erwiesen. Deshalb ist der Stanley-Regler geeigneter für die Anwendung des
+autonomen Fahrens, da er in der Lage ist, höhere Geschwindigkeiten ohne
 Überwachung zu bewältigen. Unter Berücksichtigung aller Aspekte der
 Problemstellung ist der Stanley-Regler daher die bessere Wahl für diese
 Anwendung.
@@ -1121,13 +1140,13 @@ Anwendung.
 
 
 
-\subsection{K"unfigte Arbeit}
+\subsection{K"unftige Arbeit}
 
 Am Ende dieser Arbeit wurde festgestellt, dass das Fahrzeug vor jeder Kurve
 immer noch von der Fahrbahn abdriftet. Um dieses Problem zu lösen, wird
-vorgeschlagen, den Stanley-Regler durch Hinzufügen eines Integrators zu
-verändern, um diese Abweichung zu kompensieren. Der adaptierte Stanley-Regler
-wird durch die folgende Gleichung beschrieben:
+vorgeschlagen, den Stanley-Regler in Anlehnung an \cite{iglied} durch
+Hinzufügen eines Integrators zu verändern, um diese Abweichung zu kompensieren.
+Der adaptierte Stanley-Regler wird durch die folgende Gleichung beschrieben:
 
 \begin{equation}
     u = \theta - \theta_d + \arctan\left(\frac{ke_{V}}{v}\right) + k_{i} \int_{0}^{t} e_{V}d\tau,
@@ -1136,10 +1155,10 @@ wird durch die folgende Gleichung beschrieben:
 
 In der linearen Regelungstheorie wird ein Integrator verwendet, um bleibende
 Regelabweichungen aus einer Anwendung zu entfernen. Da es sich bei der
-Kleinsignalversion des Stanley-Reglers um einen PD-Regler handelt, wird
-vermutet, dass das Hinzufügen eines Integrators die beobachtete Drift
-korrigieren wird. Wie in der Abb. \ref{quer} zu sehen ist, ist die Drift im Eingang
-des Reglers sichtbar. Durch die Integration der Querabweichung soll die Drift
+Kleinsignalversion des Stanley-Reglers um einen PD-Regler handelt, ist zu
+vermuten, dass das Hinzufügen eines Integrators den beobachteten Drift
+korrigieren wird. Wie in der Abb. \ref{quer} zu sehen ist, ist der Drift im Eingang
+des Reglers sichtbar. Durch die Integration der Querabweichung soll der Drift
 mit der Zeit kompensiert werden und das Fahrzeug auf der Fahrspur bleiben.
 Weitere Untersuchungen sind erforderlich, um diese Hypothese zu testen und die
 Wirksamkeit der vorgeschlagenen Anpassung zu überprüfen.
