@@ -63,8 +63,8 @@
 
 % Zunächst für das Vorgeplänkel römische Seitenzahlen und einfacher Seitenstil
 % ============================================================================
-\pagenumbering{gobble}
 \pagestyle{plain}
+\pagenumbering{Roman}
 
 
 % Titelseite erstellen
@@ -98,7 +98,7 @@ to follow.}
 % Inhaltsverzeichnis
 % ==================
 \tableofcontents
-\pagenumbering{Roman}
+\pagenumbering{arabic}
 \listoffigures
 
 \chapter{Einleitung}
@@ -246,7 +246,7 @@ analysieren.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.5]{Fahrbahn}
+    \includegraphics[scale=0.5]{fahrbahn}
     \caption{Grafische Darstellung der Fahrbahn.}
     \label{fahrbahn}
 \end{figure}
@@ -282,7 +282,7 @@ nur für das kinematische Zweiachsmodell nachgewiesen wurde. \cite{stanley}
 Da der Stanley-Regler für die Querabweichung den Mittelpunkt der Vorderachse
 benötigt, muss dieser aus der Hinterachse berechnet werden. Der Mittelpunkt der
 Vorderachse wird aus den Zustandskomponenten durch die folgende statische
-Funktion berechnet: 
+Funktion \cite{car-model} berechnet: 
 \begin{subequations}
 \begin{align}
     \underline{p}_H &:= 
@@ -310,11 +310,11 @@ Pfadausrichtung zu berechnen, muss der richtige Bahnpunkt gewählt werden. Der
 Stanley-Regler verwendet den nächstliegenden Bahnpunkt vom
 Vorderachsmittelpunkt des Fahrzeugs, um die Ausrichtung des Pfades $\theta_d$
 und die aktuelle Querabweichung $e_{V}$ zu bestimmen. Für die Simulation wird
-dieser bestimmt, indem der Punkt mit dem geringsten Abstand $\lambda$ zum
+dieser bestimmt, indem der Punkt mit dem geringsten Abstand $\underline{\lambda}$ zum
 Vorderachsmittelpunkt gefunden wird. An diesem Punkt wird
 dann die Ausrichtung des Pfades ermittelt. Das Skalarprodukt zwischen dem
 Vektor senkrecht zur Fahrzeugausrichtung $\underline{\nu}_{\perp}$ und dem Vektor
-vom Pfadpunkt zur Fahrzeugvorderachse $\delta\underline{x}$ ist die
+vom Pfadpunkt zur Fahrzeugvorderachse $\underline{\lambda}$ ist die
 Querabweichung $e_{V}$. Zur Verdeutlichung ist in Abb. \ref{algorithm} eine visuelle
 Darstellung dieser beiden Vektoren und ihres Skalarprodukts abgebildet. Die Berechnung
 der wichtigen Parameter sind in folgende Gleichungen dargestellt: \\
@@ -332,22 +332,20 @@ der wichtigen Parameter sind in folgende Gleichungen dargestellt: \\
 \begin{align}
     \underline{\nu} &:= \begin{bmatrix} \cos(\theta) & \sin(\theta) \end{bmatrix}^T, \\
         \underline{\nu}_{\perp} &:= \begin{bmatrix} \cos(\theta + \pi/2) & \sin(\theta + \pi/2) \end{bmatrix}^T, \\
-            \Delta\underline{x} &:= \underline{p}_V - \underline{p}_P(s), \\
-    s^* &:= \argmin  || \Delta\underline{x} ||_2, \\
+            s^* &:= \arg\min_{s}  \left\Vert\underline{p}_V - \underline{p}_P(s) \right\Vert_2, \\
     \underline{\lambda} &:= \underline{p}_P(s^*), \\
-    \theta_d &:= \arctan\left(\frac{\frac{d}{dy}\underline{\lambda}}{\frac{d}{dx}\underline{\lambda}}\right), \\
     e_{V} &:= \underline{\lambda} \cdot \underline{v}_{\perp}.
  \label{alg:quer}
 \end{align}
 \end{subequations}
 
-Der Pfad und die Querabweichung werden dann an den Stanley-Regler eingegeben,
+Die Pfadausrichtung und die Querabweichung werden dann an den Stanley-Regler eingegeben,
 und der Ausgang des Reglers wird in das Fahrzeugmodell eingespeist. Ein
 Übersichtsdiagramm des Regelkreises ist in Abb. \ref{control_loop} dargestellt.
 
 \begin{figure}[h]
     \centering
-    \includegraphics{control_loop}
+    \includegraphics[scale=1.2]{control_loop}
     \caption{Darstellung des Regelkreises.}
     \label{control_loop}
 \end{figure}
@@ -370,12 +368,12 @@ verschiedenen Abtastfrequenzen ist in Abb. \ref{sampling} dargestellt.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.47]{T15ms}
-    \includegraphics[scale=0.47]{T100ms}
-    \includegraphics[scale=0.47]{50Hz}
-    \includegraphics[scale=0.47]{25Hz}
-    \includegraphics[scale=0.47]{15Hz}
-    \includegraphics[scale=0.47]{10Hz}
+    \includegraphics[scale=0.47]{0.015ms50Hz}
+    \includegraphics[scale=0.47]{0.1ms50Hz}
+    \includegraphics[scale=0.47]{0.15ms50Hz}
+    \includegraphics[scale=0.47]{0.15ms25Hz}
+    \includegraphics[scale=0.47]{0.15ms15Hz}
+    \includegraphics[scale=0.47]{0.15ms10Hz}
     \caption{Verhalten des Stanley-Reglers mit verschiedenen Abtastfrequenzen und Zeitkonstanten.
     Das Verhalten bleibt "ahnlich bis unter 15 Hz. Der Stanley-Regler folgt den Pfad besser
     wenn die Zeitkonstante des PT1-Glieds niedrig ist, aber die Lenkwinkelstrecke im Auto hat eine 
@@ -471,7 +469,7 @@ werden. \\
     \fbox{\includegraphics[scale=0.75]{before_calibration_checkerboard}}
     \fbox{\includegraphics[scale=0.75]{after_calibration_checkerboard}}
     \caption{Die Kalibrierung des linken Bilds liefert das rechte Bild. Die gekr"ummte Linie 
-    des Schachbretts sind gerade nach der Kalibrierung.} 
+    des Schachbretts sind gerade nach dem Verzeichnungkorrektur.} 
     \label{checkerboards}
 \end{figure}
 
@@ -499,7 +497,7 @@ der folgenden Formel skaliert werden:
 \end{equation} 
 wobei $k$ ein positiver skalarer Wert ist, der den Skalierungsfaktor darstellt. Da es
 sich bei der intrinsischen Kameramatrix um eine affine Abbildung handelt, muss
-der Wert bei $K_{\matthrm{n},3, 3}$ auf 1 gesetzt werden. Die resultierende intrinsische
+der Wert bei $K_{\mathrm{n},3, 3}$ auf 1 gesetzt werden. Die resultierende intrinsische
 Kameramatrix funktioniert bei kleineren Auflösungen, die dem Seitenverhältnis
 der für die Kalibrierung verwendeten Bilder gleich sind. 
 
@@ -576,7 +574,8 @@ bleibt. Die in der Pipeline verwendeten Werte für Gelb werden in Tab.
     Maximaler Wert & 40 & 255 & 255 \\
 \hline
 \end{tabular}
-    \caption{Minimalen und Maximalen Werte f"ur die Bestimmung des gelben Farbtonbereiches.}
+    \caption{Minimalen und Maximalen Werte f"ur die Bestimmung des gelben Farbtonbereiches. Der Bereich
+    der Werte sind zwischenn 0 und 255 begrenzt.}
     \label{hsvtable}
 \end{center}
 \end{table}
@@ -688,7 +687,7 @@ Abb. \ref{gleit} zu sehen. Mit Hilfe der Methode der kleinsten Quadrate wird ein
 2. Ordnung Polynom durch die verbleibenden Pixel approximiert.
 
 Um das Polynom, das die Fahrspur repräsentiert, aus den $n$ verbleibenden
-Pixeln zu bestimmen, wird die folgende Berechnung verwendet:
+Pixeln zu bestimmen, wird die folgende Berechnung \cite{lstsq} verwendet:
 \begin{subequations}
 \begin{align}
     \underline{x} &:= \begin{bmatrix} x_1 & x_2 & ... & x_n \end{bmatrix}^T \\
@@ -728,8 +727,8 @@ analytische Ausrichtung an einem ausgewählten Punkt entlang der Bahn mit der
 folgenden Gleichung ermittelt:
 \begin{subequations} 
     \begin{align}
-        \hat{x} &= h(y), \\
-        \theta &= \arctan(h^\prime(y)).
+        \hat{x} &= g(y), \\
+        \theta &= \arctan(g^\prime(y)).
     \end{align}
 \end{subequations} 
 Der Arkustangens der Ableitung des Polynoms liefert die Ausrichtung der Spur
@@ -820,14 +819,20 @@ ms auf Y ms senkte. (Ich muss die Werte nochmal finden.)
 \chapter{Experimentelle Untersuchungen}
 \section{Hardware}
 
-%Insert photo of cute lil car
-
 Die CoRoLa-Car-Platform besteht aus einem busförmigen Modellfahrzeug mit einem Raspberry Pi, 
 einer Fisheye-Kamera,
 einem b"urstenlosen Gleichstrommotor und einem Motorregler zur Steuerung der
 Fahrzeuggeschwindigkeit und einem Servomotor um den Radeinschlag des Fahrzeugs
 zu steuern. Der Raspberry Pi sendet Power-Werte-Signale an den
 Motorregler und den Servoregler, um das Fahrzeug zu steuern. 
+
+\begin{figure}[h]
+    \centering
+    \fbox{\includegraphics[scale=0.2]{cars}}
+    \caption{Modellfahrzeuge.}
+    \label{cars}
+\end{figure}
+
 
 \section{Experimentkriterien}
 
@@ -902,7 +907,7 @@ Zeitraum genau auf die Spur zu gelangen.
 
 Die Ergebnisse des Experiments ist in Tab. \ref{fehlerwinkel} zu sehen.
 Der Stanley-Regler ist im Vergleich zum PID-Regler weniger tolerant gegenüber
-einer Abweichung von der Fahrspur. Dies liegt an der Kalibrierungsstufe der
+einer Abweichung von der Fahrspur. Dies liegt an dem Kalibrierungsschritt der
 Pipeline und der Anforderung eines approximierten Polynoms, was es für den
 Stanley-Regler schwieriger macht, die Fahrspur zu erkennen. Im Gegensatz dazu
 benötigt der PID-Regler nur eine Gruppe von gelben Pixeln im Bild.
@@ -943,7 +948,7 @@ Bewegung, die mit der Vorwärtsgeschwindigkeit skaliert, auf der Bahn hält.
 Die Ergebnisse der Simulation des Stanley-Reglers in Abb. \ref{sampling} mit
 einer Vorwärtsgeschwindigkeit von 1,75 $\frac{\mathrm{m}}{\mathrm{s}}$ und einer Abtastfrequenz von 50 Hz
 stimmen mit dem Verhalten des Stanley-Reglers auf der tatsächlichen Strecke weitgehend 
-überein. Allerdings driftet der Stanley-Regler, wie in der Abb. \ref{sampling} gezeigt,
+überein. Allerdings driftet der Stanley-Regler, wie in der Abb. \ref{ab:2.0} gezeigt,
 vor der Kurve vom geraden Streckenabschnitt weg. Dieses Ph"anomen wird als \glqq Drift
 \grqq bezeichnet.
 
