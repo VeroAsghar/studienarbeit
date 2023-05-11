@@ -192,8 +192,7 @@ den Gr"o{\ss}en sind in Abb. \ref{stanley} zu sehen.
     \centering
     \includegraphics[scale=1.5]{stanley}
     \caption{Grafische Darstellung der geometischen Beziehungen zwischen
-    den Gr"o{\ss}en des Stanley-Reglers. Der Parameter $\varphi$ bezeichnet
-    den Lenkwinkel des Modellfahrzeugs.}
+    den Gr"o{\ss}en des Stanley-Reglers.}
     \label{stanley}
 \end{figure}
 
@@ -327,7 +326,7 @@ Stanley-Regler verwendet den nächstliegenden Bahnpunkt vom
 Vorderachsmittelpunkt des Fahrzeugs, um die Ausrichtung des Pfades $\theta_d$
 und die aktuelle Querabweichung $e_{V}$ zu bestimmen. Für die Simulation wird
 dieser bestimmt, indem der Pfadpunkt mit dem geringsten Abstand $\underline{\lambda}$ zum
-Vorderachsmittelpunkt gefunden wird (entspricht Kurvenparameter $s^*$. An diesem Punkt wird
+Vorderachsmittelpunkt gefunden wird (entspricht Kurvenparameter $s^*$). An diesem Punkt wird
 dann die Ausrichtung des Pfades ermittelt. Das Skalarprodukt zwischen dem
 Vektor senkrecht zur Fahrzeugausrichtung $\underline{\nu}_{\perp}$ und dem Vektor
 vom Pfadpunkt zur Fahrzeugvorderachse $\underline{\lambda}$ ist die
@@ -546,7 +545,7 @@ ursprüngliche Position verschoben werden.
     \fbox{\includegraphics[scale=0.5]{orig_not_shifted}}
     \fbox{\includegraphics[scale=0.5]{cal_shifted}}
     \caption{Ein Beispiel von dem Korrekturschritt. Die Mittellinie im
-    rechten Bilds ist leicht nach rechts verschoben.}
+    rechten Bilds ist leicht nach links verschoben.}
     \label{shifted}
 \end{figure}
 
@@ -593,7 +592,7 @@ bleibt. Die in der Pipeline verwendeten Werte für Gelb werden in Tab.
 \hline
 \end{tabular}
     \caption{Minimalen und Maximalen Werte f"ur die Bestimmung des gelben Farbtonbereiches. Der Bereich
-    der Werte sind zwischenn 0 und 255 begrenzt.}
+    der Werte sind zwischen 0 und 255 begrenzt.}
     \label{hsvtable}
 \end{center}
 \end{table}
@@ -767,13 +766,14 @@ Fahrspur, $\sigma_\mathrm{mpp}$ eine Skalierungskonstante zur Umrechnung von
 Pixeln in Meter und $g(h)$ die Ausgabe des berechneten Polynoms am unteren Rand
 des Bildes, d.h. bei $y=h$. Zusammenfassend wird die Differenz aus der
 $x$-Komponente des Mittelpunkts und der $x$-Komponente des Polynompunkts am
-unteren Bildrand von Pixel in Meter umgerechnet.
+unteren Bildrand von Pixeln in Meter umgerechnet.
 
 \section{Ausrei{\ss}er}
 
 Fahrspurerkennungalgorithmen k"onnen zu einem Phänomen führen, das als \glqq
 Ausreißer\grqq bekannt ist. Diese treten auf, wenn der Algorithmus die
-Fahrspurlinie in einem bestimmten Bild falsch bestimmt. Abb. \ref{ausrei} zeigt
+Fahrspurlinie in einem bestimmten Bild falsch erkennt. Im Folgenden wird dieses 
+am Beispiel dieser Pipeline diskutiert. Abb. \ref{ausrei} zeigt
 eine Sequenz von drei Einzelbildern, wobei das erste Einzelbild (links) den
 Ausgangspunkt bildet. Im ersten Bild wird die Fahrspurlinie richtig erkannt,
 aber im zweiten Bild tritt ein Ausreißer auf, bei dem die Fahrspurlinie falsch
@@ -790,15 +790,16 @@ bestimmt wird. Im letzten Bild wird die Fahrspurlinie wieder korrekt erkannt.
     \label{ausrei}
 \end{figure}
 
-Eine der Hauptursachen für Ausreißer ist die falsche Auswahl der HSV-Werte im Color-Thresholding-Schritt.
-Wenn die im Algorithmus verwendeten HSV-Werte nicht restriktiv genug sind,
-werden Farben außer Gelb möglicherweise nicht herausgefiltert, was zu einer
-ungenauen Bestimmung der Fahrspurlinie führt.
+Eine der Hauptursachen für Ausreißer ist die falsche Auswahl der HSV-Werte im
+Color-Thresholding-Schritt. Wenn die im Algorithmus verwendeten HSV-Werte nicht
+restriktiv genug sind, werden Farben außer Gelb möglicherweise nicht
+herausgefiltert, was zu einer ungenauen Bestimmung der Fahrspurlinie führt.
 
-Außreißer sind ein unvermeidbares Resultat des Bildverarbeitungsprozesses. Die Empfindlichkeit mit der ein
-Regelungsalgorithmus auf sie reagiert ist ein wichtiges Kriterium bei der Wahl eines Algorithmus.
-Wie in Kapitel 4 genauer beschrieben, erschien in den hier durchgeführten Tests der Stanley-Regler
-in dieser Hinsicht weniger empfindlich als der PID-Regler.
+Außreißer sind ein unvermeidbares Resultat des Bildverarbeitungsprozesses. Die
+Empfindlichkeit mit der ein Regelungsalgorithmus auf sie reagiert ist ein
+wichtiges Kriterium bei der Wahl eines Algorithmus. Wie in Kapitel 4 genauer
+beschrieben, erschien in den hier durchgeführten Tests der Stanley-Regler in
+dieser Hinsicht weniger empfindlich als der PID-Regler.
 
 
 \iffalse
@@ -837,8 +838,8 @@ ms auf Y ms senkte. (Ich muss die Werte nochmal finden.)
 \chapter{Experimentelle Untersuchungen}
 \section{Hardware}
 
-Die CoRoLa-Car-Platform besteht aus einem busförmigen Modellfahrzeug mit einem Raspberry Pi, 
-einer Fisheye-Kamera,
+Die CoRoLa-Car-Platform besteht aus einem busförmigen Modellfahrzeug, in
+\ref{cars} dargestellt, mit einem Raspberry Pi, einer Fisheye-Kamera,
 einem b"urstenlosen Gleichstrommotor und einem Motorregler zur Steuerung der
 Fahrzeuggeschwindigkeit und einem Servomotor um den Radeinschlag des Fahrzeugs
 zu steuern. Der Raspberry Pi sendet Power-Werte-Signale an den
