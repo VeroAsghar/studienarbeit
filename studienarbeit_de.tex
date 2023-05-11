@@ -561,8 +561,25 @@ beiden Kanäle ermöglicht eine zuverlässigere Erkennung der Farbe.
 Um die gelbe Spur zu erkennen, filtert die Pipeline Farben außerhalb des gelben
 Farbtonbereichs heraus und schneidet dann den unteren Teil des Helligkeits- und
 Sättigungskanals ab. Das Ergebnis ist, dass nur reines Gelb im Bild übrig
-bleibt. Die in der Pipeline verwendeten Werte für Gelb werden durch den
-folgenden Bereich, TABLE, dargestellt.
+bleibt. Die in der Pipeline verwendeten Werte für Gelb werden in Tab.
+\ref{hsvtable} dargestellt. \\
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+    & H & S & V\\
+\hline
+\hline
+    Minimaler Wert & 15 & 90 & 90 \\
+\hline
+    Maximaler Wert & 40 & 255 & 255 \\
+\hline
+\end{tabular}
+    \caption{Minimalen und Maximalen Werte f"ur die Bestimmung des gelben Farbtonbereiches.}
+    \label{hsvtable}
+\end{center}
+\end{table}
 
 Das Ergebnis dieser Stufe der Pipeline ist f"ur ein Beispielbild in Abb.
 \ref{color-thresholding} dargestellt. Um die Darstellung zu vereinfachen,
@@ -879,6 +896,7 @@ Bahn ab. Dabei oszilliert es um die gelbe Fahrspur ohne je wieder für einen lä
 Zeitraum genau auf die Spur zu gelangen.
 
 \subsection{Maximal m"oglicher Fehlerwinkel}
+
 \begin{table}[h]
 \begin{center}
 \begin{tabular}{|c|c|c|}
@@ -931,43 +949,49 @@ Parameter benötigte, was nicht praktikabel war. Daher wurde die Drift vorerst
 so belassen, wie sie ist. In Kapitel 5 werden mögliche Anpassungen des
 Stanley-Reglers erörtert, die seine Leistung in Zukunft verbessern könnten.
 
-\begin{figure}[h]
-    \centering
-    \fbox{\includegraphics[scale=0.8]{done1.0}}
-    \caption{Gezeigt ist der vom Fahrzeug gewählte Pfad (Fahrtrichtung von rechts nach links).
-    Dabei wurde der Standort des Fahrzeugs nicht immer ganz korrekt aufgezeichnet, was zu den sichtbaren
-    Zacken führt. Es ist sichtbar, dass der PID- und der Stanley-Regler ungef"ahr das gleiche Verhalten haben.}
-    \label{ab:1.0}
+\begin{figure}
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \fbox{\includegraphics[width=0.85\linewidth]{done1.0}}
+        \caption{$v = 1.0 \frac{\mathrm{m}}{\mathrm{s}}$.}
+        \label{ab:1.0}
+    \end{subfigure}
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \fbox{\includegraphics[width=0.85\linewidth]{done1.25}}
+        \caption{$v = 1.25 \frac{\mathrm{m}}{\mathrm{s}}$.}
+        \label{ab:1.25}
+    \end{subfigure}
+    \caption{Gezeigt ist der vom Fahrzeug gewählte Pfad (Fahrtrichtung von
+    rechts nach links) f"ur die Vorw"artsgeschwindigkeiten $v = 1.0
+    \frac{\mathrm{m}}{\mathrm{s}}$ und $v = 1.25
+    \frac{\mathrm{m}}{\mathrm{s}}$. Dabei wurde der Standort des Fahrzeugs
+    nicht immer ganz korrekt aufgezeichnet, was zu den sichtbaren Zacken
+    führt. Es ist sichtbar, dass der PID- und der Stanley-Regler ungef"ahr
+    das gleiche Verhalten haben.}
 \end{figure}
-
-\begin{figure}[h]
+\begin{figure}
     \centering
-    \fbox{\includegraphics[scale=0.45]{done1.25}}
-    \fbox{\includegraphics[scale=0.45]{done1.5}}
-    \caption{Ein weiterer Vergleich zwischen den von dem PID-Regler und dem Stanley-Regler gewählten Pfaden,
-    nun mit einer größeren Vorwärtsgeschwindigkeit.}
-    \label{ab:1.25}
-\end{figure}
-\begin{figure}[h]
-    \centering
- 
+    \begin{subfigure}{0.3\textwidth}
+        \centering
+        \fbox{\includegraphics[width=0.9\linewidth]{done1.5}}
+        \caption{$v = 1.5 \frac{\mathrm{m}}{\mathrm{s}}$.}
+        \label{ab:1.5}
+    \end{subfigure}
+    \begin{subfigure}{0.3\textwidth}
+        \centering
+        \fbox{\includegraphics[width=0.9\linewidth]{done1.75}}
+        \caption{$v = 1.75 \frac{\mathrm{m}}{\mathrm{s}}$.}
+        \label{ab:1.75}
+    \end{subfigure}
+    \begin{subfigure}{0.3\textwidth}
+        \centering
+        \fbox{\includegraphics[width=0.9\linewidth]{done2.0}}
+        \caption{$v = 2.0 \frac{\mathrm{m}}{\mathrm{s}}$.}
+        \label{ab:2.0}
+    \end{subfigure}
     \caption{Das Modellfahrzeug mit dem Stanley-Regler hat eine kleine Abweichung am Anfang der Kurve (rechts). Dabei handelt
     es sich um den in Kapitel 4 beschriebenen Drift. Am Ende der Kurve ist es aber auf der Fahrspur.}
-    \label{ab:1.5}
-\end{figure}
-\begin{figure}[h]   
-    \centering
-    \fbox{\includegraphics[scale=0.8]{done1.75}}
-    \caption{Die Abweichung mit dem Stanley-Regler ist gro{\ss}er. PID-Regler verh"alt sich
-    gleich.}
-    \label{ab:1.75}
-\end{figure}
-\begin{figure}[h]
-    \centering
-    \fbox{\includegraphics[scale=0.8]{done2.0}}
-    \caption{Die Abweichung mit dem Stanley-Regler ist am gro{\ss}ten. PID-Regler driftet nach links
-    am Ende der Kurve.}
-    \label{ab:2.0}
 \end{figure}
 \FloatBarrier
 
