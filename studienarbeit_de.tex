@@ -879,6 +879,7 @@ Bahn ab. Dabei oszilliert es um die gelbe Fahrspur ohne je wieder für einen lä
 Zeitraum genau auf die Spur zu gelangen.
 
 \subsection{Maximal m"oglicher Fehlerwinkel}
+\begin{table}[h]
 \begin{center}
 \begin{tabular}{|c|c|c|}
 \hline
@@ -890,8 +891,13 @@ Zeitraum genau auf die Spur zu gelangen.
     Gegenuhrzeigersinn & 54 \pm 1 & 44 \pm 1 \\
 \hline
 \end{tabular}
+    \caption{Maximal m"oglicher Fehlerwinkel beider Regler, wenn die im oder gegen den Uhrzeigersinn
+    gedreht wird.}
+    \label{fehlerwinkel}
 \end{center}
+\end{table}
 
+Die Ergebnisse des Experiments ist in Tab. \ref{fehlerwinkel} zu sehen.
 Der Stanley-Regler ist im Vergleich zum PID-Regler weniger tolerant gegenüber
 einer Abweichung von der Fahrspur. Dies liegt an der Kalibrierungsstufe der
 Pipeline und der Anforderung eines approximierten Polynoms, was es für den
@@ -967,25 +973,31 @@ Stanley-Reglers erörtert, die seine Leistung in Zukunft verbessern könnten.
 
 \subsection{Reglerausgang}
 
+    \begin{table}[h]
 \begin{center}
-\begin{tabular}{|c|c|c|}
-\hline
-    Geschwindigkeit (m/s) & PID (\textdegree) & Stanley (\textdegree)\\
-\hline
-\hline
-    1,0 & 5,33 & 4,79 \\ 
-\hline
-    1,25 & 11,97 & 11,82 \\
-\hline
-    1,5 & 9,61 & 13,19 \\
-\hline
-    1,75 & 12,35 & 13,30 \\
-\hline
-    2,0 & 13,84 & 13,51 \\
-\hline
-\end{tabular}
+        \begin{tabular}{|c|c|c|}
+            \hline
+            Geschwindigkeit (m/s) & PID (\textdegree) & Stanley (\textdegree)\\
+            \hline
+            \hline
+            1,0 & 5,33 & 4,79 \\ 
+            \hline
+            1,25 & 11,97 & 11,82 \\
+            \hline
+            1,5 & 9,61 & 13,19 \\
+            \hline
+            1,75 & 12,35 & 13,30 \\
+            \hline
+            2,0 & 13,84 & 13,51 \\
+            \hline
+        \end{tabular}
+        \caption{Zeitlichen Mittelwerte der Reglerausg"ange bei den verschiedenen
+        Vorw"artsgeschwindigkeiten.}
+        \label{reglerausgabe}
 \end{center}
+    \end{table}
 
+Die Ergebnisse des Experiments ist in Tab. \ref{reglerausgabe} zu sehen.
 Die durchschnittliche Reglerausgabe beider Regler ist ähnlich, unabhängig von
 der Geschwindigkeit, außer für den PID-Regler bei einer Geschwindigkeit von 1,5
 m/s. Mit zunehmender Vorwärtsgeschwindigkeit des Fahrzeugs steigt der
