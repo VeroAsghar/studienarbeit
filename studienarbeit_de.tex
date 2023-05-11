@@ -928,12 +928,14 @@ Kurvenabschnitts, während der PID-Controller keine solchen Voraussetzungen hat.
 
 \subsection{Bahnfolgeverhalten}
 
-Abb. \ref{ab:1.5}, \ref{ab:1.75} und \ref{ab:2.0} zeigen, dass der PID-Regler
-die Bahn genauer verfolgt als der Stanley-Regler. Selbst unter Berücksichtigung
-des anfänglichen Versatzes bringt der Stanley-Regler das Fahrzeug erst am Ende
-der Kurve auf die Fahrspur, während der PID-Regler das Fahrzeug mit einer
-leichten nach links driftenden Bewegung, die mit der Vorwärtsgeschwindigkeit
-skaliert, auf der Bahn hält.
+Abb. \ref{ab:1.0} und \ref{ab:1.25} zeigen, dass bei niedrigeren
+Vorw"artsgeschwindigkeiten verhalten die beide Regler "ahnlich. Aber Abb.
+\ref{ab:1.5}, \ref{ab:1.75} und \ref{ab:2.0} zeigen, dass der PID-Regler bei
+h"oheren Vorw"artsgeschwindigkeiten die Bahn genauer verfolgt als der
+Stanley-Regler. Selbst unter Berücksichtigung des anfänglichen Versatzes bringt
+der Stanley-Regler das Fahrzeug erst am Ende der Kurve auf die Fahrspur,
+während der PID-Regler das Fahrzeug mit einer leichten nach links driftenden
+Bewegung, die mit der Vorwärtsgeschwindigkeit skaliert, auf der Bahn hält.
 
 Die Ergebnisse der Simulation des Stanley-Reglers in Abb. \ref{sampling} mit
 einer Vorwärtsgeschwindigkeit von 1,75 $\frac{\mathrm{m}}{\mathrm{s}}$ und einer Abtastfrequenz von 50 Hz
@@ -972,19 +974,19 @@ Stanley-Reglers erörtert, die seine Leistung in Zukunft verbessern könnten.
 \end{figure}
 \begin{figure}
     \centering
-    \begin{subfigure}{0.3\textwidth}
+    \begin{subfigure}{0.4\textwidth}
         \centering
         \fbox{\includegraphics[width=0.9\linewidth]{done1.5}}
         \caption{$v = 1.5 \frac{\mathrm{m}}{\mathrm{s}}$.}
         \label{ab:1.5}
     \end{subfigure}
-    \begin{subfigure}{0.3\textwidth}
+    \begin{subfigure}{0.4\textwidth}
         \centering
         \fbox{\includegraphics[width=0.9\linewidth]{done1.75}}
         \caption{$v = 1.75 \frac{\mathrm{m}}{\mathrm{s}}$.}
         \label{ab:1.75}
     \end{subfigure}
-    \begin{subfigure}{0.3\textwidth}
+    \begin{subfigure}{0.4\textwidth}
         \centering
         \fbox{\includegraphics[width=0.9\linewidth]{done2.0}}
         \caption{$v = 2.0 \frac{\mathrm{m}}{\mathrm{s}}$.}
