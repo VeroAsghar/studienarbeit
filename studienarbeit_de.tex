@@ -58,7 +58,7 @@
 \betreuer{M.Sc. Paul Auerbach}
 
 % Datum der Einreichung
-\date{2. Februar 2222}
+\date{12. Mai 2023}
 
 
 % Zunächst für das Vorgeplänkel römische Seitenzahlen und einfacher Seitenstil
@@ -169,7 +169,16 @@ Dabei ist $u$ der Reglerausgang, welcher im Wesentlichen die "Anderung des Lenkw
 bestimmt, siehe \eqref{eq:model}, $\theta$ die aktuelle Ausrichtung des Fahrzeugs,
 $\theta_d$ die Pfadausrichtung, $k$ ein Skalierungsfaktor, $v$ die
 Geschwindigkeit des Fahrzeugs und $e_{V}$ die Querabweichung vom Mittelpunkt
-der Vorderachse des Fahrzeugs zum Pfad.
+der Vorderachse des Fahrzeugs zum Pfad. Die geometrische Beziehungen zwischen
+den Gr"o{\ss}en ist in Abb. \ref{stanley} zu sehen.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=1.5]{stanley}
+    \caption{Grafische Darstellung der geometischen Beziehungen zwischen
+    den Gr"o{\ss}en des Stanley-Reglers.}
+    \label{stanley}
+\end{figure}
 
 Der Stanley-Regler besteht aus zwei Komponenten: einer Komponente, die die
 Differenz zwischen der Ausrichtung des Fahrzeugs und der des Pfades behandelt,
@@ -248,7 +257,7 @@ analysieren.
 
 Das verwendete Fahrzeugmodell ist das Modell eines zweiachsiges Fahrzeug mit
 gelenkter Vorderachse. Dieses Modell wird durch die folgende nichtlineare
-Zustandsraumdarstellung dargestellt: 
+Zustandsraumdarstellung dargestellt \cite{car-model}: 
 \begin{subequations} \label{eq:model}
     \begin{align}
         \dot{x} &= v \cos(\theta) \\ 
@@ -256,7 +265,7 @@ Zustandsraumdarstellung dargestellt:
         \dot{\theta} &= \frac{v}{l}\tan(\varphi) \\
         \dot{\varphi} &= \frac{\left(\varphi-u\right)}{T}. 
     \end{align}
-\end{subequations}
+\end{subequations} 
 
 Die Zustandskomponenten des Modells sind $x_H$, $y_H$, $\phi$ und $\theta$, wobei
 $x_H$ und $y_H$ die kartesischen Koordinaten des Mittelpunkts der Hinterachse
@@ -343,8 +352,7 @@ und der Ausgang des Reglers wird in das Fahrzeugmodell eingespeist. Ein
     \label{control_loop}
 \end{figure}
 
-Der nominelle Stanley-Regler \eqref{}
-%fill ref
+Der nominelle Stanley-Regler \eqref{eq:Stanley-Regler}
 arbeitet mit zeitkontinuierlichen Signalen, die sich von den
 vom \glqq echten\grqq Fahrzeug verwendeten zeitdiskreten Signalen
 unterscheiden. Das Fahrzeug nimmt Bilder mit einer festen Abtastfrequenz auf,
@@ -631,16 +639,17 @@ Eine visuelle Darstellung des Histogramms ist in Abb. \ref{hist} zu sehen. \\
 
 \section{Gleitfenstermethode}
 
-Im fünften Schritt der Pipeline wird die Form der Fahrspur bestimmt. 
-Dazu soll in einem vorbereitenden Schritt das Bild bereinigt werden, indem Pixel gelöscht werden,
-die klar nicht zu der gesuchten Fahrspur gehören.
-Dies wird durch die Verwendung der Gleitfenstermethode erreicht, die in \cite{addison} beschrieben ist.
+Im fünften Schritt der Pipeline wird die Form der Fahrspur bestimmt. Dazu soll
+in einem vorbereitenden Schritt das Bild bereinigt werden, indem Pixel gelöscht
+werden, die klar nicht zu der gesuchten Fahrspur gehören. Dies wird durch die
+Verwendung der Gleitfenstermethode erreicht, die in \cite{addison-pipeline}
+beschrieben ist.
 
-Dabei wird eine ausgewählte Anzahl von Rechtecken (Fenstern) erstellt. Die
-Höhe wird so gewählt, dass die Summe der H"ohe aller Rechteck gleich der
-Bildh"ohe ist, während ihre Breite entsprechend proportional zur Bildbreite
-gewählt wird. Die Anzahl der Fenster wird so gewählt, dass der aus dem
-Histogramm bekannte Bereich der schwarzen Pixel umfasst wird, wie in Abb. \ref{gleit} zu sehen ist. 
+Dabei wird eine ausgewählte Anzahl von Rechtecken (Fenstern) erstellt. Die Höhe
+wird so gewählt, dass die Summe der H"ohe aller Rechteck gleich der Bildh"ohe
+ist, während ihre Breite entsprechend proportional zur Bildbreite gewählt wird.
+Die Anzahl der Fenster wird so gewählt, dass der aus dem Histogramm bekannte
+Bereich der schwarzen Pixel umfasst wird, wie in Abb. \ref{gleit} zu sehen ist. 
 
 
 
@@ -980,28 +989,30 @@ Stanley-Reglers erörtert, die seine Leistung in Zukunft verbessern könnten.
 Die durchschnittliche Reglerausgabe beider Regler ist ähnlich, unabhängig von
 der Geschwindigkeit, außer für den PID-Regler bei einer Geschwindigkeit von 1,5
 m/s. Mit zunehmender Vorwärtsgeschwindigkeit des Fahrzeugs steigt der
-durchschnittliche Reglerausgang entsprechend an. Dies ist plausibel, da eine größere Vorwärtsgeschwindigkeit
-eine schnellere Reaktion des Reglers nötig macht.
-Der Unterschied zwischen den
-beiden Reglern liegt jedoch im zeitlichen Verlauf der beiden Signale. Bei
-Vorwärtsgeschwindigkeiten zwischen 1,0 und 1,5 $\frac{\mathrm{m}}{\mathrm{s}}$ ist der Signalverlauf der
-beiden Regler ähnlich \ref{}. Bei 1,75 und 2,0 $\frac{\mathrm{m}}{\mathrm{s}}$ verschlechtert sich jedoch der
+durchschnittliche Reglerausgang entsprechend an. Dies ist plausibel, da eine
+größere Vorwärtsgeschwindigkeit eine schnellere Reaktion des Reglers nötig
+macht. Der Unterschied zwischen den beiden Reglern liegt jedoch im zeitlichen
+Verlauf der beiden Signale. Bei Vorwärtsgeschwindigkeiten zwischen 1,0 und 1,5
+$\frac{\mathrm{m}}{\mathrm{s}}$ ist der Signalverlauf der beiden Regler
+ähnlich, wie in Abb. \ref{reg:1.0} und \ref{reg:1.5} zu sehen sind. Bei 1,75
+und 2,0 $\frac{\mathrm{m}}{\mathrm{s}}$ verschlechtert sich jedoch der
 periodische Verlauf des PID-Reglers, während die Periodizität des
 Stanley-Reglers zunimmt.
 
-Bei 1,75 $\frac{\mathrm{m}}{\mathrm{s}}$ kann der PID-Regler das Fahrzeug immer noch auf die Fahrspur
-lenken. Wie in Abb. \ref{reg:1.75} gezeigt, führen Ausreißer allerdings zu starken
-Schwingungen im Reglerausgang. Wenn der PID-Regler die Fahrspur nicht richtig
-erkennt, hat er Schwierigkeiten, das Fahrzeug auf die Fahrspur zurückzubringen.
-Stattdessen kann es passieren, dass das Fahrzeug gegen die Wand fährt, wie am rechten Ende des
-Diagramms zu sehen ist. Im Vergleich dazu hat der Stanley-Regler keine
-Probleme, dem Weg mit der gleichen Geschwindigkeit zu folgen.
+Bei 1,75 $\frac{\mathrm{m}}{\mathrm{s}}$ kann der PID-Regler das Fahrzeug immer
+noch auf die Fahrspur lenken. Wie in Abb. \ref{reg:1.75} gezeigt, führen
+Ausreißer allerdings zu starken Schwingungen im Reglerausgang. Wenn der
+PID-Regler die Fahrspur nicht richtig erkennt, hat er Schwierigkeiten, das
+Fahrzeug auf die Fahrspur zurückzubringen. Stattdessen kann es passieren, dass
+das Fahrzeug gegen die Wand fährt, wie am rechten Ende des Diagramms zu sehen
+ist. Im Vergleich dazu hat der Stanley-Regler keine Probleme, dem Weg mit der
+gleichen Geschwindigkeit zu folgen.
 
-Bei 2,0 $\frac{\mathrm{m}}{\mathrm{s}}$ ist der PID-Regler nicht in der Lage, eine Kollision mit der 
-Wand zu vermeiden. Wie in Abb. \ref{reg:2.0} dargestellt, schwankt der Ausgang
-zwischen -30 und 30 Grad, und es gibt keine Periodizität. Im Vergleich dazu
-weist der Stanley-Regler eine stabile Schwingung zwischen -30 und 0 Grad auf
-und ist periodisch.
+Bei 2,0 $\frac{\mathrm{m}}{\mathrm{s}}$ ist der PID-Regler nicht in der Lage,
+eine Kollision mit der Wand zu vermeiden. Wie in Abb. \ref{reg:2.0}
+dargestellt, schwankt der Ausgang zwischen -30 und 30 Grad, und es gibt keine
+Periodizität. Im Vergleich dazu weist der Stanley-Regler eine stabile
+Schwingung zwischen -30 und 0 Grad auf und ist periodisch.
 
 Ausreißer führen nicht zu starken Schwingungen, wenn das Fahrzeug mit dem
 Stanley-Regler gesteuert wird. Es wurde beobachtet, dass sich das Fahrzeug viel
