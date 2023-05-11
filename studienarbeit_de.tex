@@ -145,7 +145,9 @@ Fahrzeug auf die Fahrspur lenkte.
 
 Aufgrund der Einschränkungen der bisherigen Fahrzeugregelung, wie z. B. der
 geringen maximal m"oglichen Vorwärtsgeschwindigkeit und der mangelnden
-Robustheit, bestand im Vorfeld der Arbeit der Wunsch, eine neue Regelstrategie
+Robustheit. Der bisher verwendete Regler hat bei h"oheren Vorw"artsgeschwindigkeiten
+Schwierigkeiten, das Modellfahrzeug auf die Strecke zu halten. Deswegen bestand im
+Vorfeld der Arbeit der Wunsch, eine neue Regelstrategie
 zu implementieren. Um dieses Ziel zu erreichen, umfasst die hiererarbeitete
 Lösung die Entwicklung einer neuen Bildverarbeitungspipeline und die Ersetzung des
 PID-Reglers durch einen Stanley-Regler.
@@ -223,7 +225,7 @@ Stanley-Regler} hat die Form eines PD-Reglers. Die P-Komponente wird durch
 konstant angenommen wird, besteht eine Proportionalität zwischen den
 Ableitungen von der Querabweichung \(e_{V}\) nach Zeit und Ort. Die Ableitung
 von \(e_{V}\) nach dem Ort ist \(\theta\). Daher enspricht im linearisierten
-Stanley-Regler die Orientierungsdifferenz \(\bar\theta\) der D-Komponente.
+Stanley-Regler die Fahrzeugausrichtung \(\theta\) der D-Komponente.
 
 \subsection{Gro{\ss}signalverhalten}
 
@@ -325,7 +327,7 @@ Pfadausrichtung zu berechnen, muss der richtige Bahnpunkt gewählt werden. Der
 Stanley-Regler verwendet den nächstliegenden Bahnpunkt vom
 Vorderachsmittelpunkt des Fahrzeugs, um die Ausrichtung des Pfades $\theta_d$
 und die aktuelle Querabweichung $e_{V}$ zu bestimmen. Für die Simulation wird
-dieser bestimmt, indem der Punkt mit dem geringsten Abstand $\underline{\lambda}$ zum
+dieser bestimmt, indem der Pfadpunkt mit dem geringsten Abstand $\underline{\lambda}$ zum
 Vorderachsmittelpunkt gefunden wird (entspricht Kurvenparameter $s^*$. An diesem Punkt wird
 dann die Ausrichtung des Pfades ermittelt. Das Skalarprodukt zwischen dem
 Vektor senkrecht zur Fahrzeugausrichtung $\underline{\nu}_{\perp}$ und dem Vektor
@@ -454,10 +456,10 @@ einer Kamera werden häufig durch die 3x3-Matrix
         0 & 0 & 1
     \end{bmatrix}, 
 \end{equation} 
-\glqq Kameramatrix\grqq dargestellt, wobei $f_x$ und $f_y$ die Brennweiten der Kamera in Pixeln in den
-Richtungen $x$ und $y$ sind und $c_x$ und $c_y$ die Koordinaten des Bildmittelpunkts
-bezeichnen. Die extrinsischen Parameter werden häufig durch die folgende Matrix
-dargestellt: 
+\glqq Kameramatrix\grqq dargestellt, wobei $f_x$ und $f_y$ die Brennweiten der
+Kamera in Pixeln in den Richtungen $x$ und $y$ sind und $c_x$ und $c_y$ die
+Koordinaten des Bildmittelpunkts bezeichnen. Die extrinsischen Parameter werden
+häufig durch die folgende Matrix dargestellt: 
 \begin{equation}
     \begin{bmatrix} R & T \end{bmatrix}. 
 \end{equation} 
@@ -555,9 +557,7 @@ Als Nächstes folgt der Schritt des sogenannten \glqq Color-Thresholding\grqq. I
 Schritt werden alle Pixel aus dem Bild entfernt, die nicht zur Bahnlinie geh"oren.
 In dieser Implementierung sind alle Farbe au{\ss}er Gelb unerw"unscht.
 
-Zunächst wird das Bild von allen Pixeln ohne hohen Rotanteil gefiltert, da
-Hellgelb im Rot-Grün-Blau-Farbraum (RGB) einen hohen Rotanteil hat.
-Anschließend wird das Bild in den HSV-Farbraum (Hue, Saturation, Value engl. f"ur Farbwert, Sättigung und
+Zuerst wird das Bild von dem RGB in den HSV-Farbraum (Hue, Saturation, Value engl. f"ur Farbwert, Sättigung und
 Helligkeitswert) umgewandelt. 
 
 Im RGB-Farbraum ist reines Gelb so definiert, dass sowohl der rote als auch der
@@ -752,7 +752,7 @@ folgenden Gleichung \cite{tangentangle} ermittelt:
 \end{subequations} 
 Der Arkustangens der Ableitung des Polynoms liefert die Ausrichtung der Spur
 an einem bestimmten Punkt. Für den Stanley-Regler wird nur die Differenz
-zwischen der Bahnausrichtung und der Ausrichtung des Fahrzeugs benötigt. Da
+zwischen der Bahnausrichtung und der Ausrichtung des Fahrzeugs benötigt \eqref{eq:Stanley-Regler}. Da
 kein globales Koordinatensystem für das Fahrzeug benötigt wird, kann die
 Ausrichtung des Fahrzeugs zu jedem Zeitpunkt als $0^{\circ}$ definiert
 werden. Die aus dem Bild erkannte Ausrichtung $\theta$ der Bahn bildet somit
@@ -761,7 +761,7 @@ direkt die für den Stanley-Regler relevante Winkel-Eingangsgröße.
 Die Abweichung von der Fahrspurlinie wird aus dem angepassten Polynom mit
 folgender Funktion berechnet: 
 \begin{equation}
-    e_{V} = \left(\frac{w}{2} - f(h)\right)\cdot \sigma_\mathrm{mpp}.
+    e_{V} = \left(\frac{w}{2} - g(h)\right)\cdot \sigma_\mathrm{mpp}.
 \end{equation}
 Dabei ist $w$ die Breite des Bildes, $e_{V}$ der Abstand des Fahrzeugs zur
 Fahrspur, $\sigma_\mathrm{mpp}$ eine Skalierungskonstante zur Umrechnung von
