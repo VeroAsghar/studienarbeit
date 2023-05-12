@@ -347,8 +347,8 @@ der wichtigen Parameter ist in folgenden Gleichungen dargestellt: \\
 \begin{align}
     \underline{\nu} &:= \begin{bmatrix} \cos(\theta) & \sin(\theta) \end{bmatrix}^T, \\
         \underline{\nu}_{\perp} &:= \begin{bmatrix} \cos(\theta + \pi/2) & \sin(\theta + \pi/2) \end{bmatrix}^T, \\
-            s^* &:= \arg\min_{s}  \left\Vert\underline{p}_V - \underline{p}_P(s) \right\Vert_2, \\
-    \underline{\lambda} &:= \underline{p}_P(s^*), \\
+            s^* &:= \arg\min_{s}  \left\Vert\underline{p}_P(s) - \underline{p}_V \right\Vert_2, \\
+    \underline{\lambda} &:= \underline{p}_P(s^*) - \underline{p}_V, \\
     e_{V} &:= \underline{\lambda} \cdot \underline{v}_{\perp}.
  \label{alg:quer}
 \end{align}
@@ -757,7 +757,7 @@ werden. Die aus dem Bild erkannte Ausrichtung $\theta$ der Bahn bildet somit
 direkt die für den Stanley-Regler relevante Winkel-Eingangsgröße.
 
 Die Abweichung von der Fahrspurlinie wird aus dem angepassten Polynom mit
-folgender Funktion berechnet: 
+folgender Gleichung \cite{addison-pipeline} berechnet: 
 \begin{equation}
     e_{V} = \left(\frac{w}{2} - g(h)\right)\cdot \sigma_\mathrm{mpp}.
 \end{equation}
